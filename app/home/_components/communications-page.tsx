@@ -23,83 +23,78 @@ interface CommunicationsPageProps {
 const sampleConversations: Conversation[] = [
   {
     id: "1",
-    name: "Jonas Smith",
-    preview: "I believe a subtle blue or green would be...",
-    time: "Jul 2024",
-    unreadCount: 3,
+    name: "Michael Chen",
+    preview: "Thank you for the prescription refill reminder...",
+    time: "Today",
+    unreadCount: 2,
     avatarSrc: "https://randomuser.me/api/portraits/men/52.jpg",
     pinned: true,
   },
   {
     id: "2",
-    name: "Herry Brooks",
-    preview: "I believe a subtle blue or green would be...",
-    time: "Jul 2024",
-    unreadCount: 3,
-    avatarSrc: "https://randomuser.me/api/portraits/men/22.jpg",
+    name: "Sarah Johnson",
+    preview: "Can I reschedule my appointment to next week?",
+    time: "Today",
+    unreadCount: 1,
+    avatarSrc: "https://randomuser.me/api/portraits/women/44.jpg",
     pinned: true,
   },
   {
     id: "3",
-    name: "Sahid Ajmol",
-    preview: "Ready your last final project",
-    time: "Jul 2024",
-    avatarSrc: "https://randomuser.me/api/portraits/men/35.jpg",
+    name: "Margaret Williams",
+    preview: "My blood pressure readings from this morning...",
+    time: "Yesterday",
+    avatarSrc: "https://randomuser.me/api/portraits/women/65.jpg",
     pinned: true,
   },
   {
     id: "4",
-    name: "Joe Roots",
-    preview: "I believe a subtle blue or green would be...",
-    time: "Jul 2024",
-    unreadCount: 3,
+    name: "James Wilson",
+    preview: "I have a question about my lab results",
+    time: "Yesterday",
+    unreadCount: 1,
     avatarSrc: "https://randomuser.me/api/portraits/men/41.jpg",
-    countryFlag: "🇬🇧",
   },
   {
     id: "5",
-    name: "Janson Roy",
-    preview: "are you ready for new project",
-    time: "Jul 2024",
-    avatarSrc: "https://randomuser.me/api/portraits/men/18.jpg",
+    name: "Emily Davis",
+    preview: "Confirming my new patient appointment for...",
+    time: "Feb 2",
+    avatarSrc: "https://randomuser.me/api/portraits/women/32.jpg",
   },
   {
     id: "6",
-    name: "Azam Khan",
-    preview: "I believe a subtle blue or green would be...",
-    time: "Jul 2024",
-    unreadCount: 3,
+    name: "Robert Brown",
+    preview: "Is my telehealth link still the same?",
+    time: "Feb 1",
+    unreadCount: 1,
     avatarSrc: "https://randomuser.me/api/portraits/men/29.jpg",
-    countryFlag: "🇵🇰",
   },
   {
     id: "7",
-    name: "David Willey",
-    preview: "great id i can try it's",
-    time: "Jul 2024",
-    unreadCount: 3,
-    avatarSrc: "https://randomuser.me/api/portraits/men/56.jpg",
+    name: "Lisa Anderson",
+    preview: "Thank you for the care plan summary",
+    time: "Jan 31",
+    avatarSrc: "https://randomuser.me/api/portraits/women/56.jpg",
   },
   {
     id: "8",
-    name: "Tim David",
-    preview: "well great i'd",
-    time: "Jul 2024",
-    unreadCount: 3,
+    name: "David Martinez",
+    preview: "Called about insurance coverage question",
+    time: "Jan 30",
   },
   {
     id: "9",
-    name: "Dashi Lukce",
-    preview: "I believe a subtle blue or green would be...",
-    time: "Jul 2024",
-    unreadCount: 3,
-    countryFlag: "🇬🇧",
+    name: "Jennifer Taylor",
+    preview: "Appointment reminder received, will be there",
+    time: "Jan 29",
+    avatarSrc: "https://randomuser.me/api/portraits/women/28.jpg",
   },
   {
     id: "10",
-    name: "Henry Killer",
-    preview: "Thanks for the update",
-    time: "Jul 2024",
+    name: "Thomas Moore",
+    preview: "Requesting medical records for specialist",
+    time: "Jan 28",
     avatarSrc: "https://randomuser.me/api/portraits/men/64.jpg",
   },
 ];
@@ -107,64 +102,53 @@ const sampleConversations: Conversation[] = [
 const sampleMessages: Message[] = [
   {
     id: "1",
-    content: "Hi there",
-    time: "Jul 07, 2024",
+    content: "Hi Dr. Chen's office,",
+    time: "Feb 3, 2026",
     isOwn: false,
-    senderName: "Herry Brooks",
-    senderAvatar: "https://randomuser.me/api/portraits/men/22.jpg",
+    senderName: "Sarah Johnson",
+    senderAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
   },
   {
     id: "2",
     content:
-      "I recently filled out the form on your website to sign up for a demo account and am now waiting for further instructions. Is there anything else I need to do at this point?",
+      "I received the appointment reminder for next Monday at 9 AM. Unfortunately, something came up at work and I need to reschedule. Would it be possible to move my appointment to later in the week?",
     time: "",
     isOwn: false,
-    senderName: "Herry Brooks",
-    senderAvatar: "https://randomuser.me/api/portraits/men/22.jpg",
+    senderName: "Sarah Johnson",
+    senderAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
   },
   {
     id: "3",
-    content: "Best regards,\nBrooks",
+    content: "Thank you,\nSarah Johnson",
     time: "10:44",
     isOwn: false,
-    senderName: "Herry Brooks",
-    senderAvatar: "https://randomuser.me/api/portraits/men/22.jpg",
+    senderName: "Sarah Johnson",
+    senderAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
     status: "read",
   },
   {
     id: "4",
-    content: "Hello Brooks! 👋",
-    time: "Jul 07, 2024",
+    content: "Hello Sarah!",
+    time: "Feb 3, 2026",
     isOwn: true,
     senderName: "You",
   },
   {
     id: "5",
     content:
-      "Thank you for your interest in our product. I've added you to the waitlist for our private beta. You'll receive an access key via email in the next few days.\n\nThanks again for your patience and enthusiasm!\n\nBest regards,\nTahsan",
-    time: "12:02",
+      "Thank you for letting us know in advance. I'd be happy to help you reschedule.\n\nWe have availability on Wednesday at 2:30 PM or Thursday at 10:00 AM. Would either of those work for you?\n\nPlease let me know and I'll get you confirmed right away.\n\nBest,\nDr. Chen's Office",
+    time: "11:02",
     isOwn: true,
     senderName: "You",
     status: "read",
-    reaction: "😊",
   },
   {
     id: "6",
-    content: "Thats Perfect, looking forward! my email herrybro@pixem.com",
-    time: "",
+    content: "Thursday at 10 AM would be perfect! Thank you so much for accommodating me.",
+    time: "11:15",
     isOwn: false,
-    senderName: "Herry Brooks",
-    senderAvatar: "https://randomuser.me/api/portraits/men/22.jpg",
-  },
-  {
-    id: "7",
-    content: "",
-    time: "10:44",
-    isOwn: false,
-    senderName: "Herry Brooks",
-    senderAvatar: "https://randomuser.me/api/portraits/men/22.jpg",
-    type: "voice",
-    voiceDuration: "00:24",
+    senderName: "Sarah Johnson",
+    senderAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
     status: "read",
   },
 ];
@@ -202,7 +186,7 @@ export function CommunicationsPage({ className }: CommunicationsPageProps) {
         />
         <Button className="gap-2">
           <Plus className="h-4 w-4" />
-          Add Message
+          New Message
         </Button>
       </div>
 
@@ -249,8 +233,9 @@ export function CommunicationsPage({ className }: CommunicationsPageProps) {
             </Button>
           </div>
           <ChatThread
-            contactName="Tahsan Khan"
-            contactRole="Assignee"
+            contactName="Sarah Johnson"
+            contactRole="Patient"
+            contactAvatar="https://randomuser.me/api/portraits/women/44.jpg"
             messages={sampleMessages}
             onSendMessage={handleSendMessage}
             className="h-full sm:h-full"

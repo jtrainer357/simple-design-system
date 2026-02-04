@@ -25,162 +25,173 @@ import {
   isSameDay,
 } from "date-fns";
 
-// Sample events data
+// Sample patient appointments for healthcare practice
 const createSampleEvents = (baseDate: Date): CalendarEvent[] => {
   const weekStart = startOfWeek(baseDate, { weekStartsOn: 1 });
 
   return [
-    // Monday
+    // Monday - Patient Appointments
     {
       id: "1",
-      title: "Monday standup",
-      startTime: setMinutes(setHours(weekStart, 9), 0),
-      endTime: setMinutes(setHours(weekStart, 9), 30),
-      color: "gray",
+      title: "Michael Chen - Follow-up",
+      startTime: setMinutes(setHours(weekStart, 8), 0),
+      endTime: setMinutes(setHours(weekStart, 8), 30),
+      color: "blue",
     },
     {
       id: "2",
-      title: "Content planning",
-      startTime: setMinutes(setHours(weekStart, 11), 0),
-      endTime: setMinutes(setHours(weekStart, 12), 0),
+      title: "Sarah Johnson - New Patient",
+      startTime: setMinutes(setHours(weekStart, 9), 0),
+      endTime: setMinutes(setHours(weekStart, 10), 0),
+      color: "green",
+    },
+    {
+      id: "3",
+      title: "Margaret Williams - BP Check",
+      startTime: setMinutes(setHours(weekStart, 10), 30),
+      endTime: setMinutes(setHours(weekStart, 11), 0),
+      color: "purple",
+    },
+    {
+      id: "4",
+      title: "Team Huddle",
+      startTime: setMinutes(setHours(weekStart, 12), 0),
+      endTime: setMinutes(setHours(weekStart, 12), 30),
+      color: "gray",
+    },
+    {
+      id: "5",
+      title: "Michael Chen - Diabetes Mgmt",
+      startTime: setMinutes(setHours(weekStart, 14), 0),
+      endTime: setMinutes(setHours(weekStart, 14), 45),
       color: "blue",
     },
     // Tuesday
     {
-      id: "3",
-      title: "One-on-one with Eva",
+      id: "6",
+      title: "Sarah Johnson - Lab Review",
+      startTime: setMinutes(setHours(addDays(weekStart, 1), 8), 30),
+      endTime: setMinutes(setHours(addDays(weekStart, 1), 9), 0),
+      color: "green",
+    },
+    {
+      id: "7",
+      title: "New Patient - James Wilson",
       startTime: setMinutes(setHours(addDays(weekStart, 1), 10), 0),
       endTime: setMinutes(setHours(addDays(weekStart, 1), 11), 0),
       color: "pink",
     },
     {
-      id: "4",
-      title: "Catch up w/ Alex",
-      startTime: setMinutes(setHours(addDays(weekStart, 1), 15), 30),
-      endTime: setMinutes(setHours(addDays(weekStart, 1), 16), 30),
+      id: "8",
+      title: "Margaret Williams - Cardiology",
+      startTime: setMinutes(setHours(addDays(weekStart, 1), 13), 0),
+      endTime: setMinutes(setHours(addDays(weekStart, 1), 14), 0),
+      color: "purple",
+      hasNotification: true,
+    },
+    {
+      id: "9",
+      title: "Telehealth - Robert Brown",
+      startTime: setMinutes(setHours(addDays(weekStart, 1), 15), 0),
+      endTime: setMinutes(setHours(addDays(weekStart, 1), 15), 30),
       color: "blue",
     },
     // Wednesday
     {
-      id: "5",
-      title: "Deep work",
+      id: "10",
+      title: "Michael Chen - A1C Review",
       startTime: setMinutes(setHours(addDays(weekStart, 2), 9), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 2), 11), 0),
-      color: "purple",
+      endTime: setMinutes(setHours(addDays(weekStart, 2), 9), 30),
+      color: "blue",
     },
     {
-      id: "6",
-      title: "Design sync",
-      startTime: setMinutes(setHours(addDays(weekStart, 2), 10), 30),
-      endTime: setMinutes(setHours(addDays(weekStart, 2), 11), 30),
-      color: "purple",
-    },
-    {
-      id: "7",
-      title: "Lunch with Olivia",
+      id: "11",
+      title: "Staff Training",
       startTime: setMinutes(setHours(addDays(weekStart, 2), 12), 0),
       endTime: setMinutes(setHours(addDays(weekStart, 2), 13), 0),
-      color: "green",
-      hasNotification: true,
+      color: "gray",
     },
     {
-      id: "8",
-      title: "SEO planning",
-      startTime: setMinutes(setHours(addDays(weekStart, 2), 13), 30),
+      id: "12",
+      title: "Margaret Williams - Follow-up",
+      startTime: setMinutes(setHours(addDays(weekStart, 2), 14), 0),
       endTime: setMinutes(setHours(addDays(weekStart, 2), 14), 30),
       color: "purple",
     },
     {
-      id: "9",
-      title: "Meetup event",
-      startTime: setMinutes(setHours(addDays(weekStart, 2), 15), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 2), 17), 0),
-      color: "yellow",
+      id: "13",
+      title: "Sarah Johnson - Wellness",
+      startTime: setMinutes(setHours(addDays(weekStart, 2), 15), 30),
+      endTime: setMinutes(setHours(addDays(weekStart, 2), 16), 30),
+      color: "green",
     },
     // Thursday
     {
-      id: "10",
-      title: "Research new project",
+      id: "14",
+      title: "New Patient - Emily Davis",
       startTime: setMinutes(setHours(addDays(weekStart, 3), 8), 0),
       endTime: setMinutes(setHours(addDays(weekStart, 3), 9), 0),
-      color: "purple",
-    },
-    {
-      id: "11",
-      title: "Design onboarding",
-      startTime: setMinutes(setHours(addDays(weekStart, 3), 9), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 3), 10), 0),
       color: "pink",
     },
     {
-      id: "12",
-      title: "Learn Webflow",
-      startTime: setMinutes(setHours(addDays(weekStart, 3), 10), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 3), 11), 0),
-      color: "green",
-    },
-    {
-      id: "13",
-      title: "Lunch break",
-      startTime: setMinutes(setHours(addDays(weekStart, 3), 12), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 3), 13), 0),
-      color: "red",
-    },
-    {
-      id: "14",
-      title: "Report progress with client",
-      startTime: setMinutes(setHours(addDays(weekStart, 3), 16), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 3), 17), 0),
-      color: "green",
-    },
-    // Friday
-    {
       id: "15",
-      title: "Friday standup",
-      startTime: setMinutes(setHours(addDays(weekStart, 4), 9), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 4), 9), 30),
-      color: "gray",
+      title: "Michael Chen - Nutrition",
+      startTime: setMinutes(setHours(addDays(weekStart, 3), 10), 0),
+      endTime: setMinutes(setHours(addDays(weekStart, 3), 10), 45),
+      color: "blue",
     },
     {
       id: "16",
-      title: "Olivia x Riley",
-      startTime: setMinutes(setHours(addDays(weekStart, 4), 10), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 4), 11), 30),
-      color: "purple",
+      title: "Lunch & Learn",
+      startTime: setMinutes(setHours(addDays(weekStart, 3), 12), 0),
+      endTime: setMinutes(setHours(addDays(weekStart, 3), 13), 0),
+      color: "yellow",
     },
     {
       id: "17",
-      title: "Product demo",
-      startTime: setMinutes(setHours(addDays(weekStart, 4), 13), 30),
-      endTime: setMinutes(setHours(addDays(weekStart, 4), 15), 30),
-      color: "gray",
+      title: "Telehealth - Lisa Anderson",
+      startTime: setMinutes(setHours(addDays(weekStart, 3), 14), 0),
+      endTime: setMinutes(setHours(addDays(weekStart, 3), 14), 30),
+      color: "blue",
     },
-    // Saturday
     {
       id: "18",
-      title: "House inspection",
-      startTime: setMinutes(setHours(addDays(weekStart, 5), 11), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 5), 12), 0),
-      color: "pink",
+      title: "Margaret Williams - Med Review",
+      startTime: setMinutes(setHours(addDays(weekStart, 3), 16), 0),
+      endTime: setMinutes(setHours(addDays(weekStart, 3), 16), 30),
+      color: "purple",
       hasNotification: true,
     },
-    // Sunday
+    // Friday
     {
       id: "19",
-      title: "Ava's engagement party",
-      startTime: setMinutes(setHours(addDays(weekStart, 6), 13), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 6), 15), 0),
+      title: "Sarah Johnson - Physical",
+      startTime: setMinutes(setHours(addDays(weekStart, 4), 9), 0),
+      endTime: setMinutes(setHours(addDays(weekStart, 4), 10), 0),
+      color: "green",
+    },
+    {
+      id: "20",
+      title: "Michael Chen - Lab Follow-up",
+      startTime: setMinutes(setHours(addDays(weekStart, 4), 11), 0),
+      endTime: setMinutes(setHours(addDays(weekStart, 4), 11), 30),
       color: "blue",
-      hasNotification: true,
+    },
+    {
+      id: "21",
+      title: "Admin Time",
+      startTime: setMinutes(setHours(addDays(weekStart, 4), 14), 0),
+      endTime: setMinutes(setHours(addDays(weekStart, 4), 16), 0),
+      color: "gray",
     },
   ];
 };
 
 const filterTabs = [
-  { id: "all", label: "All events" },
-  { id: "shared", label: "Shared" },
-  { id: "public", label: "Public" },
-  { id: "archived", label: "Archived" },
+  { id: "all", label: "All Appointments" },
+  { id: "inperson", label: "In-Person" },
+  { id: "telehealth", label: "Telehealth" },
+  { id: "pending", label: "Pending" },
 ];
 
 export default function SchedulePage() {
@@ -252,7 +263,7 @@ export default function SchedulePage() {
         <main className="px-4 py-4 sm:px-6 sm:py-6 md:py-8">
           <PageTransition>
             <div className="mx-auto flex max-w-[1600px] flex-col overflow-hidden lg:h-[calc(100vh-8.5rem)]">
-              {/* Desktop: Filter tabs and Add Event button */}
+              {/* Desktop: Filter tabs and Add Appointment button */}
               <div className="mb-4 flex items-center justify-between">
                 <FilterTabs
                   tabs={filterTabs}
@@ -261,7 +272,7 @@ export default function SchedulePage() {
                 />
                 <Button className="gap-2">
                   <Plus className="h-4 w-4" />
-                  Add Event
+                  New Appointment
                 </Button>
               </div>
 
@@ -283,8 +294,8 @@ export default function SchedulePage() {
                   <CalendarWeekView
                     weekDays={weekDays}
                     events={events}
-                    startHour={7}
-                    endHour={20}
+                    startHour={8}
+                    endHour={18}
                     className="min-h-0 flex-1"
                   />
 

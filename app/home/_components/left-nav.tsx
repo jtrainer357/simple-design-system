@@ -1,9 +1,9 @@
 "use client";
 import * as React from "react";
-import { Home, User, Calendar, MessageSquare, CreditCard, BarChart2 } from "lucide-react";
+import { Home, Users, Calendar, MessageSquare, CreditCard, TrendingUp } from "lucide-react";
 import { LeftNav as LeftNavBase, NavItem } from "@/design-system/components/ui/left-nav";
 
-type ActivePage = "home" | "patients" | "schedule" | "messages" | "billing" | "reports";
+type ActivePage = "home" | "patients" | "schedule" | "messages" | "billing" | "marketing";
 
 interface LeftNavProps {
   activePage?: ActivePage;
@@ -12,7 +12,7 @@ interface LeftNavProps {
 function getNavItems(activePage: ActivePage = "home"): NavItem[] {
   return [
     { icon: Home, label: "Home", active: activePage === "home", href: "/home" },
-    { icon: User, label: "Patients", active: activePage === "patients", href: "/home/patients" },
+    { icon: Users, label: "Patients", active: activePage === "patients", href: "/home/patients" },
     {
       icon: Calendar,
       label: "Schedule",
@@ -25,8 +25,18 @@ function getNavItems(activePage: ActivePage = "home"): NavItem[] {
       active: activePage === "messages",
       href: "/home/communications",
     },
-    { icon: CreditCard, label: "Billing", active: activePage === "billing", href: "/home/billing" },
-    { icon: BarChart2, label: "Reports", active: activePage === "reports", href: "/home/reports" },
+    {
+      icon: CreditCard,
+      label: "Billing",
+      active: activePage === "billing",
+      href: "/home/billing",
+    },
+    {
+      icon: TrendingUp,
+      label: "Marketing",
+      active: activePage === "marketing",
+      href: "/home/marketing",
+    },
   ];
 }
 
