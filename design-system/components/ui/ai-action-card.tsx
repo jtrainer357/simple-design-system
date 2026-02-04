@@ -96,8 +96,8 @@ export function AIActionCard({
             <span className="text-card-foreground text-sm">
               {readyStatus}
               {suggestedActions && suggestedActions > 0 && (
-                <span className="text-primary ml-2">
-                  • {suggestedActions} suggested action{suggestedActions > 1 ? "s" : ""}
+                <span className="text-primary ml-2 cursor-pointer hover:underline">
+                  + {suggestedActions} suggested action{suggestedActions > 1 ? "s" : ""}
                 </span>
               )}
             </span>

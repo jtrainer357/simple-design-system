@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useCallback, useMemo } from "react";
 import { cn } from "@/design-system/lib/utils";
 import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
 import { ConversationCard } from "@/design-system/components/ui/conversation-card";
@@ -118,8 +119,15 @@ export function ConversationList({
   onAssign,
   className,
 }: ConversationListProps) {
-  const pinnedConversations = conversations.filter((c) => c.pinned);
-  const allConversations = conversations.filter((c) => !c.pinned);
+  const pinnedConversations = useMemo(() => conversations.filter((c) => c.pinned), [conversations]);
+  const allConversations = useMemo(() => conversations.filter((c) => !c.pinned), [conversations]);
+
+  const handleSelect = useCallback(
+    (id: string) => {
+      onSelect?.(id);
+    },
+    [onSelect]
+  );
 
   return (
     <CardWrapper className={cn("flex h-full flex-col overflow-hidden p-0", className)}>
@@ -145,7 +153,7 @@ export function ConversationList({
                   avatarSrc={conversation.avatarSrc}
                   countryFlag={conversation.countryFlag}
                   selected={selectedId === conversation.id}
-                  onClick={() => onSelect?.(conversation.id)}
+                  onClick={() => handleSelect(conversation.id)}
                 />
               ))}
             </div>
@@ -171,7 +179,7 @@ export function ConversationList({
                 avatarSrc={conversation.avatarSrc}
                 countryFlag={conversation.countryFlag}
                 selected={selectedId === conversation.id}
-                onClick={() => onSelect?.(conversation.id)}
+                onClick={() => handleSelect(conversation.id)}
               />
             ))}
           </div>

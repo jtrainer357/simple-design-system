@@ -153,8 +153,9 @@ const mockPatientDetails: Record<string, PatientDetail> = {
 
 // Generate default patient details for patients without mock data
 function getPatientDetails(patient: Patient): PatientDetail {
-  if (mockPatientDetails[patient.id]) {
-    return mockPatientDetails[patient.id];
+  const existingDetails = mockPatientDetails[patient.id];
+  if (existingDetails) {
+    return existingDetails;
   }
 
   return {
@@ -183,7 +184,9 @@ function getPatientDetails(patient: Patient): PatientDetail {
 }
 
 export function PatientsPage() {
-  const [selectedPatient, setSelectedPatient] = React.useState<Patient | null>(mockPatients[0]);
+  const [selectedPatient, setSelectedPatient] = React.useState<Patient | null>(
+    mockPatients[0] ?? null
+  );
   const [activeFilter, setActiveFilter] = React.useState("all");
 
   const patientDetails = selectedPatient ? getPatientDetails(selectedPatient) : null;

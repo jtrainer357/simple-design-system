@@ -3,9 +3,9 @@
 import * as React from "react";
 import { LeftNav } from "./_components/left-nav";
 import { HeaderSearch } from "./_components/header-search";
-import { PriorityActionsSection } from "./_components/priority-actions-section";
-import { TodaysPatientsList } from "./_components/todays-patients-list";
+import { DynamicCanvas } from "./_components/dynamic-canvas";
 import { MessagesWidget } from "./_components/messages-widget";
+import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
 import { OutstandingItemsWidget } from "./_components/outstanding-items-widget";
 import { BillingUpsellWidget } from "./_components/billing-upsell-widget";
 import { AnimatedBackground } from "@/design-system/components/ui/animated-background";
@@ -25,17 +25,16 @@ export default function HomePage() {
 
         <main className="px-4 py-4 sm:px-6 sm:py-6 md:py-8">
           <PageTransition>
-            <div className="mx-auto flex max-w-[1600px] flex-col gap-6 lg:flex-row">
-              {/* Main Content Area */}
-              <div className="flex-1 space-y-6">
-                <PriorityActionsSection />
-                <TodaysPatientsList />
-              </div>
+            <div className="mx-auto flex max-w-[1600px] flex-col gap-2 lg:h-[calc(100vh-8.5rem)] lg:flex-row">
+              {/* Main Content Area - Unified Card with Dynamic Canvas */}
+              <CardWrapper className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <DynamicCanvas className="flex min-h-0 flex-1 flex-col" />
+              </CardWrapper>
 
               {/* Right Sidebar Widgets */}
-              <aside className="w-full space-y-4 lg:w-80">
+              <aside className="flex w-full flex-col gap-2 lg:w-[380px]">
                 <MessagesWidget />
-                <OutstandingItemsWidget />
+                {/* <OutstandingItemsWidget /> */}
                 <BillingUpsellWidget />
               </aside>
             </div>

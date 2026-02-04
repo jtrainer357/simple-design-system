@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useCallback } from "react";
 import { cn } from "@/design-system/lib/utils";
 import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
 import { Avatar, AvatarFallback, AvatarImage } from "@/design-system/components/ui/avatar";
@@ -93,6 +94,20 @@ export function InboxSidebar({
 }: InboxSidebarProps) {
   const [searchQuery, setSearchQuery] = React.useState("");
 
+  const handleSectionChange = useCallback(
+    (sectionId: string) => {
+      onSectionChange?.(sectionId);
+    },
+    [onSectionChange]
+  );
+
+  const handleContactSelect = useCallback(
+    (contactId: string) => {
+      onContactSelect?.(contactId);
+    },
+    [onContactSelect]
+  );
+
   return (
     <CardWrapper className={cn("flex h-full flex-col overflow-hidden p-0", className)}>
       {/* Header */}
@@ -132,7 +147,7 @@ export function InboxSidebar({
               <button
                 key={item.id}
                 type="button"
-                onClick={() => onSectionChange?.(item.id)}
+                onClick={() => handleSectionChange(item.id)}
                 className={cn(
                   "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                   activeSection === item.id
@@ -165,7 +180,7 @@ export function InboxSidebar({
               <button
                 key={item.id}
                 type="button"
-                onClick={() => onSectionChange?.(item.id)}
+                onClick={() => handleSectionChange(item.id)}
                 className={cn(
                   "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                   activeSection === item.id
@@ -196,7 +211,7 @@ export function InboxSidebar({
               <button
                 key={contact.id}
                 type="button"
-                onClick={() => onContactSelect?.(contact.id)}
+                onClick={() => handleContactSelect(contact.id)}
                 className={cn(
                   "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
                   activeContact === contact.id

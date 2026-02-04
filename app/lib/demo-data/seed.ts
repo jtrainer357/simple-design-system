@@ -430,14 +430,14 @@ export function getUnreadMessageCount(): number {
 }
 
 export function getUpcomingAppointments(): DemoAppointment[] {
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0] ?? "";
   return demoAppointments
     .filter((a) => a.date >= today && a.status === "Scheduled")
     .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
 }
 
 export function getTodaysAppointments(): DemoAppointment[] {
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0] ?? "";
   return demoAppointments
     .filter((a) => a.date === today && a.status === "Scheduled")
     .sort((a, b) => a.time.localeCompare(b.time));

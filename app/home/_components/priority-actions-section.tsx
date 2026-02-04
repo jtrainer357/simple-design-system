@@ -1,78 +1,151 @@
 "use client";
 
 import * as React from "react";
-import { PriorityActionCard, PriorityAction } from "./priority-action-card";
+import Link from "next/link";
+import { PriorityAction } from "@/design-system/components/ui/priority-action";
+import { AIActionCard } from "@/design-system/components/ui/ai-action-card";
 import { Heading, Text } from "@/design-system/components/ui/typography";
+import { demoContext, type OrchestrationContext } from "@/src/lib/orchestration/types";
 
-// Demo Data - 4 Priority Actions as specified
-const priorityActions: PriorityAction[] = [
+// Arriving patient data for the top coral card
+const arrivingPatient = {
+  patientId: "michael-chen",
+  patientName: "Michael Chen",
+  avatarSrc: "https://randomuser.me/api/portraits/men/75.jpg",
+  appointmentTime: "9:30 AM",
+  room: "Room 101",
+};
+
+// AI Action cards data
+const aiActions = [
   {
-    id: "action-1",
     patientId: "michael-chen",
     patientName: "Michael Chen",
-    patientAvatar: "https://randomuser.me/api/portraits/men/75.jpg",
-    appointmentTime: "11:00 AM - Psychotherapy Session",
-    actionType: "results_ready",
-    description:
-      "A1C results available: 7.2% (down from 8.1%) - Excellent progress on diabetes management",
-    metadata: "Content ready + 3 suggested actions",
-    ctaLabel: "Begin Check-In",
+    avatarSrc: "https://randomuser.me/api/portraits/men/75.jpg",
+    mainAction: "A1C results available: 7.2% (↓ from 8.1%)",
+    statusIndicators: "EXCELLENT PROGRESS ON TYPE 2 DIABETES MANAGEMENT",
+    readyStatus: "Content ready",
+    suggestedActions: 3,
+    badgeText: "RESULTS READY",
+    badgeVariant: "default" as const,
   },
   {
-    id: "action-2",
     patientId: "sarah-johnson",
     patientName: "Sarah Johnson",
-    patientAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
-    appointmentTime: "2:00 PM - Initial Consultation",
-    actionType: "first_appt",
-    description: "First appointment today - Review intake forms and prepare welcome materials",
-    metadata: "Everything pre-configured + 4 suggested actions",
-    ctaLabel: "Begin Check-In",
+    avatarSrc: "https://randomuser.me/api/portraits/women/44.jpg",
+    mainAction: "9:00 AM Annual Physical",
+    statusIndicators: "INSURANCE VERIFIED • 2 CARE GAPS IDENTIFIED • RECENT MESSAGE FLAGGED",
+    readyStatus: "Everything pre-configured",
+    suggestedActions: 4,
+    badgeText: "FIRST APPT TODAY",
+    badgeVariant: "success" as const,
   },
   {
-    id: "action-3",
     patientId: "margaret-williams",
     patientName: "Margaret Williams",
-    patientAvatar: "https://randomuser.me/api/portraits/women/68.jpg",
-    appointmentTime: "ASAP - Medication Review",
-    actionType: "urgent_refill",
-    description: "Metformin 500mg: 5 days remaining - Patient messaged about running low",
-    metadata: "One-click approval ready",
-    ctaLabel: "Approve Refill",
-  },
-  {
-    id: "action-4",
-    patientId: "david-park",
-    patientName: "David Park",
-    patientAvatar: "https://randomuser.me/api/portraits/men/32.jpg",
-    appointmentTime: "4:30 PM - Follow-Up Session",
-    actionType: "priority_action",
-    description: "PHQ-9 score increased to 15 - Depression screening indicates moderate symptoms",
-    metadata: "Assessment tools ready + 2 suggested actions",
-    ctaLabel: "Begin Check-In",
+    avatarSrc: "https://randomuser.me/api/portraits/women/68.jpg",
+    mainAction: "Metformin 500mg: 5 days remaining",
+    statusIndicators: "SCHEDULED TODAY AT 10 AM • SAFETY CHECKS COMPLETE",
+    readyStatus: "One-click approval",
+    badgeText: "URGENT REFILL",
+    badgeVariant: "urgent" as const,
   },
 ];
 
 interface PriorityActionsSectionProps {
   className?: string;
+  onSelectPatient?: (context: OrchestrationContext) => void;
 }
 
-export function PriorityActionsSection({ className }: PriorityActionsSectionProps) {
+export function PriorityActionsSection({
+  className,
+  onSelectPatient,
+}: PriorityActionsSectionProps) {
+  const initials = arrivingPatient.patientName
+    .split(" ")
+    .map((n) => n[0])
+    .join("");
+
   return (
     <section className={className}>
       <div className="mb-4">
         <Heading level={3} className="text-xl sm:text-2xl">
-          Priority Actions
+          Today&apos;s Actions
         </Heading>
         <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-          AI-surfaced items requiring your attention
+          Saturday, Jan 3 •{" "}
+          <span className="text-card-foreground font-semibold">39 Appointments</span>
         </Text>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {priorityActions.map((action) => (
-          <PriorityActionCard key={action.id} action={action} />
-        ))}
+      <div className="space-y-4">
+        {/* Top coral "arriving" card */}
+        <Link href={`/patients/${arrivingPatient.patientId}`} className="block">
+          <PriorityAction
+            title={`${arrivingPatient.patientName} is arriving`}
+            subtitle={`${arrivingPatient.appointmentTime} appointment • ${arrivingPatient.room}`}
+            avatarInitials={initials}
+            avatarSrc={arrivingPatient.avatarSrc}
+            buttonText="Begin Check-in"
+            onButtonClick={() => {}}
+          />
+        </Link>
+
+        {/* AI Action Cards list */}
+        <div className="space-y-2">
+          {aiActions.map((action) => {
+            // For Michael Chen "Results Ready" card, use onClick for dynamic canvas
+            const isResultsReadyCard =
+              action.patientId === "michael-chen" && action.badgeText === "RESULTS READY";
+
+            if (isResultsReadyCard && onSelectPatient) {
+              return (
+                <div
+                  key={`${action.patientId}-${action.badgeText}`}
+                  onClick={() => onSelectPatient(demoContext)}
+                  className="block cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      onSelectPatient(demoContext);
+                    }
+                  }}
+                >
+                  <AIActionCard
+                    patientName={action.patientName}
+                    avatarSrc={action.avatarSrc}
+                    mainAction={action.mainAction}
+                    statusIndicators={action.statusIndicators}
+                    readyStatus={action.readyStatus}
+                    suggestedActions={action.suggestedActions}
+                    badgeText={action.badgeText}
+                    badgeVariant={action.badgeVariant}
+                  />
+                </div>
+              );
+            }
+
+            return (
+              <Link
+                key={`${action.patientId}-${action.badgeText}`}
+                href={`/patients/${action.patientId}`}
+                className="block"
+              >
+                <AIActionCard
+                  patientName={action.patientName}
+                  avatarSrc={action.avatarSrc}
+                  mainAction={action.mainAction}
+                  statusIndicators={action.statusIndicators}
+                  readyStatus={action.readyStatus}
+                  suggestedActions={action.suggestedActions}
+                  badgeText={action.badgeText}
+                  badgeVariant={action.badgeVariant}
+                />
+              </Link>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useCallback } from "react";
 import { cn } from "@/design-system/lib/utils";
 import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
 import { ChatMessage } from "@/design-system/components/ui/chat-message";
@@ -143,6 +144,13 @@ export function ChatThread({
 
   const messagesEndRef = React.useRef<HTMLDivElement>(null);
 
+  const handleChannelChange = useCallback(
+    (channelId: string) => {
+      onChannelChange?.(channelId);
+    },
+    [onChannelChange]
+  );
+
   React.useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
@@ -220,7 +228,7 @@ export function ChatThread({
             <button
               key={channel.id}
               type="button"
-              onClick={() => onChannelChange?.(channel.id)}
+              onClick={() => handleChannelChange(channel.id)}
               className={cn(
                 "flex items-center gap-2 border-b-2 pb-3 text-sm transition-colors",
                 activeChannel === channel.id

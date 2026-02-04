@@ -93,7 +93,7 @@ export function MessagesWidget({ className }: MessagesWidgetProps) {
   const unreadCount = messages.filter((m) => m.unread).length;
 
   return (
-    <CardWrapper className={cn("flex max-h-[400px] flex-col", className)}>
+    <CardWrapper className={cn("flex max-h-[720px] flex-col", className)}>
       <div className="flex items-center justify-between pb-4">
         <div className="flex items-center gap-2">
           <Heading level={4} className="text-lg">
@@ -109,7 +109,7 @@ export function MessagesWidget({ className }: MessagesWidgetProps) {
           Inbox
         </Button>
       </div>
-      <div className="-mx-2 h-full space-y-2 overflow-y-auto px-2">
+      <div className="-mx-2 min-h-0 flex-1 space-y-2 overflow-y-auto px-2">
         {messages.map((msg) => (
           <MessageRowCard
             key={msg.id}
