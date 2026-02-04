@@ -5,66 +5,234 @@ import Link from "next/link";
 import { PriorityAction } from "@/design-system/components/ui/priority-action";
 import { AIActionCard } from "@/design-system/components/ui/ai-action-card";
 import { Heading, Text } from "@/design-system/components/ui/typography";
-import { demoContext, type OrchestrationContext } from "@/src/lib/orchestration/types";
-
-// Arriving patient data for the top coral card
-const arrivingPatient = {
-  patientId: "michael-chen",
-  patientName: "Michael Chen",
-  avatarSrc: "https://randomuser.me/api/portraits/men/75.jpg",
-  appointmentTime: "9:30 AM",
-  room: "Room 101",
-};
-
-// AI Action cards data
-const aiActions = [
-  {
-    patientId: "michael-chen",
-    patientName: "Michael Chen",
-    avatarSrc: "https://randomuser.me/api/portraits/men/75.jpg",
-    mainAction: "A1C results available: 7.2% (↓ from 8.1%)",
-    statusIndicators: "EXCELLENT PROGRESS ON TYPE 2 DIABETES MANAGEMENT",
-    readyStatus: "Content ready",
-    suggestedActions: 3,
-    badgeText: "RESULTS READY",
-    badgeVariant: "default" as const,
-  },
-  {
-    patientId: "sarah-johnson",
-    patientName: "Sarah Johnson",
-    avatarSrc: "https://randomuser.me/api/portraits/women/44.jpg",
-    mainAction: "9:00 AM Annual Physical",
-    statusIndicators: "INSURANCE VERIFIED • 2 CARE GAPS IDENTIFIED • RECENT MESSAGE FLAGGED",
-    readyStatus: "Everything pre-configured",
-    suggestedActions: 4,
-    badgeText: "FIRST APPT TODAY",
-    badgeVariant: "success" as const,
-  },
-  {
-    patientId: "margaret-williams",
-    patientName: "Margaret Williams",
-    avatarSrc: "https://randomuser.me/api/portraits/women/68.jpg",
-    mainAction: "Metformin 500mg: 5 days remaining",
-    statusIndicators: "SCHEDULED TODAY AT 10 AM • SAFETY CHECKS COMPLETE",
-    readyStatus: "One-click approval",
-    badgeText: "URGENT REFILL",
-    badgeVariant: "urgent" as const,
-  },
-];
+import { Loader2, AlertTriangle, Database } from "lucide-react";
+import { Button } from "@/design-system/components/ui/button";
+import { getPriorityActions } from "@/src/lib/queries/priority-actions";
+import { getTodayAppointments } from "@/src/lib/queries/appointments";
+import { isDatabasePopulated } from "@/src/lib/queries/practice";
+import type { PriorityActionWithPatient } from "@/src/lib/supabase/types";
+import type { AppointmentWithPatient } from "@/src/lib/queries/appointments";
+import type { OrchestrationContext } from "@/src/lib/orchestration/types";
 
 interface PriorityActionsSectionProps {
   className?: string;
   onSelectPatient?: (context: OrchestrationContext) => void;
 }
 
+// Map urgency to badge variant
+function getBadgeVariant(urgency: string): "urgent" | "success" | "default" {
+  switch (urgency) {
+    case "urgent":
+      return "urgent";
+    case "high":
+      return "urgent";
+    case "medium":
+      return "success";
+    default:
+      return "default";
+  }
+}
+
+// Map urgency to badge text
+function getBadgeText(urgency: string, timeframe: string | null): string {
+  if (urgency === "urgent") return "URGENT";
+  if (timeframe === "Immediate" || timeframe === "Today") return "TODAY";
+  if (timeframe === "Within 3 days") return "WITHIN 3 DAYS";
+  return "ACTION NEEDED";
+}
+
+// Convert database action to OrchestrationContext for the detail view
+function actionToContext(action: PriorityActionWithPatient): OrchestrationContext {
+  const patient = action.patient;
+  return {
+    patient: {
+      id: patient.id,
+      name: `${patient.first_name} ${patient.last_name}`,
+      mrn: patient.id.substring(0, 8),
+      dob: patient.date_of_birth,
+      age: Math.floor(
+        (Date.now() - new Date(patient.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+      ),
+      primaryDiagnosis: action.clinical_context || "Mental Health",
+      avatar: patient.avatar_url || `https://i.pravatar.cc/150?u=${patient.id}`,
+    },
+    trigger: {
+      type: "screening",
+      title: action.title,
+      urgency:
+        action.urgency === "urgent" ? "urgent" : action.urgency === "high" ? "high" : "medium",
+    },
+    clinicalData: {},
+    suggestedActions: ((action.suggested_actions as string[]) || []).map((suggestion, i) => ({
+      id: String(i + 1),
+      label: suggestion,
+      type: "task",
+      checked: true,
+    })),
+  };
+}
+
 export function PriorityActionsSection({
   className,
   onSelectPatient,
 }: PriorityActionsSectionProps) {
-  const initials = arrivingPatient.patientName
-    .split(" ")
-    .map((n) => n[0])
-    .join("");
+  const [actions, setActions] = React.useState<PriorityActionWithPatient[]>([]);
+  const [todayAppts, setTodayAppts] = React.useState<AppointmentWithPatient[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
+  const [dbReady, setDbReady] = React.useState<boolean | null>(null);
+
+  React.useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Check if database is populated
+        const populated = await isDatabasePopulated();
+        setDbReady(populated);
+
+        if (!populated) {
+          setLoading(false);
+          return;
+        }
+
+        // Fetch priority actions and today's appointments in parallel
+        const [actionsData, apptsData] = await Promise.all([
+          getPriorityActions(),
+          getTodayAppointments(),
+        ]);
+
+        setActions(actionsData.slice(0, 10)); // Show top 10
+        setTodayAppts(apptsData);
+      } catch (err) {
+        console.error("Failed to load priority actions:", err);
+        setError("Failed to load data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, []);
+
+  // Format today's date
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+
+  // Get the first arriving/scheduled patient
+  const arrivingPatient = todayAppts.find((a) => a.status === "Scheduled") || todayAppts[0];
+
+  // Loading state
+  if (loading) {
+    return (
+      <section className={className}>
+        <div className="mb-4">
+          <Heading level={3} className="text-xl sm:text-2xl">
+            Today&apos;s Actions
+          </Heading>
+          <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+            Loading...
+          </Text>
+        </div>
+        <div className="flex flex-col items-center justify-center py-12">
+          <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          <Text size="sm" muted className="mt-3">
+            Loading substrate intelligence...
+          </Text>
+        </div>
+      </section>
+    );
+  }
+
+  // Database not populated state
+  if (dbReady === false) {
+    return (
+      <section className={className}>
+        <div className="mb-4">
+          <Heading level={3} className="text-xl sm:text-2xl">
+            Today&apos;s Actions
+          </Heading>
+          <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+            {formattedDate}
+          </Text>
+        </div>
+        <div className="border-muted-foreground/30 bg-muted/20 flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
+          <Database className="text-muted-foreground/50 h-12 w-12" />
+          <Text size="sm" muted className="mt-4 text-center">
+            No data imported yet.
+          </Text>
+          <Text size="xs" muted className="mt-1 max-w-sm text-center">
+            Run the import wizard to populate the database with patient data and generate AI-powered
+            priority actions.
+          </Text>
+          <Link href="/import" className="mt-4">
+            <Button variant="default" size="sm">
+              Start Import
+            </Button>
+          </Link>
+        </div>
+      </section>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <section className={className}>
+        <div className="mb-4">
+          <Heading level={3} className="text-xl sm:text-2xl">
+            Today&apos;s Actions
+          </Heading>
+          <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+            {formattedDate}
+          </Text>
+        </div>
+        <div className="border-destructive/30 bg-destructive/10 flex flex-col items-center justify-center rounded-lg border py-12">
+          <AlertTriangle className="text-destructive h-8 w-8" />
+          <Text size="sm" className="text-destructive mt-3">
+            {error}
+          </Text>
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-4"
+            onClick={() => window.location.reload()}
+          >
+            Retry
+          </Button>
+        </div>
+      </section>
+    );
+  }
+
+  // Empty state
+  if (actions.length === 0) {
+    return (
+      <section className={className}>
+        <div className="mb-4">
+          <Heading level={3} className="text-xl sm:text-2xl">
+            Today&apos;s Actions
+          </Heading>
+          <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+            {formattedDate} •{" "}
+            <span className="text-card-foreground font-semibold">
+              {todayAppts.length} Appointments
+            </span>
+          </Text>
+        </div>
+        <div className="border-muted-foreground/30 bg-muted/20 flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
+          <Text size="sm" muted className="text-center">
+            All caught up! No priority actions right now.
+          </Text>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className={className}>
@@ -73,74 +241,80 @@ export function PriorityActionsSection({
           Today&apos;s Actions
         </Heading>
         <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-          Saturday, Jan 3 •{" "}
-          <span className="text-card-foreground font-semibold">39 Appointments</span>
+          {formattedDate} •{" "}
+          <span className="text-card-foreground font-semibold">
+            {todayAppts.length} Appointments
+          </span>
         </Text>
       </div>
 
       <div className="space-y-4">
-        {/* Top coral "arriving" card */}
-        <Link href={`/patients/${arrivingPatient.patientId}`} className="block">
-          <PriorityAction
-            title={`${arrivingPatient.patientName} is arriving`}
-            subtitle={`${arrivingPatient.appointmentTime} appointment • ${arrivingPatient.room}`}
-            avatarInitials={initials}
-            avatarSrc={arrivingPatient.avatarSrc}
-            buttonText="Begin Check-in"
-            onButtonClick={() => {}}
-          />
-        </Link>
+        {/* Top coral "arriving" card - if there's an arriving patient */}
+        {arrivingPatient && (
+          <Link href={`/patients/${arrivingPatient.patient_id}`} className="block">
+            <PriorityAction
+              title={`${arrivingPatient.patient.first_name} ${arrivingPatient.patient.last_name} is arriving`}
+              subtitle={`${arrivingPatient.start_time} appointment • ${arrivingPatient.service_type}`}
+              avatarInitials={`${arrivingPatient.patient.first_name[0]}${arrivingPatient.patient.last_name[0]}`}
+              avatarSrc={arrivingPatient.patient.avatar_url || undefined}
+              buttonText="Begin Check-in"
+              onButtonClick={() => {}}
+            />
+          </Link>
+        )}
 
-        {/* AI Action Cards list */}
+        {/* AI Action Cards from database */}
         <div className="space-y-2">
-          {aiActions.map((action) => {
-            // For Michael Chen "Results Ready" card, use onClick for dynamic canvas
-            const isResultsReadyCard =
-              action.patientId === "michael-chen" && action.badgeText === "RESULTS READY";
+          {actions.map((action) => {
+            const patientName = `${action.patient.first_name} ${action.patient.last_name}`;
+            const suggestedCount = Array.isArray(action.suggested_actions)
+              ? (action.suggested_actions as string[]).length
+              : 0;
 
-            if (isResultsReadyCard && onSelectPatient) {
+            // First urgent/high action opens the dynamic canvas
+            const isFirstUrgent =
+              actions.indexOf(action) === 0 &&
+              (action.urgency === "urgent" || action.urgency === "high");
+
+            if (isFirstUrgent && onSelectPatient) {
               return (
                 <div
-                  key={`${action.patientId}-${action.badgeText}`}
-                  onClick={() => onSelectPatient(demoContext)}
+                  key={action.id}
+                  onClick={() => onSelectPatient(actionToContext(action))}
                   className="block cursor-pointer"
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === "Enter" || e.key === " ") {
-                      onSelectPatient(demoContext);
+                      onSelectPatient(actionToContext(action));
                     }
                   }}
                 >
                   <AIActionCard
-                    patientName={action.patientName}
-                    avatarSrc={action.avatarSrc}
-                    mainAction={action.mainAction}
-                    statusIndicators={action.statusIndicators}
-                    readyStatus={action.readyStatus}
-                    suggestedActions={action.suggestedActions}
-                    badgeText={action.badgeText}
-                    badgeVariant={action.badgeVariant}
+                    patientName={patientName}
+                    avatarSrc={action.patient.avatar_url || undefined}
+                    mainAction={action.title}
+                    statusIndicators={action.description || action.clinical_context || ""}
+                    readyStatus={`Confidence: ${action.confidence_score || 85}%`}
+                    suggestedActions={suggestedCount}
+                    badgeText={getBadgeText(action.urgency, action.timeframe)}
+                    badgeVariant={getBadgeVariant(action.urgency)}
                   />
                 </div>
               );
             }
 
             return (
-              <Link
-                key={`${action.patientId}-${action.badgeText}`}
-                href={`/patients/${action.patientId}`}
-                className="block"
-              >
+              <Link key={action.id} href={`/patients/${action.patient_id}`} className="block">
                 <AIActionCard
-                  patientName={action.patientName}
-                  avatarSrc={action.avatarSrc}
-                  mainAction={action.mainAction}
-                  statusIndicators={action.statusIndicators}
-                  readyStatus={action.readyStatus}
-                  suggestedActions={action.suggestedActions}
-                  badgeText={action.badgeText}
-                  badgeVariant={action.badgeVariant}
+                  patientName={patientName}
+                  avatarSrc={action.patient.avatar_url || undefined}
+                  mainAction={action.title}
+                  statusIndicators={action.description || action.clinical_context || ""}
+                  readyStatus={`Confidence: ${action.confidence_score || 85}%`}
+                  suggestedActions={suggestedCount}
+                  badgeText={getBadgeText(action.urgency, action.timeframe)}
+                  badgeVariant={getBadgeVariant(action.urgency)}
                 />
               </Link>
             );

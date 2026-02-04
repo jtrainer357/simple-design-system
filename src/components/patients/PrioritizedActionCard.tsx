@@ -13,9 +13,15 @@ import {
 import { Badge } from "@/design-system/components/ui/badge";
 import { cn } from "@/design-system/lib/utils";
 
-export type UrgencyLevel = "urgent" | "high" | "medium";
+export type UrgencyLevel = "urgent" | "high" | "medium" | "low";
 export type ActionIcon = "alert-triangle" | "pill" | "calendar" | "brain";
-export type Timeframe = "Immediate" | "Within 3 days" | "This month" | "Next visit";
+export type Timeframe =
+  | "Immediate"
+  | "Today"
+  | "Within 3 days"
+  | "This week"
+  | "This month"
+  | "Next visit";
 
 export interface PrioritizedAction {
   id: string;
@@ -53,12 +59,14 @@ const urgencyBadgeStyles: Record<UrgencyLevel, string> = {
   urgent: "bg-red-500 text-white border-none",
   high: "bg-orange-500 text-white border-none",
   medium: "bg-teal text-white border-none",
+  low: "bg-slate-500 text-white border-none",
 };
 
 const urgencyCardStyles: Record<UrgencyLevel, string> = {
   urgent: "border-l-red-500 bg-red-500/5 border-[0.5px] border-l-4 border-red-500/20",
   high: "border-l-orange-500 bg-orange-500/5 border-[0.5px] border-l-4 border-orange-500/20",
   medium: "border-l-teal bg-teal/5 border-[0.5px] border-l-4 border-teal/20",
+  low: "border-l-slate-500 bg-slate-500/5 border-[0.5px] border-l-4 border-slate-500/20",
 };
 
 export function PrioritizedActionCard({ action, onClick, className }: PrioritizedActionCardProps) {

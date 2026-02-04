@@ -3,115 +3,134 @@
 import * as React from "react";
 import Link from "next/link";
 import { ScheduleRowCard } from "@/design-system/components/ui/schedule-row-card";
-import { Heading } from "@/design-system/components/ui/typography";
+import { Heading, Text } from "@/design-system/components/ui/typography";
+import { Loader2 } from "lucide-react";
 import { cn } from "@/design-system/lib/utils";
+import { getTodayAppointments } from "@/src/lib/queries/appointments";
+import { isDatabasePopulated } from "@/src/lib/queries/practice";
+import type { AppointmentWithPatient } from "@/src/lib/queries/appointments";
 
 type AppointmentStatus = "ENDED" | "IN PROGRESS" | "CHECKED IN" | "SCHEDULED";
 
-interface Appointment {
-  id: string;
-  patientId: string;
-  time: string;
-  patient: string;
-  type: string;
-  provider: string;
-  status: AppointmentStatus;
-  room: string;
-  avatarSrc?: string;
+// Map database status to component status
+function mapStatus(status: string, startTime: string): AppointmentStatus {
+  if (status === "Completed") return "ENDED";
+  if (status === "No-Show" || status === "Cancelled") return "ENDED";
+
+  // Check if appointment is in progress based on time
+  const now = new Date();
+  const [hours, minutes] = startTime.split(":").map(Number);
+  const appointmentTime = new Date();
+  appointmentTime.setHours(hours!, minutes!, 0, 0);
+
+  const diffMinutes = (now.getTime() - appointmentTime.getTime()) / 60000;
+
+  if (diffMinutes >= 0 && diffMinutes <= 60) {
+    return "IN PROGRESS";
+  }
+
+  return "SCHEDULED";
 }
 
-const appointments: Appointment[] = [
-  {
-    id: "apt-1",
-    patientId: "michael-chen",
-    time: "9:30 AM",
-    patient: "Michael Chen",
-    type: "DIABETES FOLLOW-UP",
-    provider: "Dr. Patel",
-    status: "IN PROGRESS",
-    room: "Room 101",
-    avatarSrc: "https://randomuser.me/api/portraits/men/75.jpg",
-  },
-  {
-    id: "apt-2",
-    patientId: "emma-johnson",
-    time: "9:45 AM",
-    patient: "Emma Johnson",
-    type: "SPORTS PHYSICAL",
-    provider: "Dr. Chen",
-    status: "CHECKED IN",
-    room: "Room 103",
-    avatarSrc: "https://randomuser.me/api/portraits/women/63.jpg",
-  },
-  {
-    id: "apt-3",
-    patientId: "emily-rodriguez",
-    time: "10:00 AM",
-    patient: "Emily Rodriguez",
-    type: "PHYSICAL",
-    provider: "Dr. Patel",
-    status: "SCHEDULED",
-    room: "Room 101",
-    avatarSrc: "https://randomuser.me/api/portraits/women/28.jpg",
-  },
-  {
-    id: "apt-4",
-    patientId: "james-wilson",
-    time: "10:15 AM",
-    patient: "James Wilson",
-    type: "BLOOD PRESSURE CHECK",
-    provider: "Dr. Morrison",
-    status: "SCHEDULED",
-    room: "Room 201",
-  },
-  {
-    id: "apt-5",
-    patientId: "lisa-thompson",
-    time: "10:30 AM",
-    patient: "Lisa Thompson",
-    type: "PRENATAL VISIT",
-    provider: "Dr. Chen",
-    status: "SCHEDULED",
-    room: "Room 103",
-    avatarSrc: "https://randomuser.me/api/portraits/women/17.jpg",
-  },
-  {
-    id: "apt-6",
-    patientId: "robert-garcia",
-    time: "10:45 AM",
-    patient: "Robert Garcia",
-    type: "FOLLOW-UP",
-    provider: "Dr. Patel",
-    status: "SCHEDULED",
-    room: "Room 101",
-  },
-];
+// Format time from 24h to 12h
+function formatTime(time: string): string {
+  const [hours, minutes] = time.split(":").map(Number);
+  const period = hours! >= 12 ? "PM" : "AM";
+  const displayHours = hours! % 12 || 12;
+  return `${displayHours}:${String(minutes).padStart(2, "0")} ${period}`;
+}
 
 interface TodaysPatientsListProps {
   className?: string;
 }
 
 export function TodaysPatientsList({ className }: TodaysPatientsListProps) {
+  const [appointments, setAppointments] = React.useState<AppointmentWithPatient[]>([]);
+  const [loading, setLoading] = React.useState(true);
+  const [dbReady, setDbReady] = React.useState<boolean | null>(null);
+
+  React.useEffect(() => {
+    async function loadAppointments() {
+      try {
+        setLoading(true);
+
+        // Check if database is populated
+        const populated = await isDatabasePopulated();
+        setDbReady(populated);
+
+        if (!populated) {
+          setLoading(false);
+          return;
+        }
+
+        const data = await getTodayAppointments();
+        setAppointments(data);
+      } catch (err) {
+        console.error("Failed to load today's appointments:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadAppointments();
+  }, []);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className={cn("flex min-h-0 flex-col", className)}>
+        <Heading
+          level={6}
+          className="text-muted-foreground mb-3 shrink-0 text-xs font-semibold tracking-wider uppercase"
+        >
+          Today&apos;s Patients
+        </Heading>
+        <div className="flex items-center justify-center py-8">
+          <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
+  // No data state
+  if (dbReady === false || appointments.length === 0) {
+    return (
+      <div className={cn("flex min-h-0 flex-col", className)}>
+        <Heading
+          level={6}
+          className="text-muted-foreground mb-3 shrink-0 text-xs font-semibold tracking-wider uppercase"
+        >
+          Today&apos;s Patients
+        </Heading>
+        <div className="border-muted-foreground/30 bg-muted/10 flex items-center justify-center rounded-lg border border-dashed py-8">
+          <Text size="sm" muted className="text-center">
+            {dbReady === false ? "No data imported yet" : "No appointments today"}
+          </Text>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={cn("flex min-h-0 flex-col", className)}>
       <Heading
         level={6}
         className="text-muted-foreground mb-3 shrink-0 text-xs font-semibold tracking-wider uppercase"
       >
-        Today&apos;s Patients
+        Today&apos;s Patients ({appointments.length})
       </Heading>
 
       <div className="-mx-2 min-h-0 flex-1 space-y-2 overflow-y-auto px-2">
         {appointments.map((apt) => (
-          <Link key={apt.id} href={`/patients/${apt.patientId}`} className="block">
+          <Link key={apt.id} href={`/patients/${apt.patient_id}`} className="block">
             <ScheduleRowCard
-              time={apt.time}
-              patient={apt.patient}
-              type={apt.type}
-              provider={apt.provider}
-              status={apt.status}
-              room={apt.room}
-              avatarSrc={apt.avatarSrc}
+              time={formatTime(apt.start_time)}
+              patient={`${apt.patient.first_name} ${apt.patient.last_name}`}
+              type={apt.service_type.toUpperCase()}
+              provider="Dr. Demo"
+              status={mapStatus(apt.status, apt.start_time)}
+              room={apt.location || "Main Office"}
+              avatarSrc={apt.patient.avatar_url || undefined}
             />
           </Link>
         ))}
