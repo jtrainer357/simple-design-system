@@ -1,5 +1,6 @@
 import "@/design-system/styles/globals.css";
 import { PageBackground } from "@/design-system/components/ui/page-background";
+import { ActionOrchestrationModal } from "@/src/components/orchestration/ActionOrchestrationModal";
 
 export const metadata = {
   title: "HealthAI - Practice Management",
@@ -11,6 +12,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <PageBackground>{children}</PageBackground>
+        <ActionOrchestrationModal />
       </body>
     </html>
   );
