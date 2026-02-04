@@ -1,0 +1,268 @@
+@import "tailwindcss";
+
+@source "../../app/**/*.{js,ts,jsx,tsx}";
+@source "../components/**/*.{js,ts,jsx,tsx}";
+
+@font-face {
+  font-family: "Akkurat LL";
+  src: url("/fonts/AkkuratLL-Thin.otf") format("opentype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Akkurat LL";
+  src: url("/fonts/AkkuratLL-ThinItalic.otf") format("opentype");
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Akkurat LL";
+  src: url("/fonts/AkkuratLL-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Akkurat LL";
+  src: url("/fonts/AkkuratLL-LightItalic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Akkurat LL";
+  src: url("/fonts/AkkuratLL-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Akkurat LL";
+  src: url("/fonts/AkkuratLL-Italic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Akkurat LL";
+  src: url("/fonts/AkkuratLL-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Akkurat LL";
+  src: url("/fonts/AkkuratLL-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Akkurat LL";
+  src: url("/fonts/AkkuratLL-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Akkurat LL";
+  src: url("/fonts/AkkuratLL-BlackItalic.otf") format("opentype");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+@theme {
+  /* Colors using OKLCH */
+  --color-background: transparent;
+  --color-foreground: #545454;
+
+  --color-card: oklch(1 0 0 / 0.97);
+  --color-card-foreground: oklch(0.2795 0.0368 260.031);
+
+  --color-popover: oklch(1 0 0);
+  --color-popover-foreground: oklch(0.2795 0.0368 260.031);
+
+  --color-primary: oklch(0.679 0.1311 36.0386);
+  --color-primary-foreground: oklch(1 0 0);
+
+  --color-secondary: oklch(0.95 0 0);
+  --color-secondary-foreground: oklch(0.3682 0.0638 210.4879);
+
+  --color-muted: oklch(0.95 0 0);
+  --color-muted-foreground: oklch(0.4413 0.009 260.7262);
+
+  --color-accent: oklch(0.9473 0.0065 185.2685);
+  --color-accent-foreground: oklch(0.3729 0.0306 259.7328);
+
+  --color-destructive: oklch(0.4985 0.1865 22.5763);
+  --color-destructive-foreground: oklch(1 0 0);
+
+  --color-success: oklch(0.6 0.15 145);
+  --color-success-foreground: oklch(1 0 0);
+
+  --color-border: oklch(0.8761 0 0);
+  --color-input: oklch(0.8687 0.0043 56.366);
+  --color-ring: oklch(0.562 0.0478 159.1543);
+
+  /* Charts */
+  --color-chart-1: oklch(0.679 0.1311 36.0386);
+  --color-chart-2: oklch(0.4345 0.065 206.7827);
+  --color-chart-3: oklch(0.8041 0.0754 208.7554);
+  --color-chart-4: oklch(0.5789 0.1405 260.163);
+  --color-chart-5: oklch(0.5445 0.1358 308.0395);
+
+  /* Sidebar */
+  --color-sidebar-background: oklch(1 0 0);
+  --color-sidebar-foreground: oklch(0.2795 0.0368 260.031);
+  --color-sidebar-primary: oklch(0.4345 0.065 206.7827);
+  --color-sidebar-primary-foreground: oklch(1 0 0);
+  --color-sidebar-accent: oklch(0.949 0.0083 91.4846);
+  --color-sidebar-accent-foreground: oklch(0.3729 0.0306 259.7328);
+  --color-sidebar-border: oklch(0.8687 0.0043 56.366);
+  --color-sidebar-ring: oklch(0.5555 0.0643 206.6112);
+
+  /* Healthcare specific colors */
+  --color-avatar-fallback: oklch(0.6824 0.0451 175.1172);
+  --color-teal: oklch(0.4345 0.065 206.7827);
+  --color-teal-foreground: oklch(1 0 0);
+  --color-selected-border: #b3c6c4;
+  --color-foreground-strong: oklch(0 0 0);
+
+  /* Cool Blue Glow Right */
+  --color-page-background: #ffffff;
+  --color-cool-blue: rgba(70, 130, 180, 0.5);
+
+  /* Shadows */
+  --shadow-sm: 0 2px 6px -1px rgb(0 0 0 / 0.06);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.08);
+  --shadow-lg: 0 8px 20px -4px rgb(0 0 0 / 0.12);
+
+  /* Border radius */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.525rem;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: transparent;
+    min-height: 100vh;
+    position: relative;
+    color: var(--color-foreground);
+    font-family: "Akkurat LL", system-ui, sans-serif;
+    font-feature-settings:
+      "rlig" 1,
+      "calt" 1;
+  }
+
+  /* Animated Background */
+  @keyframes move {
+    100% {
+      transform: translate3d(0, 0, 1px) rotate(360deg);
+    }
+  }
+
+  .animated-background {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    background: #fbf9f8;
+    overflow: hidden;
+    z-index: -1;
+  }
+
+  .animated-background span {
+    width: 60vmax;
+    height: 60vmax;
+    border-radius: 50%;
+    backface-visibility: hidden;
+    position: absolute;
+    animation: move;
+    animation-duration: 1;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    filter: blur(80px);
+  }
+
+  .animated-background span:nth-child(1) {
+    top: 20%;
+    left: 20%;
+    animation-duration: 1800s;
+    animation-delay: -251s;
+    transform-origin: 10vw 10vh;
+    background: rgba(198, 220, 206, 0.5);
+  }
+
+  .animated-background span:nth-child(2) {
+    top: 10%;
+    left: 50%;
+    animation-duration: 1700s;
+    animation-delay: -12s;
+    transform-origin: 5vw 15vh;
+    background: rgba(245, 241, 235, 0.5);
+  }
+
+  .animated-background span:nth-child(3) {
+    top: 30%;
+    left: 70%;
+    animation-duration: 1500s;
+    animation-delay: -211s;
+    transform-origin: -5vw 10vh;
+    background: rgba(248, 236, 227, 0.5);
+  }
+
+  .animated-background span:nth-child(4) {
+    top: 50%;
+    left: 30%;
+    animation-duration: 1900s;
+    animation-delay: -421s;
+    transform-origin: 8vw 8vh;
+    background: rgba(203, 221, 224, 0.5);
+  }
+
+  .animated-background span:nth-child(5) {
+    top: 60%;
+    left: 60%;
+    animation-duration: 1100s;
+    animation-delay: -308s;
+    transform-origin: -8vw 12vh;
+    background: rgba(248, 236, 227, 0.5);
+  }
+
+  .animated-background span:nth-child(6) {
+    top: 40%;
+    left: 10%;
+    animation-duration: 1600s;
+    animation-delay: -153s;
+    transform-origin: 12vw 5vh;
+    background: rgba(232, 228, 223, 0.5);
+  }
+
+  .animated-background span:nth-child(7) {
+    top: 70%;
+    left: 40%;
+    animation-duration: 1200s;
+    animation-delay: -450s;
+    transform-origin: 6vw 10vh;
+    background: rgba(254, 245, 213, 0.3);
+  }
+}

@@ -1,0 +1,120 @@
+name: DesignSystemTransformer
+description: Transform wireframes/designs into production Next.js components
+version: 1.0.0
+
+inputs:
+  - name: design_file
+    type: string
+    description: Figma URL or path to image file
+    required: true
+  - name: project_path
+    type: string
+    description: Path to Next.js project root
+    default: "."
+  - name: design_system_path
+    type: string
+    description: Path to design system folder
+    default: "./design-system"
+  - name: output_path
+    type: string
+    description: Where to create the new page
+    required: true
+
+agents:
+  design_analyzer:
+    model: gemini-2.0-flash-thinking-exp-01-21
+    system_prompt_file: .antigravity/agents/design-analyzer.md
+    tools:
+      - figma_get_screenshot
+      - figma_get_design_context
+      - vision_analysis
+      - file_read
+    max_tokens: 8000
+
+  component_generator:
+    model: gemini-2.0-flash-thinking-exp-01-21
+    system_prompt_file: .antigravity/agents/component-generator.md
+    tools:
+      - file_write
+      - file_read
+      - bash_tool
+    max_tokens: 16000
+
+  quality_validator:
+    model: gemini-2.0-flash-thinking-exp-01-21
+    system_prompt_file: .antigravity/agents/quality-validator.md
+    tools:
+      - browser_screenshot
+      - bash_tool
+      - file_read
+      - file_write
+    max_tokens: 8000
+    max_iterations: 2
+
+  project_integrator:
+    model: gemini-2.0-flash-thinking-exp-01-21
+    system_prompt_file: .antigravity/agents/project-integrator.md
+    tools:
+      - file_write
+      - bash_tool
+      - memory_write
+    max_tokens: 4000
+
+workflow:
+  steps:
+    - id: analyze_design
+      agent: design_analyzer
+      inputs:
+        design_file: ${inputs.design_file}
+        design_system_path: ${inputs.design_system_path}
+      outputs:
+        - design_analysis
+        - component_mapping
+        - content_extraction
+
+    - id: generate_components
+      agent: component_generator
+      depends_on: [analyze_design]
+      inputs:
+        design_analysis: ${analyze_design.design_analysis}
+        component_mapping: ${analyze_design.component_mapping}
+        content: ${analyze_design.content_extraction}
+        design_system_path: ${inputs.design_system_path}
+        output_path: ${inputs.output_path}
+      outputs:
+        - generated_files
+        - file_structure
+
+    - id: validate_quality
+      agent: quality_validator
+      depends_on: [generate_components]
+      inputs:
+        generated_files: ${generate_components.generated_files}
+        output_path: ${inputs.output_path}
+        project_path: ${inputs.project_path}
+        original_design: ${inputs.design_file}
+      outputs:
+        - validation_report
+        - fixed_files
+      loop:
+        max_iterations: 2
+        condition: validation_report.all_checks_passed == false
+
+    - id: integrate_project
+      agent: project_integrator
+      depends_on: [validate_quality]
+      inputs:
+        validated_files: ${validate_quality.fixed_files}
+        output_path: ${inputs.output_path}
+        project_path: ${inputs.project_path}
+        validation_report: ${validate_quality.validation_report}
+      outputs:
+        - integration_report
+
+memory:
+  store_file: .antigravity/memory/design_patterns.json
+  learning:
+    - component_usage_patterns
+    - design_preferences
+    - component_compositions
+    - responsive_strategies
