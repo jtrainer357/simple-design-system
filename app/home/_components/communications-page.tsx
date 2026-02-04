@@ -162,8 +162,8 @@ export function CommunicationsPage({ className }: CommunicationsPageProps) {
   const [mobileView, setMobileView] = React.useState<MobileView>("list");
   const [activeFilter, setActiveFilter] = React.useState("all");
 
-  const handleSendMessage = (message: string) => {
-    console.log("Sending message:", message);
+  const handleSendMessage = (_message: string) => {
+    // Message sending will be implemented
   };
 
   const handleSelectConversation = (id: string) => {

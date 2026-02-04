@@ -12,7 +12,6 @@ import {
 } from "@/design-system/components/ui/dialog";
 import { Button } from "@/design-system/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/design-system/components/ui/avatar";
-import { Badge } from "@/design-system/components/ui/badge";
 import { X, AlertTriangle, CheckCircle2, Zap } from "lucide-react";
 import { cn } from "@/design-system/lib/utils";
 

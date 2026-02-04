@@ -4,7 +4,6 @@ import * as React from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/design-system/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/design-system/components/ui/avatar";
-import { Badge } from "@/design-system/components/ui/badge";
 import { Text } from "@/design-system/components/ui/typography";
 import { cn } from "@/design-system/lib/utils";
 import { ScrollArea } from "@/design-system/components/ui/scroll-area";

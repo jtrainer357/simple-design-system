@@ -6,7 +6,6 @@ import { HeaderSearch } from "./_components/header-search";
 import { DynamicCanvas } from "./_components/dynamic-canvas";
 import { MessagesWidget } from "./_components/messages-widget";
 import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
-import { OutstandingItemsWidget } from "./_components/outstanding-items-widget";
 import { BillingUpsellWidget } from "./_components/billing-upsell-widget";
 import { AnimatedBackground } from "@/design-system/components/ui/animated-background";
 import { PageTransition } from "@/design-system/components/ui/page-transition";

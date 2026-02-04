@@ -8,7 +8,6 @@ import { ChatMessage } from "@/design-system/components/ui/chat-message";
 import { ChatInput } from "@/design-system/components/ui/chat-input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/design-system/components/ui/avatar";
 import { Button } from "@/design-system/components/ui/button";
-import { Badge } from "@/design-system/components/ui/badge";
 import { Heading, Text } from "@/design-system/components/ui/typography";
 import {
   Check,

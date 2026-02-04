@@ -24,7 +24,7 @@ export function ActionRowCard({
   time,
   patient,
   type,
-  provider,
+  provider: _provider,
   status,
   room,
   avatarSrc,

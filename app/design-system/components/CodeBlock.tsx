@@ -9,7 +9,7 @@ interface CodeBlockProps {
   language?: string;
 }
 
-export function CodeBlock({ code, label, language = "typescript" }: CodeBlockProps) {
+export function CodeBlock({ code, label, language: _language = "typescript" }: CodeBlockProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {

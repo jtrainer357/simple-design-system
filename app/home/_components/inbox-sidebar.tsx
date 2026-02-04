@@ -7,8 +7,7 @@ import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
 import { Avatar, AvatarFallback, AvatarImage } from "@/design-system/components/ui/avatar";
 import { Button } from "@/design-system/components/ui/button";
 import { Input } from "@/design-system/components/ui/input";
-import { Badge } from "@/design-system/components/ui/badge";
-import { Heading, Text } from "@/design-system/components/ui/typography";
+import { Heading } from "@/design-system/components/ui/typography";
 import { ChevronDown, Search, Plus, LayoutGrid } from "lucide-react";
 import {
   Squares2X2Icon,

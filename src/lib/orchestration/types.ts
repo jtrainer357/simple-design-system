@@ -73,20 +73,21 @@ export interface ExecutionResult {
 }
 
 // Demo data for showcasing the modal
+// Michael Chen - RESULTS READY: A1C improved from 8.1% to 7.2%
 export const demoContext: OrchestrationContext = {
   patient: {
     id: "michael-chen",
     name: "Michael Chen",
     mrn: "45821",
-    dob: "03/15/1967",
-    age: 58,
+    dob: "11/15/1973",
+    age: 52,
     primaryDiagnosis: "Type 2 Diabetes",
-    avatar: "/avatars/michael-chen.jpg",
+    avatar: "https://randomuser.me/api/portraits/men/75.jpg",
   },
   trigger: {
     type: "lab_result",
-    title: "Elevated A1C Levels Detected",
-    urgency: "urgent",
+    title: "A1C Results: Excellent Improvement!",
+    urgency: "medium",
   },
   clinicalData: {
     labResults: [
@@ -95,7 +96,7 @@ export const demoContext: OrchestrationContext = {
         value: "7.2",
         unit: "%",
         trend: "down",
-        trendValue: "0.9% improvement",
+        trendValue: "0.9% improvement from 8.1%",
         status: "elevated",
       },
       {

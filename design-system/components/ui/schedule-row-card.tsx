@@ -24,7 +24,7 @@ export function ScheduleRowCard({
   time,
   patient,
   type,
-  provider,
+  provider: _provider,
   status,
   room,
   avatarSrc,

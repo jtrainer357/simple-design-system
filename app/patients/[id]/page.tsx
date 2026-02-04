@@ -220,7 +220,6 @@ export default function PatientDetailPage() {
 
   const handleActionClick = (action: PrioritizedAction) => {
     // This would typically open an orchestration modal
-    console.log("Action clicked:", action);
     alert(`Action: ${action.title}\n\nSuggested Actions:\n${action.suggestedActions.join("\n")}`);
   };
 

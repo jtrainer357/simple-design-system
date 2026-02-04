@@ -72,9 +72,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-  DropdownMenuCheckboxItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
 } from "@/design-system/components/ui/dropdown-menu";
 import {
   ContextMenu,
@@ -91,7 +88,8 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@/design-system/components/ui/navigation-menu";
-import { LeftNav, NavItem } from "@/design-system/components/ui/left-nav";
+// LeftNav and NavItem imported but not currently used in demo
+// import { LeftNav, NavItem } from "@/design-system/components/ui/left-nav";
 import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
 import { PriorityAction } from "@/design-system/components/ui/priority-action";
 import { AIActionCard } from "@/design-system/components/ui/ai-action-card";
@@ -179,7 +177,7 @@ import {
   ShadowToken,
   RadiusToken,
 } from "./components/TypographyToken";
-import { ComponentShowcase, ComponentSection } from "./components/ComponentShowcase";
+import { ComponentSection } from "./components/ComponentShowcase";
 
 export default function DesignSystemCatalog() {
   const [date, setDate] = useState<Date | undefined>(new Date());
@@ -538,8 +536,8 @@ import { Card } from '@/design-system/components/ui/card'`}
         <div id="spacing" className="scroll-mt-8 space-y-6">
           <h3 className="text-2xl font-light text-black">Spacing</h3>
           <p className="text-muted-foreground">
-            The design system uses Tailwind's default spacing scale. Custom spacing values can be
-            defined in globals.css.
+            The design system uses Tailwind&apos;s default spacing scale. Custom spacing values can
+            be defined in globals.css.
           </p>
 
           <SpacingToken
@@ -1354,7 +1352,7 @@ import { Card } from '@/design-system/components/ui/card'`}
                     <DialogHeader>
                       <DialogTitle>Edit profile</DialogTitle>
                       <DialogDescription>
-                        Make changes to your profile here. Click save when you're done.
+                        Make changes to your profile here. Click save when you&apos;re done.
                       </DialogDescription>
                     </DialogHeader>
                     <div className="grid gap-4 py-4">
@@ -1745,7 +1743,7 @@ import { Card } from '@/design-system/components/ui/card'`}
                           <NavigationMenuLink asChild>
                             <a
                               className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none"
-                              href="#"
+                              href="/design-system#introduction"
                             >
                               <div className="text-sm leading-none font-medium">Introduction</div>
                               <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
@@ -1756,7 +1754,7 @@ import { Card } from '@/design-system/components/ui/card'`}
                           <NavigationMenuLink asChild>
                             <a
                               className="hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none"
-                              href="#"
+                              href="/design-system#installation"
                             >
                               <div className="text-sm leading-none font-medium">Installation</div>
                               <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
@@ -1774,7 +1772,7 @@ import { Card } from '@/design-system/components/ui/card'`}
                           <NavigationMenuLink asChild>
                             <a
                               className="hover:bg-accent hover:text-accent-foreground block space-y-1 rounded-md p-3 leading-none no-underline transition-colors outline-none select-none"
-                              href="#"
+                              href="/design-system#button"
                             >
                               <div className="text-sm leading-none font-medium">Button</div>
                               <p className="text-muted-foreground line-clamp-2 text-sm leading-snug">
@@ -2272,7 +2270,7 @@ const navItems: NavItem[] = [
                   <AccordionItem value="item-3">
                     <AccordionTrigger>Is it animated?</AccordionTrigger>
                     <AccordionContent>
-                      Yes. It's animated by default with smooth open/close transitions.
+                      Yes. It&apos;s animated by default with smooth open/close transitions.
                     </AccordionContent>
                   </AccordionItem>
                 </Accordion>
