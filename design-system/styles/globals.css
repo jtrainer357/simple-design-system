@@ -188,6 +188,7 @@
     background: #fbf9f8;
     overflow: hidden;
     z-index: -1;
+    pointer-events: none;
   }
 
   .animated-background span {

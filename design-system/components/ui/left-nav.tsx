@@ -53,7 +53,7 @@ export function LeftNav({
       {/* Desktop Side Nav */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-40 hidden h-screen w-36 flex-col items-center pt-6 pb-4 lg:flex",
+          "pointer-events-auto fixed top-0 left-0 z-40 hidden h-screen w-36 flex-col items-center pt-6 pb-4 lg:flex",
           className
         )}
       >
@@ -137,7 +137,7 @@ export function LeftNav({
       </aside>
 
       {/* Tablet/Mobile Bottom Nav */}
-      <nav className="bg-card/95 safe-area-pb fixed right-0 bottom-0 left-0 z-40 flex items-center justify-around border-t px-4 py-3 backdrop-blur-sm lg:hidden">
+      <nav className="bg-card/95 safe-area-pb pointer-events-auto fixed right-0 bottom-0 left-0 z-40 flex items-center justify-around border-t px-4 py-3 backdrop-blur-sm lg:hidden">
         {items.map((item, index) => {
           const mobileButtonContent = (
             <>

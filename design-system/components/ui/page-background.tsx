@@ -10,7 +10,7 @@ interface PageBackgroundProps extends React.HTMLAttributes<HTMLDivElement> {
 export function PageBackground({ children, className, ...props }: PageBackgroundProps) {
   return (
     <div className={cn("relative isolate min-h-screen w-full", className)} {...props}>
-      <div className="background" aria-hidden="true">
+      <div className="animated-background" aria-hidden="true">
         <span></span>
         <span></span>
         <span></span>

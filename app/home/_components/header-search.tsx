@@ -1,4 +1,4 @@
-"use strict";
+"use client";
 import * as React from "react";
 import { Mic, Sparkles } from "lucide-react";
 import { Input } from "@/design-system/components/ui/input";
