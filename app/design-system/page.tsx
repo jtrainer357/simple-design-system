@@ -711,6 +711,9 @@ import { Card } from '@/design-system/components/ui/card'`}
             "Use CardContent for main content area",
             "Use CardFooter for actions or additional info",
             "Cards can be nested but use sparingly",
+            "Use opacity='default' (90%) for standard cards",
+            "Use opacity='transparent' (50%) for Today's Patients cards",
+            "Use opacity='solid' (100%) for Today's Actions cards",
           ]}
         >
           <div className="space-y-6">
@@ -790,6 +793,54 @@ import { Card } from '@/design-system/components/ui/card'`}
   <CardFooter>
     <Button className="w-full">Sign In</Button>
   </CardFooter>
+</Card>`}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            <h3 className="text-xl font-light text-black">Card Opacity Variants</h3>
+            <p className="text-muted-foreground text-sm">
+              Cards support three opacity levels for different use cases.
+            </p>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+              <div
+                className="rounded-lg border p-6"
+                style={{ background: "linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)" }}
+              >
+                <div className="space-y-4">
+                  <Card opacity="default" className="p-4">
+                    <p className="font-medium">Default (90% opacity)</p>
+                    <p className="text-muted-foreground text-sm">
+                      Standard cards with subtle transparency
+                    </p>
+                  </Card>
+                  <Card opacity="transparent" className="p-4">
+                    <p className="font-medium">Transparent (50% opacity)</p>
+                    <p className="text-muted-foreground text-sm">
+                      For Today&apos;s Patients schedule cards
+                    </p>
+                  </Card>
+                  <Card opacity="solid" className="p-4">
+                    <p className="font-medium">Solid (100% opacity)</p>
+                    <p className="text-muted-foreground text-sm">For Today&apos;s Actions cards</p>
+                  </Card>
+                </div>
+              </div>
+              <CodeBlock
+                code={`{/* Default - 90% opacity with blur */}
+<Card opacity="default">
+  ...
+</Card>
+
+{/* Transparent - 50% opacity */}
+<Card opacity="transparent">
+  ...
+</Card>
+
+{/* Solid - 100% white */}
+<Card opacity="solid">
+  ...
 </Card>`}
               />
             </div>
@@ -2097,7 +2148,7 @@ const navItems: NavItem[] = [
           guidelines={[
             "Use for filtering content views (e.g., All, Shared, Public, Archived)",
             "Keep tab labels short and action-oriented",
-            "Active tab is visually distinguished with white background and shadow",
+            "Active tab is visually distinguished with white background and 1px gray border",
           ]}
         >
           <div className="space-y-6">
@@ -3217,10 +3268,11 @@ function MyForm() {
         <ComponentSection
           id="ai-action-card"
           title="AIActionCard"
-          description="An AI-recommended action card featuring a large patient avatar, action details, status indicators, and badge variants"
+          description="An AI-recommended action card featuring a large patient avatar, action details, status indicators, and badge variants. Uses solid white (100% opacity) background."
           importCode={`import { AIActionCard } from '@/design-system/components/ui/ai-action-card'`}
           guidelines={[
-            "Use for AI substrate-recommended actions",
+            "Use for AI substrate-recommended actions (Today's Actions)",
+            "Uses solid white background (100% opacity) for maximum readability",
             "Large avatar emphasizes the patient focus",
             "Badge variants indicate action urgency/type",
             "Ready status shows preparation state",
@@ -3465,10 +3517,11 @@ function MyForm() {
         <ComponentSection
           id="schedule-row-card"
           title="ScheduleRowCard"
-          description="A compact row card for displaying schedule items with patient info, status badges, and room location"
+          description="A compact row card for displaying schedule items with patient info, status badges, and room location. Uses transparent (50% opacity) background."
           importCode={`import { ScheduleRowCard } from '@/design-system/components/ui/schedule-row-card'`}
           guidelines={[
-            "Use in schedule views and appointment lists",
+            "Use for Today's Patients schedule list on homepage",
+            "Uses transparent background (50% opacity) for glassmorphism effect",
             "Status badge provides quick visual context",
             "Single-row horizontal layout for consistency",
             "Patient name and type truncate on smaller screens",

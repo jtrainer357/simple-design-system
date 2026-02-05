@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import Image from "next/image";
+import Link from "next/link";
 import { PriorityAction } from "@/design-system/components/ui/priority-action";
 import { AIActionCard } from "@/design-system/components/ui/ai-action-card";
 import { Heading, Text } from "@/design-system/components/ui/typography";
@@ -19,15 +19,52 @@ import type { OrchestrationContext } from "@/src/lib/orchestration/types";
 interface PriorityActionsSectionProps {
   className?: string;
   onSelectPatient?: (context: OrchestrationContext) => void;
+  hideHeader?: boolean;
+}
+
+// Exported header component for use in parent layouts
+interface TodaysActionsHeaderProps {
+  appointmentCount: number;
+  isLoading?: boolean;
+}
+
+export function TodaysActionsHeader({ appointmentCount, isLoading }: TodaysActionsHeaderProps) {
+  const formattedDate = formatDemoDate("long");
+
+  return (
+    <div className="flex items-center gap-4">
+      <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
+      <div className="flex-1">
+        <Heading level={3} className="text-xl sm:text-2xl">
+          Today&apos;s Actions
+        </Heading>
+        <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+          {isLoading ? (
+            "Loading..."
+          ) : (
+            <>
+              {formattedDate} •{" "}
+              <span className="text-card-foreground font-semibold">
+                {appointmentCount} Appointments
+              </span>
+            </>
+          )}
+        </Text>
+      </div>
+      <Button variant="outline" className="shrink-0">
+        Complete All Actions
+      </Button>
+    </div>
+  );
 }
 
 // Map urgency to badge variant
-function getBadgeVariant(urgency: string): "urgent" | "success" | "default" {
+function getBadgeVariant(urgency: string): "urgent" | "warning" | "success" | "default" {
   switch (urgency) {
     case "urgent":
       return "urgent";
     case "high":
-      return "urgent";
+      return "warning";
     case "medium":
       return "success";
     default:
@@ -74,9 +111,35 @@ function actionToContext(action: PriorityActionWithPatient): OrchestrationContex
   };
 }
 
+// Convert appointment to OrchestrationContext for the detail view
+function appointmentToContext(apt: AppointmentWithPatient): OrchestrationContext {
+  const patient = apt.patient;
+  return {
+    patient: {
+      id: patient.id,
+      name: `${patient.first_name} ${patient.last_name}`,
+      mrn: patient.id.substring(0, 8),
+      dob: patient.date_of_birth,
+      age: Math.floor(
+        (Date.now() - new Date(patient.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+      ),
+      primaryDiagnosis: apt.service_type || "General Visit",
+      avatar: patient.avatar_url || `https://i.pravatar.cc/150?u=${patient.id}`,
+    },
+    trigger: {
+      type: "appointment",
+      title: `${apt.service_type} Appointment`,
+      urgency: "medium",
+    },
+    clinicalData: {},
+    suggestedActions: [],
+  };
+}
+
 export function PriorityActionsSection({
   className,
   onSelectPatient,
+  hideHeader = false,
 }: PriorityActionsSectionProps) {
   const [actions, setActions] = React.useState<PriorityActionWithPatient[]>([]);
   const [todayAppts, setTodayAppts] = React.useState<AppointmentWithPatient[]>([]);
@@ -105,7 +168,7 @@ export function PriorityActionsSection({
           getTodayAppointments(),
         ]);
 
-        setActions(actionsData.slice(0, 10)); // Show top 10
+        setActions(actionsData.slice(0, 3)); // Show top 3
         setTodayAppts(apptsData);
       } catch (err) {
         console.error("Failed to load priority actions:", err);
@@ -245,37 +308,51 @@ export function PriorityActionsSection({
 
   return (
     <section className={className}>
-      <div className="mb-10 flex items-center gap-4">
-        <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
-        <div className="flex-1">
-          <Heading level={3} className="text-xl sm:text-2xl">
-            Today&apos;s Actions
-          </Heading>
-          <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-            {formattedDate} •{" "}
-            <span className="text-card-foreground font-semibold">
-              {todayAppts.length} Appointments
-            </span>
-          </Text>
+      {!hideHeader && (
+        <div className="mb-14 flex items-center gap-4">
+          <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
+          <div className="flex-1">
+            <Heading level={3} className="text-xl sm:text-2xl">
+              Today&apos;s Actions
+            </Heading>
+            <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+              {formattedDate} •{" "}
+              <span className="text-card-foreground font-semibold">
+                {todayAppts.length} Appointments
+              </span>
+            </Text>
+          </div>
+          <Button variant="outline" className="shrink-0">
+            Complete All Actions
+          </Button>
         </div>
-        <Button variant="outline" className="shrink-0">
-          Complete All Actions
-        </Button>
-      </div>
+      )}
 
       <div className="space-y-4">
         {/* Top coral "arriving" card - if there's an arriving patient */}
         {arrivingPatient && (
-          <Link href={`/patients/${arrivingPatient.patient_id}`} className="block">
+          <div
+            onClick={() => onSelectPatient?.(appointmentToContext(arrivingPatient))}
+            className="mb-10 block cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                onSelectPatient?.(appointmentToContext(arrivingPatient));
+              }
+            }}
+          >
             <PriorityAction
               title={`${arrivingPatient.patient.first_name} ${arrivingPatient.patient.last_name} is arriving`}
               subtitle={`${arrivingPatient.start_time} appointment • ${arrivingPatient.service_type}`}
               avatarInitials={`${arrivingPatient.patient.first_name[0]}${arrivingPatient.patient.last_name[0]}`}
               avatarSrc={arrivingPatient.patient.avatar_url || undefined}
+              secondaryButtonText="View Suggested Actions"
+              onSecondaryButtonClick={() => {}}
               buttonText="Begin Check-in"
               onButtonClick={() => {}}
             />
-          </Link>
+          </div>
         )}
 
         {/* AI Action Cards from database */}
@@ -286,41 +363,19 @@ export function PriorityActionsSection({
               ? (action.suggested_actions as string[]).length
               : 0;
 
-            // First urgent/high action opens the dynamic canvas
-            const isFirstUrgent =
-              actions.indexOf(action) === 0 &&
-              (action.urgency === "urgent" || action.urgency === "high");
-
-            if (isFirstUrgent && onSelectPatient) {
-              return (
-                <div
-                  key={action.id}
-                  onClick={() => onSelectPatient(actionToContext(action))}
-                  className="block cursor-pointer"
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter" || e.key === " ") {
-                      onSelectPatient(actionToContext(action));
-                    }
-                  }}
-                >
-                  <AIActionCard
-                    patientName={patientName}
-                    avatarSrc={action.patient.avatar_url || undefined}
-                    mainAction={action.title}
-                    statusIndicators={action.description || action.clinical_context || ""}
-                    readyStatus={`Confidence: ${action.confidence_score || 85}%`}
-                    suggestedActions={suggestedCount}
-                    badgeText={getBadgeText(action.urgency, action.timeframe)}
-                    badgeVariant={getBadgeVariant(action.urgency)}
-                  />
-                </div>
-              );
-            }
-
             return (
-              <Link key={action.id} href={`/patients/${action.patient_id}`} className="block">
+              <div
+                key={action.id}
+                onClick={() => onSelectPatient?.(actionToContext(action))}
+                className="block cursor-pointer"
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    onSelectPatient?.(actionToContext(action));
+                  }
+                }}
+              >
                 <AIActionCard
                   patientName={patientName}
                   avatarSrc={action.patient.avatar_url || undefined}
@@ -331,7 +386,7 @@ export function PriorityActionsSection({
                   badgeText={getBadgeText(action.urgency, action.timeframe)}
                   badgeVariant={getBadgeVariant(action.urgency)}
                 />
-              </Link>
+              </div>
             );
           })}
         </div>

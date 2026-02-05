@@ -64,10 +64,10 @@ export function ChatMessage({
 
         <div
           className={cn(
-            "rounded-2xl px-4 py-2.5",
+            "rounded-2xl px-4 py-3",
             isOwn
-              ? "bg-primary text-primary-foreground rounded-tr-sm"
-              : "bg-card border-border rounded-tl-sm border"
+              ? "bg-primary text-primary-foreground rounded-br-md"
+              : "border-border/50 rounded-bl-md border bg-white shadow-sm"
           )}
         >
           {type === "text" ? (

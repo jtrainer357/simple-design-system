@@ -6,13 +6,34 @@ import { ChevronDown, Loader2, Database } from "lucide-react";
 import { Button } from "@/design-system/components/ui/button";
 import { FilterTabs } from "@/design-system/components/ui/filter-tabs";
 import { PatientListSidebar, Patient } from "./patient-list-sidebar";
-import { PatientDetailView, PatientDetail } from "./patient-detail-view";
+import {
+  PatientDetailView,
+  PatientDetail,
+  type PatientMessage,
+  type PatientInvoice,
+  type PatientOutcomeMeasure,
+  type PatientReview,
+} from "./patient-detail-view";
 import {
   getPatients,
   getPatientDetails as getPatientDetailsQuery,
+  getPatientVisitSummaries,
+  type VisitSummary,
+  type Communication,
 } from "@/src/lib/queries/patients";
+import {
+  getPatientPriorityActions,
+  type PatientPriorityAction,
+} from "@/src/lib/queries/priority-actions";
 import { isDatabasePopulated } from "@/src/lib/queries/practice";
-import type { Patient as DbPatient, Appointment, Invoice } from "@/src/lib/supabase/types";
+import type {
+  Patient as DbPatient,
+  Appointment,
+  Invoice,
+  OutcomeMeasure,
+  Review,
+} from "@/src/lib/supabase/types";
+import type { PriorityAction } from "./patient-detail-view";
 import { Text } from "@/design-system/components/ui/typography";
 
 const patientFilterTabs = [
@@ -54,7 +75,11 @@ function dbPatientToListItem(patient: DbPatient): Patient {
 function createPatientDetail(
   patient: DbPatient,
   appointments: Appointment[],
-  invoices: Invoice[]
+  invoices: Invoice[],
+  visitSummaries: VisitSummary[] = [],
+  messages: Communication[] = [],
+  outcomeMeasures: OutcomeMeasure[] = [],
+  reviews: Review[] = []
 ): PatientDetail {
   const age = Math.floor(
     (Date.now() - new Date(patient.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)
@@ -102,20 +127,141 @@ function createPatientDetail(
       provider: "Dr. Demo",
     }));
 
-  // Get recent activity from appointments
-  const recentActivity = sortedAppts
-    .filter((a) => a.status === "Completed")
-    .slice(0, 3)
-    .map((a) => ({
-      id: a.id,
-      title: a.service_type,
-      description: `Session with ${patient.first_name}`,
-      date: new Date(a.date).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-    }));
+  // Map service types to more descriptive titles
+  const getActivityTitle = (serviceType: string): string => {
+    const titleMap: Record<string, string> = {
+      "Individual Therapy": "Psychotherapy Session",
+      "Initial Intake": "Initial Assessment",
+      "Medication Management": "Medication Review",
+      "Group Therapy": "Group Therapy Session",
+      "Family Therapy": "Family Therapy Session",
+      "Couples Therapy": "Couples Therapy Session",
+      "Crisis Intervention": "Crisis Intervention",
+      Telehealth: "Telehealth Session",
+      "Follow-up": "Follow-up Appointment",
+    };
+    return titleMap[serviceType] || serviceType;
+  };
+
+  // Generate a descriptive summary based on appointment data
+  const getActivityDescription = (appointment: Appointment, patientName: string): string => {
+    // Use notes if available and meaningful
+    if (appointment.notes && appointment.notes.length > 10) {
+      // Truncate long notes to first sentence or 100 chars
+      const firstSentence = appointment.notes.split(/[.!?]/)[0];
+      if (firstSentence && firstSentence.length > 10) {
+        return firstSentence.length > 100
+          ? firstSentence.substring(0, 100) + "..."
+          : firstSentence + ".";
+      }
+    }
+
+    // Generate description based on service type
+    const durationStr = appointment.duration_minutes
+      ? `${appointment.duration_minutes}-minute`
+      : "60-minute";
+
+    const descriptions: Record<string, string> = {
+      "Individual Therapy": `${durationStr} individual therapy session. Discussed coping strategies and treatment progress.`,
+      "Initial Intake": `Comprehensive initial assessment completed. Treatment plan discussed with ${patientName}.`,
+      "Medication Management": `Reviewed current prescriptions and medication effectiveness. Discussed any side effects.`,
+      "Group Therapy": `Group therapy session focused on building coping skills and peer support.`,
+      "Family Therapy": `Family therapy session addressing communication patterns and support strategies.`,
+      Telehealth: `${durationStr} telehealth session completed. Continued work on treatment goals.`,
+      "Follow-up": `Follow-up appointment for ongoing care and progress review.`,
+    };
+
+    return (
+      descriptions[appointment.service_type] ||
+      `${durationStr} session with ${patientName}. Treatment goals reviewed.`
+    );
+  };
+
+  // Get recent activity from visit summaries (preferred) or appointments
+  const recentActivity =
+    visitSummaries.length > 0
+      ? visitSummaries.slice(0, 5).map((vs) => ({
+          id: vs.id,
+          title: getActivityTitle(vs.appointment_type || "Visit"),
+          description: vs.visit_summary || `Session with ${patient.first_name}`,
+          date: new Date(vs.visit_date).toLocaleDateString("en-US", {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          }),
+        }))
+      : sortedAppts
+          .filter((a) => a.status === "Completed")
+          .slice(0, 5)
+          .map((a) => ({
+            id: a.id,
+            title: getActivityTitle(a.service_type),
+            description: getActivityDescription(a, patient.first_name),
+            date: new Date(a.date).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            }),
+          }));
+
+  // Map all appointments for the appointments tab
+  const allAppts = sortedAppts.map((a) => ({
+    id: a.id,
+    status: a.status,
+    date: new Date(a.date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }),
+    time: a.start_time,
+    type: a.service_type,
+    provider: "Dr. Demo",
+  }));
+
+  // Map messages (reverse to show oldest first, newest at bottom for chat view)
+  const mappedMessages: PatientMessage[] = [...messages].reverse().map((m) => ({
+    id: m.id,
+    channel: m.channel,
+    direction: m.direction,
+    sender: m.sender,
+    messageBody: m.message_body,
+    isRead: m.is_read,
+    sentAt: m.sent_at,
+  }));
+
+  // Map invoices
+  const mappedInvoices: PatientInvoice[] = invoices.map((inv) => ({
+    id: inv.id,
+    invoiceDate: inv.date_of_service ?? null,
+    dateOfService: inv.date_of_service ?? null,
+    description: inv.cpt_code ? `Service (${inv.cpt_code})` : "Service Charge",
+    chargeAmount: inv.charge_amount,
+    insurancePaid: inv.insurance_paid,
+    patientPaid: inv.patient_paid,
+    balance: inv.balance,
+    status: inv.status,
+  }));
+
+  // Map outcome measures
+  const mappedOutcomeMeasures: PatientOutcomeMeasure[] = outcomeMeasures.map((om) => ({
+    id: om.id,
+    measureType: om.measure_type,
+    score: om.score,
+    measurementDate: om.measurement_date,
+    notes: om.notes,
+  }));
+
+  // Map reviews
+  const mappedReviews: PatientReview[] = reviews.map((r) => ({
+    id: r.id,
+    reviewerName: r.reviewer_name,
+    reviewType: r.review_type,
+    rating: r.rating,
+    title: r.title,
+    reviewText: r.review_text,
+    reviewDate: r.review_date,
+    isAnonymous: r.is_anonymous,
+  }));
 
   return {
     id: patient.id,
@@ -151,11 +297,51 @@ function createPatientDetail(
       type: outstandingBalance > 0 ? "Outstanding" : "Paid",
     },
     upcomingAppointments: upcomingAppts,
+    allAppointments: allAppts,
     recentActivity,
+    messages: mappedMessages,
+    invoices: mappedInvoices,
+    outcomeMeasures: mappedOutcomeMeasures,
+    reviews: mappedReviews,
   };
 }
 
-export function PatientsPage() {
+// Convert DB priority action to UI format
+function dbActionToUiAction(action: PatientPriorityAction): PriorityAction {
+  // Map urgency to priority level
+  const priorityMap: Record<string, PriorityAction["priority"]> = {
+    urgent: "urgent",
+    high: "high",
+    medium: "medium",
+    low: "medium",
+  };
+
+  // Map action type based on title keywords
+  const getActionType = (title: string): PriorityAction["type"] => {
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle.includes("medication") || lowerTitle.includes("refill")) return "medication";
+    if (lowerTitle.includes("risk") || lowerTitle.includes("elevated")) return "risk";
+    if (lowerTitle.includes("screening") || lowerTitle.includes("assessment")) return "screening";
+    if (lowerTitle.includes("wellness") || lowerTitle.includes("overdue")) return "care-gap";
+    return "screening";
+  };
+
+  return {
+    id: action.id,
+    type: getActionType(action.title),
+    title: action.title,
+    description: action.clinical_context || "",
+    priority: priorityMap[action.urgency] || "medium",
+    dueDate: action.timeframe || undefined,
+    aiConfidence: action.confidence_score || 85,
+  };
+}
+
+interface PatientsPageProps {
+  initialPatientId?: string;
+}
+
+export function PatientsPage({ initialPatientId }: PatientsPageProps) {
   const [loading, setLoading] = React.useState(true);
   const [dbReady, setDbReady] = React.useState<boolean | null>(null);
   const [patients, setPatients] = React.useState<DbPatient[]>([]);
@@ -183,10 +369,16 @@ export function PatientsPage() {
         const patientsData = await getPatients();
         setPatients(patientsData);
 
-        // Auto-select first patient
-        if (patientsData.length > 0 && patientsData[0]) {
-          const firstPatient = dbPatientToListItem(patientsData[0]);
-          setSelectedPatient(firstPatient);
+        // Select patient from URL param, or default to first patient
+        if (initialPatientId) {
+          const targetPatient = patientsData.find((p) => p.id === initialPatientId);
+          if (targetPatient) {
+            setSelectedPatient(dbPatientToListItem(targetPatient));
+          } else if (patientsData.length > 0 && patientsData[0]) {
+            setSelectedPatient(dbPatientToListItem(patientsData[0]));
+          }
+        } else if (patientsData.length > 0 && patientsData[0]) {
+          setSelectedPatient(dbPatientToListItem(patientsData[0]));
         }
       } catch (err) {
         console.error("Failed to load patients:", err);
@@ -196,7 +388,7 @@ export function PatientsPage() {
     }
 
     loadPatients();
-  }, []);
+  }, [initialPatientId]);
 
   // Load selected patient details
   React.useEffect(() => {
@@ -206,14 +398,25 @@ export function PatientsPage() {
       try {
         setDetailLoading(true);
 
-        const details = await getPatientDetailsQuery(selectedPatient!.id);
+        // Fetch patient details, priority actions, and visit summaries in parallel
+        const [details, priorityActions, visitSummaries] = await Promise.all([
+          getPatientDetailsQuery(selectedPatient!.id),
+          getPatientPriorityActions(selectedPatient!.id),
+          getPatientVisitSummaries(selectedPatient!.id),
+        ]);
 
         if (details) {
           const detailData = createPatientDetail(
             details.patient,
             details.appointments,
-            details.invoices
+            details.invoices,
+            visitSummaries,
+            details.messages,
+            details.outcomeMeasures,
+            details.reviews
           );
+          // Add priority actions to the detail data
+          detailData.prioritizedActions = priorityActions.map(dbActionToUiAction);
           setPatientDetails(detailData);
         }
       } catch (err) {
@@ -268,11 +471,11 @@ export function PatientsPage() {
   }
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
+    <div className="flex h-full flex-col">
       {/* Main Content */}
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 overflow-hidden lg:grid-cols-12">
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-12">
         {/* Patient List Column */}
-        <div className="flex flex-col overflow-hidden lg:col-span-5 xl:col-span-4">
+        <div className="flex min-h-0 flex-col lg:col-span-5 xl:col-span-4">
           {/* Filter Tabs - aligned with patient list column */}
           <div className="mb-4 flex items-center justify-between">
             <FilterTabs
@@ -291,7 +494,7 @@ export function PatientsPage() {
         </div>
 
         {/* Patient Detail Column */}
-        <div className="flex flex-col overflow-hidden lg:col-span-7 xl:col-span-8">
+        <div className="flex min-h-0 flex-col lg:col-span-7 xl:col-span-8">
           {/* Add Patient Button - aligned with detail view */}
           <div className="mb-4 flex items-center justify-end">
             <Button className="gap-1.5 text-sm sm:gap-2 sm:text-base">

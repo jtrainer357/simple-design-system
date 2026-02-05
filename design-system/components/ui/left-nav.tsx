@@ -37,6 +37,7 @@ export interface LeftNavProps {
   notificationCount?: number;
   user?: UserConfig;
   className?: string;
+  isHomePage?: boolean;
 }
 
 export function LeftNav({
@@ -47,6 +48,7 @@ export function LeftNav({
   notificationCount,
   user,
   className,
+  isHomePage = false,
 }: LeftNavProps) {
   return (
     <>
@@ -58,14 +60,28 @@ export function LeftNav({
         )}
       >
         {/* Logo */}
-        <div className="mb-6 px-4">
-          <Image
-            src={logo.src}
-            alt={logo.alt || "Logo"}
-            width={logo.width || 96}
-            height={logo.height || 23}
-          />
-        </div>
+        {isHomePage ? (
+          <div className="mb-6 px-4">
+            <Image
+              src={logo.src}
+              alt={logo.alt || "Logo"}
+              width={logo.width || 96}
+              height={logo.height || 23}
+            />
+          </div>
+        ) : (
+          <Link
+            href="/home"
+            className="mb-6 cursor-pointer px-4 transition-opacity hover:opacity-80"
+          >
+            <Image
+              src={logo.src}
+              alt={logo.alt || "Logo"}
+              width={logo.width || 96}
+              height={logo.height || 23}
+            />
+          </Link>
+        )}
 
         {/* Main Nav Icons */}
         <nav className="-mt-20 flex flex-1 flex-col items-center justify-center gap-10">

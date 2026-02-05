@@ -13,7 +13,10 @@ import {
 } from "@/src/lib/utils/demo-date";
 
 export type AppointmentWithPatient = Appointment & {
-  patient: Pick<Patient, "id" | "first_name" | "last_name" | "avatar_url" | "risk_level">;
+  patient: Pick<
+    Patient,
+    "id" | "first_name" | "last_name" | "avatar_url" | "risk_level" | "date_of_birth"
+  >;
 };
 
 /**
@@ -36,7 +39,8 @@ export async function getTodayAppointments(
         first_name,
         last_name,
         avatar_url,
-        risk_level
+        risk_level,
+        date_of_birth
       )
     `
     )
@@ -78,7 +82,8 @@ export async function getUpcomingAppointments(
         first_name,
         last_name,
         avatar_url,
-        risk_level
+        risk_level,
+        date_of_birth
       )
     `
     )
@@ -124,7 +129,8 @@ export async function getRecentAppointments(
         first_name,
         last_name,
         avatar_url,
-        risk_level
+        risk_level,
+        date_of_birth
       )
     `
     )

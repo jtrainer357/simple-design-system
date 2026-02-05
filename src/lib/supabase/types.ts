@@ -586,6 +586,63 @@ export type Database = {
           },
         ];
       };
+      reviews: {
+        Row: {
+          id: string;
+          practice_id: string;
+          patient_id: string;
+          reviewer_name: string | null;
+          review_type: "treatment_outcome" | "care_quality" | "provider_feedback" | "general";
+          rating: number;
+          title: string;
+          review_text: string;
+          is_anonymous: boolean;
+          review_date: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          practice_id: string;
+          patient_id: string;
+          reviewer_name?: string | null;
+          review_type: "treatment_outcome" | "care_quality" | "provider_feedback" | "general";
+          rating: number;
+          title: string;
+          review_text: string;
+          is_anonymous?: boolean;
+          review_date: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          practice_id?: string;
+          patient_id?: string;
+          reviewer_name?: string | null;
+          review_type?: "treatment_outcome" | "care_quality" | "provider_feedback" | "general";
+          rating?: number;
+          title?: string;
+          review_text?: string;
+          is_anonymous?: boolean;
+          review_date?: string;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "reviews_practice_id_fkey";
+            columns: ["practice_id"];
+            isOneToOne: false;
+            referencedRelation: "practices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "reviews_patient_id_fkey";
+            columns: ["patient_id"];
+            isOneToOne: false;
+            referencedRelation: "patients";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -612,6 +669,7 @@ export type Invoice = Database["public"]["Tables"]["invoices"]["Row"];
 export type PriorityAction = Database["public"]["Tables"]["priority_actions"]["Row"];
 export type ClinicalTask = Database["public"]["Tables"]["clinical_tasks"]["Row"];
 export type AIAnalysisRun = Database["public"]["Tables"]["ai_analysis_runs"]["Row"];
+export type Review = Database["public"]["Tables"]["reviews"]["Row"];
 
 // Insert types
 export type PatientInsert = Database["public"]["Tables"]["patients"]["Insert"];
@@ -621,6 +679,7 @@ export type MessageInsert = Database["public"]["Tables"]["messages"]["Insert"];
 export type InvoiceInsert = Database["public"]["Tables"]["invoices"]["Insert"];
 export type PriorityActionInsert = Database["public"]["Tables"]["priority_actions"]["Insert"];
 export type ClinicalTaskInsert = Database["public"]["Tables"]["clinical_tasks"]["Insert"];
+export type ReviewInsert = Database["public"]["Tables"]["reviews"]["Insert"];
 
 // Priority action with patient relation
 export type PriorityActionWithPatient = PriorityAction & {

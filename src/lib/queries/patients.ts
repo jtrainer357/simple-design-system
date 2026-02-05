@@ -4,7 +4,13 @@
  */
 
 import { createClient } from "@/src/lib/supabase/client";
-import type { Patient, Appointment, OutcomeMeasure, Invoice } from "@/src/lib/supabase/types";
+import type {
+  Patient,
+  Appointment,
+  OutcomeMeasure,
+  Invoice,
+  Review,
+} from "@/src/lib/supabase/types";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -166,6 +172,33 @@ export async function getPatientInvoices(patientId: string): Promise<Invoice[]> 
 }
 
 /**
+ * Get patient reviews
+ * Returns empty array if table doesn't exist or query fails (graceful degradation)
+ */
+export async function getPatientReviews(patientId: string): Promise<Review[]> {
+  const supabase = createClient();
+
+  try {
+    const { data, error } = await supabase
+      .from("reviews")
+      .select("*")
+      .eq("patient_id", patientId)
+      .order("review_date", { ascending: false });
+
+    if (error) {
+      // Table might not exist yet - return empty array gracefully
+      console.warn("Reviews query failed (table may not exist):", error.message);
+      return [];
+    }
+
+    return data || [];
+  } catch {
+    // Graceful fallback if table doesn't exist
+    return [];
+  }
+}
+
+/**
  * Get complete patient details with all related data
  */
 export async function getPatientDetails(patientId: string): Promise<{
@@ -174,15 +207,17 @@ export async function getPatientDetails(patientId: string): Promise<{
   outcomeMeasures: OutcomeMeasure[];
   messages: Communication[];
   invoices: Invoice[];
+  reviews: Review[];
 } | null> {
   const patient = await getPatientById(patientId);
   if (!patient) return null;
 
-  const [appointments, outcomeMeasures, messages, invoices] = await Promise.all([
+  const [appointments, outcomeMeasures, messages, invoices, reviews] = await Promise.all([
     getPatientAppointments(patientId),
     getPatientOutcomeMeasures(patientId),
     getPatientMessages(patientId),
     getPatientInvoices(patientId),
+    getPatientReviews(patientId),
   ]);
 
   return {
@@ -191,6 +226,7 @@ export async function getPatientDetails(patientId: string): Promise<{
     outcomeMeasures,
     messages,
     invoices,
+    reviews,
   };
 }
 
@@ -240,6 +276,40 @@ export async function getHighRiskPatients(
   if (error) {
     console.error("Failed to fetch high-risk patients:", error);
     throw error;
+  }
+
+  return data || [];
+}
+
+// Visit Summary type
+export interface VisitSummary {
+  id: string;
+  practice_id: string;
+  patient_id: string;
+  clinical_note_id: string | null;
+  visit_date: string;
+  patient_name: string | null;
+  appointment_type: string | null;
+  visit_summary: string | null;
+  created_at: string;
+}
+
+/**
+ * Get patient visit summaries for recent activity
+ */
+export async function getPatientVisitSummaries(patientId: string): Promise<VisitSummary[]> {
+  const supabase = createClient();
+
+  const { data, error } = await (supabase as SupabaseAny)
+    .from("visit_summaries")
+    .select("*")
+    .eq("patient_id", patientId)
+    .order("visit_date", { ascending: false })
+    .limit(10);
+
+  if (error) {
+    console.error("Failed to fetch patient visit summaries:", error);
+    return [];
   }
 
   return data || [];

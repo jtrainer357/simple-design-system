@@ -60,15 +60,23 @@ function threadToConversation(thread: {
   };
 }
 
+// Parse voice message duration from content like "[Voice message - 1:23] description"
+function parseVoiceDuration(content: string): string | undefined {
+  const match = content.match(/\[Voice message - (\d+:\d+)\]/);
+  return match ? match[1] : "0:30";
+}
+
 // Convert DB communication to chat message
 function commToMessage(
   comm: Communication,
   patient: { first_name: string; last_name: string; avatar_url: string | null }
 ): Message {
   const isOutbound = comm.direction === "outbound";
+  const isVoice = comm.channel?.toLowerCase() === "voice";
+
   return {
     id: comm.id,
-    content: comm.message_body || "",
+    content: isVoice ? "" : comm.message_body || "",
     time: comm.sent_at
       ? new Date(comm.sent_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
       : "",
@@ -76,6 +84,8 @@ function commToMessage(
     senderName: isOutbound ? "You" : `${patient.first_name} ${patient.last_name}`,
     senderAvatar: isOutbound ? undefined : patient.avatar_url || undefined,
     status: comm.is_read ? "read" : "sent",
+    type: isVoice ? "voice" : "text",
+    voiceDuration: isVoice ? parseVoiceDuration(comm.message_body || "") : undefined,
   };
 }
 

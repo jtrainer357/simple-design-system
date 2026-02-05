@@ -26,7 +26,7 @@ export default function HomePage() {
           <PageTransition>
             <div className="mx-auto flex max-w-[1600px] flex-col gap-2 lg:h-[calc(100vh-8.5rem)] lg:flex-row">
               {/* Main Content Area - Unified Card with Dynamic Canvas */}
-              <CardWrapper className="flex min-h-0 flex-1 flex-col overflow-auto">
+              <CardWrapper className="flex min-h-0 flex-1 flex-col overflow-visible">
                 <DynamicCanvas className="flex min-h-0 flex-1 flex-col" />
               </CardWrapper>
 

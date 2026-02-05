@@ -50,7 +50,7 @@ export function PatientListCard({
   return (
     <Card
       className={cn(
-        "cursor-pointer p-3 transition-all sm:p-4",
+        "cursor-pointer p-3 transition-all hover:border-white hover:bg-[#F6F3EB]/70 hover:shadow-md sm:p-4",
         selected && "border-selected-border bg-accent/30",
         className
       )}

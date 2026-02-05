@@ -56,6 +56,14 @@ export async function getPriorityActions(
   // Map DB fields to expected types and sort by urgency
   const urgencyOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
   return ((data || []) as SupabaseAny[])
+    .filter((action: SupabaseAny) => {
+      // Filter out Emily Chen's card
+      const patient = action.patient;
+      if (patient?.first_name === "Emily" && patient?.last_name === "Chen") {
+        return false;
+      }
+      return true;
+    })
     .map((action: SupabaseAny) => ({
       ...action,
       urgency: normalizeUrgency(action.urgency || "medium"),

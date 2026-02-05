@@ -26,11 +26,18 @@ export function MessageRowCard({
   className,
 }: MessageRowCardProps) {
   return (
-    <Card className={cn("p-3", className)}>
+    <Card
+      className={cn(
+        "cursor-pointer p-3 transition-all hover:border-white hover:bg-[#F6F3EB]/70 hover:shadow-md",
+        className
+      )}
+    >
       <div className="flex items-start gap-3">
         <Avatar className="h-10 w-10">
           {avatarSrc && <AvatarImage src={avatarSrc} alt={name} />}
-          <AvatarFallback className="bg-[#8CA7A2] text-sm text-white">
+          <AvatarFallback
+            className={cn("text-sm text-white", Icon ? "bg-[#079CB2]/70" : "bg-[#8CA7A2]/70")}
+          >
             {Icon ? <Icon className="h-5 w-5" /> : name[0]}
           </AvatarFallback>
         </Avatar>

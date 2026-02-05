@@ -14,6 +14,8 @@ export interface PriorityActionProps {
   avatarSrc?: string;
   buttonText: string;
   onButtonClick?: () => void;
+  secondaryButtonText?: string;
+  onSecondaryButtonClick?: () => void;
   className?: string;
 }
 
@@ -25,41 +27,55 @@ export function PriorityAction({
   avatarSrc,
   buttonText,
   onButtonClick,
+  secondaryButtonText,
+  onSecondaryButtonClick,
   className,
 }: PriorityActionProps) {
   return (
-    <Card className={cn("overflow-hidden bg-[#FFCFBF]/50 backdrop-blur-xl", className)}>
-      <CardContent className="p-4 sm:p-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3 sm:gap-4">
-            <Avatar className="h-12 w-12 shrink-0 border-4 border-white sm:h-14 sm:w-14">
+    <Card className={cn("overflow-hidden border-0 bg-[#FFCFBF]/50 backdrop-blur-xl", className)}>
+      <CardContent className="p-6 sm:p-8">
+        <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-4 sm:gap-5">
+            <Avatar className="h-16 w-16 shrink-0 border-4 border-white sm:h-20 sm:w-20">
               {avatarSrc && <AvatarImage src={avatarSrc} />}
-              <AvatarFallback className="bg-[#8CA7A2] text-sm text-white sm:text-base">
+              <AvatarFallback className="bg-[#8CA7A2] text-base text-white sm:text-lg">
                 {avatarInitials}
               </AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <div className="mb-1 flex items-center gap-1.5">
+              <div className="mb-1.5 flex items-center gap-1.5">
                 <Text
                   size="xs"
                   muted
-                  className="text-[10px] font-bold tracking-wider uppercase sm:text-xs"
+                  className="text-xs font-bold tracking-wider uppercase sm:text-sm"
                 >
                   {label}
                 </Text>
-                <div className="bg-primary h-1 w-1 rounded-full" />
+                <div className="bg-primary h-1.5 w-1.5 rounded-full" />
               </div>
-              <Heading level={4} className="truncate text-base sm:text-xl">
+              <Heading level={4} className="truncate text-lg sm:text-2xl">
                 {title}
               </Heading>
-              <Text size="sm" muted className="truncate text-xs sm:text-sm">
+              <Text size="sm" muted className="truncate text-sm sm:text-base">
                 {subtitle}
               </Text>
             </div>
           </div>
-          <Button onClick={onButtonClick} className="w-full sm:w-auto">
-            {buttonText}
-          </Button>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+            {secondaryButtonText && (
+              <Button
+                onClick={onSecondaryButtonClick}
+                variant="outline"
+                size="lg"
+                className="w-full sm:w-auto"
+              >
+                {secondaryButtonText}
+              </Button>
+            )}
+            <Button onClick={onButtonClick} size="lg" className="w-full sm:w-auto">
+              {buttonText}
+            </Button>
+          </div>
         </div>
       </CardContent>
     </Card>

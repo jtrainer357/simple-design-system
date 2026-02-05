@@ -1,67 +1,612 @@
 id,practice_id,patient_id,channel,direction,sender,recipient,sender_email,recipient_email,sender_phone,recipient_phone,message_body,is_read,sent_at,created_at
-27abd98c-a1d4-4970-a1d1-a7991f0431dc,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,email,outbound,Dr. Jennifer Martinez,Sarah Mitchell,dr.martinez@martineztherapy.com,sarah.mitchell@email.com,(412) 555-0100,(412) 555-2847,"Hi Sarah, just checking in to see how things are going. Let me know if you need anything before our next session.",True,2026-01-26 00:00:00,2026-01-26 00:00:00
-cb1b873b-dca2-49db-b198-17314c91cfb6,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,email,outbound,Dr. Jennifer Martinez,Sarah Mitchell,dr.martinez@martineztherapy.com,sarah.mitchell@email.com,(412) 555-0100,(412) 555-2847,Great work on your exposure homework! This kind of progress really shows your commitment to change.,True,2026-01-27 00:00:00,2026-01-27 00:00:00
-e4e69fc1-35fb-4286-92b0-abf0b08d5fe4,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,SMS,outbound,Dr. Jennifer Martinez,Marcus Johnson,dr.martinez@martineztherapy.com,marcus.j.johnson@email.com,(412) 555-0100,(412) 555-3921,Your prescription refill has been authorized. It should be ready at your pharmacy within 2 hours.,True,2026-02-02 00:00:00,2026-02-02 00:00:00
-0ac09689-a537-4e1e-a4cf-e605aeaa3b53,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,SMS,outbound,Dr. Jennifer Martinez,Marcus Johnson,dr.martinez@martineztherapy.com,marcus.j.johnson@email.com,(412) 555-0100,(412) 555-3921,Your prescription refill has been authorized. It should be ready at your pharmacy within 2 hours.,True,2026-02-03 00:00:00,2026-02-03 00:00:00
-9b076cf0-347a-4af2-93d1-3f7c36b7cfad,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,SMS,outbound,Dr. Jennifer Martinez,Marcus Johnson,dr.martinez@martineztherapy.com,marcus.j.johnson@email.com,(412) 555-0100,(412) 555-3921,"Hi Marcus, this is your appointment reminder for Thursday at 12:00 AM. Looking forward to seeing you!",True,2026-01-29 00:00:00,2026-01-29 00:00:00
-ee9969dd-0a37-4bd7-9ae3-66323c6653f2,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,SMS,outbound,Dr. Jennifer Martinez,Marcus Johnson,dr.martinez@martineztherapy.com,marcus.j.johnson@email.com,(412) 555-0100,(412) 555-3921,Your prescription refill has been authorized. It should be ready at your pharmacy within 2 hours.,True,2026-01-31 00:00:00,2026-01-31 00:00:00
-55d4215f-49d9-4dd1-a9d7-7c64d0545221,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440003,SMS,inbound,Emily Chen,Dr. Jennifer Martinez,emily.chen.2000@email.com,dr.martinez@martineztherapy.com,(412) 555-7264,(412) 555-0100,I did the homework you assigned and it really helped! Feeling more confident this week.,True,2026-01-31 00:00:00,2026-01-31 00:00:00
-270496ad-3808-4665-a7ec-be4beecad851,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440003,SMS,outbound,Dr. Jennifer Martinez,Emily Chen,dr.martinez@martineztherapy.com,emily.chen.2000@email.com,(412) 555-0100,(412) 555-7264,Your prescription refill has been authorized. It should be ready at your pharmacy within 2 hours.,False,2026-02-04 00:00:00,2026-02-04 00:00:00
-00cd423f-44d1-411a-bd46-39987618a80d,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440003,email,inbound,Emily Chen,Dr. Jennifer Martinez,emily.chen.2000@email.com,dr.martinez@martineztherapy.com,(412) 555-7264,(412) 555-0100,Had a rough week but trying to use the coping skills we discussed. Grateful for your support.,True,2026-01-25 00:00:00,2026-01-25 00:00:00
-06b0ed9b-c327-4833-8e47-2ddee3a20498,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440004,SMS,inbound,David Rodriguez,Dr. Jennifer Martinez,d.rodriguez.veteran@email.com,dr.martinez@martineztherapy.com,(412) 555-4182,(412) 555-0100,Need to reschedule my appointment - can we move it to later in the day?,False,2026-02-05 00:00:00,2026-02-05 00:00:00
-6458eff1-9a1c-4494-bb73-7e5117f6a87d,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440004,SMS,outbound,Dr. Jennifer Martinez,David Rodriguez,dr.martinez@martineztherapy.com,d.rodriguez.veteran@email.com,(412) 555-0100,(412) 555-4182,"Hi David, this is your appointment reminder for Tuesday at 12:00 AM. Looking forward to seeing you!",True,2026-02-03 00:00:00,2026-02-03 00:00:00
-299b8c74-cca2-4be7-b283-e3ef4b41bcc1,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440004,email,outbound,Dr. Jennifer Martinez,David Rodriguez,dr.martinez@martineztherapy.com,d.rodriguez.veteran@email.com,(412) 555-0100,(412) 555-4182,Great work on your exposure homework! This kind of progress really shows your commitment to change.,True,2026-01-27 00:00:00,2026-01-27 00:00:00
-f9801f28-7239-4bf2-b4a7-1c99010502b3,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440005,email,outbound,Dr. Jennifer Martinez,Jennifer Liu,dr.martinez@martineztherapy.com,jennifer.liu.pa@email.com,(412) 555-0100,(412) 555-8396,"Hi Jennifer, just checking in to see how things are going. Let me know if you need anything before our next session.",True,2026-01-27 00:00:00,2026-01-27 00:00:00
-5fac8e76-1700-41a1-a5a3-90eee4865c0d,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440005,SMS,inbound,Jennifer Liu,Dr. Jennifer Martinez,jennifer.liu.pa@email.com,dr.martinez@martineztherapy.com,(412) 555-8396,(412) 555-0100,I did the homework you assigned and it really helped! Feeling more confident this week.,True,2026-01-28 00:00:00,2026-01-28 00:00:00
-a04df7ef-041f-48c6-ab8b-73eba9921bc1,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440006,email,inbound,Robert Thompson,Dr. Jennifer Martinez,rob.thompson.1970@email.com,dr.martinez@martineztherapy.com,(412) 555-6741,(412) 555-0100,Had a rough week but trying to use the coping skills we discussed. Grateful for your support.,True,2026-01-30 00:00:00,2026-01-30 00:00:00
-8955944f-8051-494d-93e3-ac23cb07c554,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440006,email,inbound,Robert Thompson,Dr. Jennifer Martinez,rob.thompson.1970@email.com,dr.martinez@martineztherapy.com,(412) 555-6741,(412) 555-0100,Had a rough week but trying to use the coping skills we discussed. Grateful for your support.,True,2026-01-29 00:00:00,2026-01-29 00:00:00
-10a60535-08ed-44fa-a1cb-20e94ab415a7,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440006,SMS,inbound,Robert Thompson,Dr. Jennifer Martinez,rob.thompson.1970@email.com,dr.martinez@martineztherapy.com,(412) 555-6741,(412) 555-0100,Need to reschedule my appointment - can we move it to later in the day?,True,2026-01-26 00:00:00,2026-01-26 00:00:00
-c8755558-bcab-4cc1-925a-924b29335ffa,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440006,SMS,outbound,Dr. Jennifer Martinez,Robert Thompson,dr.martinez@martineztherapy.com,rob.thompson.1970@email.com,(412) 555-0100,(412) 555-6741,Your prescription refill has been authorized. It should be ready at your pharmacy within 2 hours.,True,2026-02-02 00:00:00,2026-02-02 00:00:00
-f8620b1b-b960-4e2d-8042-a653660642e3,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440007,email,outbound,Dr. Jennifer Martinez,Aisha Patel,dr.martinez@martineztherapy.com,aisha.patel.dev@email.com,(412) 555-0100,(412) 555-9153,Great work on your exposure homework! This kind of progress really shows your commitment to change.,True,2026-02-01 00:00:00,2026-02-01 00:00:00
-b68dc7ea-0508-41d1-aeb1-b0285c3d7f57,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440007,SMS,inbound,Aisha Patel,Dr. Jennifer Martinez,aisha.patel.dev@email.com,dr.martinez@martineztherapy.com,(412) 555-9153,(412) 555-0100,"Hi Dr. Martinez, quick question about my medication side effects. Can we discuss at my next appointment?",True,2026-01-24 00:00:00,2026-01-24 00:00:00
-3b6c3f3a-12f7-4f17-8152-332a694ba019,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440008,email,outbound,Dr. Jennifer Martinez,James O'Brien,dr.martinez@martineztherapy.com,james.obrien78@email.com,(412) 555-0100,(412) 555-1203,"Hi James, just checking in to see how things are going. Let me know if you need anything before our next session.",True,2026-02-03 00:00:00,2026-02-03 00:00:00
-e342354d-2f41-4654-aacf-b6ef9759ce00,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440008,email,outbound,Dr. Jennifer Martinez,James O'Brien,dr.martinez@martineztherapy.com,james.obrien78@email.com,(412) 555-0100,(412) 555-1203,Great work on your exposure homework! This kind of progress really shows your commitment to change.,True,2026-01-27 00:00:00,2026-01-27 00:00:00
-03ba8db1-c985-4db5-879b-108b59f1c297,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440009,email,inbound,Maria Rossi,Dr. Jennifer Martinez,maria.rossi92@email.com,dr.martinez@martineztherapy.com,(412) 555-2456,(412) 555-0100,Had a rough week but trying to use the coping skills we discussed. Grateful for your support.,True,2026-01-30 00:00:00,2026-01-30 00:00:00
-f815b5d9-db27-4a18-ab7a-7281d6b37538,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440009,email,inbound,Maria Rossi,Dr. Jennifer Martinez,maria.rossi92@email.com,dr.martinez@martineztherapy.com,(412) 555-2456,(412) 555-0100,Had a rough week but trying to use the coping skills we discussed. Grateful for your support.,True,2026-01-26 00:00:00,2026-01-26 00:00:00
-0323e1a6-34a3-4813-a180-f2780ee0062b,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440011,SMS,inbound,Amanda Chen,Dr. Jennifer Martinez,amanda.chen88@email.com,dr.martinez@martineztherapy.com,(412) 555-4521,(412) 555-0100,Need to reschedule my appointment - can we move it to later in the day?,True,2026-01-24 00:00:00,2026-01-24 00:00:00
-07cec1b8-9fa2-4aa5-9658-b49bb8fa09b4,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440011,SMS,outbound,Dr. Jennifer Martinez,Amanda Chen,dr.martinez@martineztherapy.com,amanda.chen88@email.com,(412) 555-0100,(412) 555-4521,"Hi Amanda, this is your appointment reminder for Thursday at 12:00 AM. Looking forward to seeing you!",True,2026-02-05 00:00:00,2026-02-05 00:00:00
-53261c38-0d90-40b5-9bd0-fddf0c34df8d,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440012,email,inbound,Christopher Murphy,Dr. Jennifer Martinez,chris.murphy81@email.com,dr.martinez@martineztherapy.com,(412) 555-5634,(412) 555-0100,Had a rough week but trying to use the coping skills we discussed. Grateful for your support.,True,2026-01-23 00:00:00,2026-01-23 00:00:00
-16c9689d-1dbb-461b-8d72-9fa62c1a977f,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440012,SMS,outbound,Dr. Jennifer Martinez,Christopher Murphy,dr.martinez@martineztherapy.com,chris.murphy81@email.com,(412) 555-0100,(412) 555-5634,Your prescription refill has been authorized. It should be ready at your pharmacy within 2 hours.,True,2026-02-04 00:00:00,2026-02-04 00:00:00
-c3fd48f7-09f0-4be8-a511-ca60e5792f2b,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440012,email,inbound,Christopher Murphy,Dr. Jennifer Martinez,chris.murphy81@email.com,dr.martinez@martineztherapy.com,(412) 555-5634,(412) 555-0100,Had a rough week but trying to use the coping skills we discussed. Grateful for your support.,True,2026-01-30 00:00:00,2026-01-30 00:00:00
-8221c46e-fa93-4b5f-997f-c3d0339ee622,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440012,email,outbound,Dr. Jennifer Martinez,Christopher Murphy,dr.martinez@martineztherapy.com,chris.murphy81@email.com,(412) 555-0100,(412) 555-5634,"Hi Christopher, just checking in to see how things are going. Let me know if you need anything before our next session.",True,2026-01-26 00:00:00,2026-01-26 00:00:00
-97cb4e33-a52f-4e6d-8e34-458634217de5,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440013,email,outbound,Dr. Jennifer Martinez,Nicole Kowalski,dr.martinez@martineztherapy.com,nicole.kowalski95@email.com,(412) 555-0100,(412) 555-6745,"Hi Nicole, just checking in to see how things are going. Let me know if you need anything before our next session.",True,2026-01-26 00:00:00,2026-01-26 00:00:00
-bd45c678-f2ee-49ce-aed2-210141b3cee1,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440013,SMS,inbound,Nicole Kowalski,Dr. Jennifer Martinez,nicole.kowalski95@email.com,dr.martinez@martineztherapy.com,(412) 555-6745,(412) 555-0100,Need to reschedule my appointment - can we move it to later in the day?,True,2026-02-01 00:00:00,2026-02-01 00:00:00
-b048afdb-9260-49b5-80d9-ba251ffc8616,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440014,email,outbound,Dr. Jennifer Martinez,Steven Nakamura,dr.martinez@martineztherapy.com,steven.nakamura72@email.com,(412) 555-0100,(412) 555-7856,"Hi Steven, just checking in to see how things are going. Let me know if you need anything before our next session.",True,2026-01-23 00:00:00,2026-01-23 00:00:00
-8e7c63ce-96b1-4ce3-9e34-e6953144bcc0,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440014,SMS,inbound,Steven Nakamura,Dr. Jennifer Martinez,steven.nakamura72@email.com,dr.martinez@martineztherapy.com,(412) 555-7856,(412) 555-0100,I did the homework you assigned and it really helped! Feeling more confident this week.,True,2026-01-29 00:00:00,2026-01-29 00:00:00
-60b0ebb7-50e5-46fc-9952-1a713b1da356,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440014,email,outbound,Dr. Jennifer Martinez,Steven Nakamura,dr.martinez@martineztherapy.com,steven.nakamura72@email.com,(412) 555-0100,(412) 555-7856,Great work on your exposure homework! This kind of progress really shows your commitment to change.,True,2026-01-26 00:00:00,2026-01-26 00:00:00
-f9c5f532-48d0-4a4e-91f5-47ded0c06844,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440014,SMS,outbound,Dr. Jennifer Martinez,Steven Nakamura,dr.martinez@martineztherapy.com,steven.nakamura72@email.com,(412) 555-0100,(412) 555-7856,Your prescription refill has been authorized. It should be ready at your pharmacy within 2 hours.,True,2026-01-27 00:00:00,2026-01-27 00:00:00
-14769a40-bb81-4d9b-8fd7-97baea6217bb,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440015,email,outbound,Dr. Jennifer Martinez,Jessica Martinez,dr.martinez@martineztherapy.com,jessica.martinez93@email.com,(412) 555-0100,(412) 555-8967,Great work on your exposure homework! This kind of progress really shows your commitment to change.,True,2026-01-28 00:00:00,2026-01-28 00:00:00
-244fc5c4-1ff6-4cb6-a956-224be169b4d6,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440015,SMS,inbound,Jessica Martinez,Dr. Jennifer Martinez,jessica.martinez93@email.com,dr.martinez@martineztherapy.com,(412) 555-8967,(412) 555-0100,I did the homework you assigned and it really helped! Feeling more confident this week.,True,2026-01-29 00:00:00,2026-01-29 00:00:00
-9dea49ee-dac8-4b00-b6b6-278566f3be25,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440018,SMS,inbound,Kevin Goldstein,Dr. Jennifer Martinez,kevin.g1975@email.com,dr.martinez@martineztherapy.com,(412) 555-1234,(412) 555-0100,I did the homework you assigned and it really helped! Feeling more confident this week.,True,2026-01-24 00:00:00,2026-01-24 00:00:00
-d14642e8-67cc-4c58-8deb-3186669e8a3f,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440018,SMS,inbound,Kevin Goldstein,Dr. Jennifer Martinez,kevin.g1975@email.com,dr.martinez@martineztherapy.com,(412) 555-1234,(412) 555-0100,I did the homework you assigned and it really helped! Feeling more confident this week.,True,2026-02-01 00:00:00,2026-02-01 00:00:00
-d8310bd5-1da5-431c-ac7a-738338fc880a,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440019,SMS,outbound,Dr. Jennifer Martinez,Rachel Thompson,dr.martinez@martineztherapy.com,rachel.thompson90@email.com,(412) 555-0100,(412) 555-2345,"Hi Rachel, this is your appointment reminder for Tuesday at 12:00 AM. Looking forward to seeing you!",True,2026-01-27 00:00:00,2026-01-27 00:00:00
-c899d85d-8dbc-4c3a-b967-8cafb0a797bf,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440019,SMS,inbound,Rachel Thompson,Dr. Jennifer Martinez,rachel.thompson90@email.com,dr.martinez@martineztherapy.com,(412) 555-2345,(412) 555-0100,"Hi Dr. Martinez, quick question about my medication side effects. Can we discuss at my next appointment?",True,2026-01-23 00:00:00,2026-01-23 00:00:00
-c161bc8a-8756-4809-b114-7d2dc983b3c1,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440019,email,inbound,Rachel Thompson,Dr. Jennifer Martinez,rachel.thompson90@email.com,dr.martinez@martineztherapy.com,(412) 555-2345,(412) 555-0100,Had a rough week but trying to use the coping skills we discussed. Grateful for your support.,True,2026-02-02 00:00:00,2026-02-02 00:00:00
-648716b3-3eb7-4e62-aa41-c921007a7dcc,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440020,SMS,outbound,Dr. Jennifer Martinez,Brian Antonelli,dr.martinez@martineztherapy.com,b.antonelli64@email.com,(412) 555-0100,(412) 555-3456,Your prescription refill has been authorized. It should be ready at your pharmacy within 2 hours.,True,2026-02-02 00:00:00,2026-02-02 00:00:00
-96efa37f-0924-4833-875b-e32bfd7f7f17,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440020,SMS,inbound,Brian Antonelli,Dr. Jennifer Martinez,b.antonelli64@email.com,dr.martinez@martineztherapy.com,(412) 555-3456,(412) 555-0100,"Hi Dr. Martinez, quick question about my medication side effects. Can we discuss at my next appointment?",False,2026-02-03 00:00:00,2026-02-03 00:00:00
-cf0e637f-c510-4eea-81c5-5d680539921f,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440021,email,inbound,Stephanie Park,Dr. Jennifer Martinez,stephanie.park87@email.com,dr.martinez@martineztherapy.com,(412) 555-4567,(412) 555-0100,Had a rough week but trying to use the coping skills we discussed. Grateful for your support.,True,2026-02-02 00:00:00,2026-02-02 00:00:00
-92148060-c649-4a3f-8227-8e5183b490f4,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440021,email,outbound,Dr. Jennifer Martinez,Stephanie Park,dr.martinez@martineztherapy.com,stephanie.park87@email.com,(412) 555-0100,(412) 555-4567,"Hi Stephanie, just checking in to see how things are going. Let me know if you need anything before our next session.",True,2026-02-02 00:00:00,2026-02-02 00:00:00
-1b0e5cb0-7cae-4f4c-8185-3d2857ab3e6d,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440021,SMS,inbound,Stephanie Park,Dr. Jennifer Martinez,stephanie.park87@email.com,dr.martinez@martineztherapy.com,(412) 555-4567,(412) 555-0100,I did the homework you assigned and it really helped! Feeling more confident this week.,True,2026-01-23 00:00:00,2026-01-23 00:00:00
-7d275289-a743-4042-a3f3-39f9f15e99a1,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440021,SMS,inbound,Stephanie Park,Dr. Jennifer Martinez,stephanie.park87@email.com,dr.martinez@martineztherapy.com,(412) 555-4567,(412) 555-0100,Need to reschedule my appointment - can we move it to later in the day?,True,2026-01-25 00:00:00,2026-01-25 00:00:00
-ae4d2361-d46a-48f1-b736-b30cc50a8360,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440023,SMS,inbound,Megan Sullivan,Dr. Jennifer Martinez,megan.sullivan94@email.com,dr.martinez@martineztherapy.com,(412) 555-6789,(412) 555-0100,Need to reschedule my appointment - can we move it to later in the day?,True,2026-02-04 00:00:00,2026-02-04 00:00:00
-85cacc36-97d6-4d5f-a186-4d6c0e29f064,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440023,email,outbound,Dr. Jennifer Martinez,Megan Sullivan,dr.martinez@martineztherapy.com,megan.sullivan94@email.com,(412) 555-0100,(412) 555-6789,"Hi Megan, just checking in to see how things are going. Let me know if you need anything before our next session.",True,2026-02-03 00:00:00,2026-02-03 00:00:00
-f281b154-9181-4fb1-bea5-d21248cbec70,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440023,email,outbound,Dr. Jennifer Martinez,Megan Sullivan,dr.martinez@martineztherapy.com,megan.sullivan94@email.com,(412) 555-0100,(412) 555-6789,Great work on your exposure homework! This kind of progress really shows your commitment to change.,True,2026-01-29 00:00:00,2026-01-29 00:00:00
-7c7eeaaa-ddc3-4219-9d83-3b3dd7fc418b,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440023,SMS,inbound,Megan Sullivan,Dr. Jennifer Martinez,megan.sullivan94@email.com,dr.martinez@martineztherapy.com,(412) 555-6789,(412) 555-0100,"Hi Dr. Martinez, quick question about my medication side effects. Can we discuss at my next appointment?",True,2026-01-23 00:00:00,2026-01-23 00:00:00
-20903090-990a-4569-b7c1-af27e0eda40f,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440024,email,inbound,Anthony Benedetti,Dr. Jennifer Martinez,a.benedetti71@email.com,dr.martinez@martineztherapy.com,(412) 555-7890,(412) 555-0100,Had a rough week but trying to use the coping skills we discussed. Grateful for your support.,True,2026-01-25 00:00:00,2026-01-25 00:00:00
-1b314e89-5d44-4749-9beb-1940831a0953,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440024,SMS,inbound,Anthony Benedetti,Dr. Jennifer Martinez,a.benedetti71@email.com,dr.martinez@martineztherapy.com,(412) 555-7890,(412) 555-0100,"Hi Dr. Martinez, quick question about my medication side effects. Can we discuss at my next appointment?",True,2026-02-03 00:00:00,2026-02-03 00:00:00
-421f21e5-34e9-47ae-9d9e-04ccf67f761e,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440024,email,outbound,Dr. Jennifer Martinez,Anthony Benedetti,dr.martinez@martineztherapy.com,a.benedetti71@email.com,(412) 555-0100,(412) 555-7890,Great work on your exposure homework! This kind of progress really shows your commitment to change.,True,2026-01-30 00:00:00,2026-01-30 00:00:00
-31bfe96e-8b05-4039-a157-653f8b1b5126,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440025,SMS,inbound,Heather Donovan,Dr. Jennifer Martinez,heather.donovan89@email.com,dr.martinez@martineztherapy.com,(412) 555-8901,(412) 555-0100,Need to reschedule my appointment - can we move it to later in the day?,True,2026-01-31 00:00:00,2026-01-31 00:00:00
-4f992b52-8ada-45d8-8b12-af7f0ac4593a,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440025,SMS,inbound,Heather Donovan,Dr. Jennifer Martinez,heather.donovan89@email.com,dr.martinez@martineztherapy.com,(412) 555-8901,(412) 555-0100,Need to reschedule my appointment - can we move it to later in the day?,True,2026-02-03 00:00:00,2026-02-03 00:00:00
-843d8423-905a-4301-94af-6a6e983e3ecc,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440025,SMS,outbound,Dr. Jennifer Martinez,Heather Donovan,dr.martinez@martineztherapy.com,heather.donovan89@email.com,(412) 555-0100,(412) 555-8901,"Hi Heather, this is your appointment reminder for Thursday at 12:00 AM. Looking forward to seeing you!",True,2026-01-29 00:00:00,2026-01-29 00:00:00
-14b7ccdf-a0db-40fd-a4ed-ab3e97ff983c,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,SMS,outbound,Dr. Jennifer Martinez,Ryan Campanelli,dr.martinez@martineztherapy.com,ryan.campanelli85@email.com,(412) 555-0100,(412) 555-9012,"Hi Ryan, this is your appointment reminder for Tuesday at 12:00 AM. Looking forward to seeing you!",True,2026-01-27 00:00:00,2026-01-27 00:00:00
-19a4105b-8d9f-47b8-8b8c-e6e950742756,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,SMS,inbound,Ryan Campanelli,Dr. Jennifer Martinez,ryan.campanelli85@email.com,dr.martinez@martineztherapy.com,(412) 555-9012,(412) 555-0100,"Hi Dr. Martinez, quick question about my medication side effects. Can we discuss at my next appointment?",True,2026-01-25 00:00:00,2026-01-25 00:00:00
-1417a09d-ed45-44e3-b894-170405f91897,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,email,outbound,Dr. Jennifer Martinez,Ryan Campanelli,dr.martinez@martineztherapy.com,ryan.campanelli85@email.com,(412) 555-0100,(412) 555-9012,Great work on your exposure homework! This kind of progress really shows your commitment to change.,True,2026-02-01 00:00:00,2026-02-01 00:00:00
-7e664759-fd59-4899-9fc4-32b2769a2335,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,SMS,inbound,Ryan Campanelli,Dr. Jennifer Martinez,ryan.campanelli85@email.com,dr.martinez@martineztherapy.com,(412) 555-9012,(412) 555-0100,I did the homework you assigned and it really helped! Feeling more confident this week.,True,2026-01-24 00:00:00,2026-01-24 00:00:00
-8942efa4-af0c-4323-8d03-fabd7c3f73ba,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440027,email,inbound,Olivia McCarthy,Dr. Jennifer Martinez,olivia.mccarthy97@email.com,dr.martinez@martineztherapy.com,(412) 555-0234,(412) 555-0100,Had a rough week but trying to use the coping skills we discussed. Grateful for your support.,True,2026-02-04 00:00:00,2026-02-04 00:00:00
-ac737ae4-2a9b-4f1f-ac43-f94cce93c6bb,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440027,SMS,inbound,Olivia McCarthy,Dr. Jennifer Martinez,olivia.mccarthy97@email.com,dr.martinez@martineztherapy.com,(412) 555-0234,(412) 555-0100,"Hi Dr. Martinez, quick question about my medication side effects. Can we discuss at my next appointment?",True,2026-01-31 00:00:00,2026-01-31 00:00:00
-17a913e3-8925-4866-b47f-44adf5fc9932,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440027,email,outbound,Dr. Jennifer Martinez,Olivia McCarthy,dr.martinez@martineztherapy.com,olivia.mccarthy97@email.com,(412) 555-0100,(412) 555-0234,Great work on your exposure homework! This kind of progress really shows your commitment to change.,True,2026-01-27 00:00:00,2026-01-27 00:00:00
+550e8400-e29b-41d4-a716-446655440801,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,sms,inbound,Ryan Campanelli,Dr. Jennifer Martinez,,,+14125559012,+14125550100,"Hi Dr. Martinez, I was referred by my primary care doctor for anxiety and depression. Would like to schedule an initial consultation if you're accepting new patients.",True,2026-01-20 09:15:00,2026-01-20 09:15:00
+550e8400-e29b-41d4-a716-446655440802,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,sms,outbound,Dr. Jennifer Martinez,Ryan Campanelli,,,+14125550100,+14125559012,"Hello Ryan, thank you for reaching out. I am accepting new patients. I have availability next Tuesday Jan 28 at 2pm or Thursday Jan 30 at 10am. Would either work for you?",True,2026-01-20 11:30:00,2026-01-20 11:30:00
+550e8400-e29b-41d4-a716-446655440803,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,sms,inbound,Ryan Campanelli,Dr. Jennifer Martinez,,,+14125559012,+14125550100,"Tuesday at 2pm works great. Thank you!",True,2026-01-20 12:05:00,2026-01-20 12:05:00
+550e8400-e29b-41d4-a716-446655440804,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,email,outbound,Dr. Jennifer Martinez,Ryan Campanelli,dr.martinez@martineztherapy.com,ryan.campanelli85@email.com,,,"Subject: Follow-up from our initial session
+
+Dear Ryan,
+
+It was good meeting with you today. I wanted to follow up on our conversation about your anxiety symptoms and the sleep difficulties you've been experiencing.
+
+As we discussed, I'd like you to start keeping a brief daily journal noting your anxiety levels (1-10) and sleep quality. This will help us identify patterns and triggers.
+
+I've also attached some information about the breathing exercises we practiced. Try to do these twice daily, especially before bed.
+
+Please don't hesitate to reach out if you have any questions before our next appointment on February 4th.
+
+Take care,
+Dr. Jennifer Martinez",True,2026-01-28 16:45:00,2026-01-28 16:45:00
+550e8400-e29b-41d4-a716-446655440805,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,voice,inbound,Ryan Campanelli,Dr. Jennifer Martinez,,,+14125559012,+14125550100,"[Voice message - 1:23] Hi Dr. Martinez, it's Ryan. I've been doing the journaling like you suggested and I noticed something concerning. My anxiety has been really spiking in the evenings, especially around 7 or 8pm. Last night I had what I think might have been a panic attack - racing heart, couldn't catch my breath, felt like something terrible was about to happen. It lasted maybe 15 minutes. I'm a little worried about this. The breathing exercises help during the day but I couldn't remember how to do them when I was panicking. Just wanted to let you know before our appointment Tuesday. Thanks.",True,2026-01-31 19:42:00,2026-01-31 19:42:00
+550e8400-e29b-41d4-a716-446655440806,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,email,outbound,Dr. Jennifer Martinez,Ryan Campanelli,dr.martinez@martineztherapy.com,ryan.campanelli85@email.com,,,"Subject: RE: Your voicemail - panic attack experience
+
+Dear Ryan,
+
+Thank you for reaching out and sharing what you experienced. What you described does sound like a panic attack, and while frightening, please know that panic attacks are not dangerous and are very treatable.
+
+It's actually a positive sign that you're noticing the evening pattern - this kind of awareness is exactly what will help us develop effective coping strategies.
+
+I'm leaving you a voice message with a simple grounding technique you can use when you feel panic coming on. It's easier to remember than the breathing exercises.
+
+We'll discuss this more in depth at your appointment Tuesday, but please call the office if you experience another episode and need support.
+
+You're doing great work, Ryan.
+
+Dr. Martinez",True,2026-02-01 08:20:00,2026-02-01 08:20:00
+550e8400-e29b-41d4-a716-446655440807,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,voice,outbound,Dr. Jennifer Martinez,Ryan Campanelli,,,+14125550100,+14125559012,"[Voice message - 2:15] Hi Ryan, Dr. Martinez here. I got your message and wanted to give you a quick technique for panic attacks. It's called the 5-4-3-2-1 grounding method. When you feel panic starting, look around and name 5 things you can see, then 4 things you can touch or feel, 3 things you can hear, 2 things you can smell, and 1 thing you can taste. This engages your senses and pulls your mind out of the panic spiral. Say them out loud if you can. The key is it gives your brain something concrete to focus on. Try practicing it now when you're calm so it becomes automatic. We'll work on more strategies Tuesday. Take care.",True,2026-02-01 08:35:00,2026-02-01 08:35:00
+550e8400-e29b-41d4-a716-446655440808,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,sms,inbound,Ryan Campanelli,Dr. Jennifer Martinez,,,+14125559012,+14125550100,"Thank you so much for the grounding technique! I practiced it a few times and used it last night when I felt anxiety building. It really helped - didn't turn into a full panic attack. See you Tuesday.",True,2026-02-02 10:18:00,2026-02-02 10:18:00
+550e8400-e29b-41d4-a716-446655440809,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440026,email,inbound,Ryan Campanelli,Dr. Jennifer Martinez,ryan.campanelli85@email.com,dr.martinez@martineztherapy.com,,,"Subject: After yesterday's session - feeling hopeful
+
+Dr. Martinez,
+
+I wanted to thank you for yesterday's session. Talking through the connection between my work stress and the evening anxiety was really eye-opening. I hadn't realized how much I was carrying the day's tension into the night.
+
+I tried the transition ritual you suggested - taking a 10 minute walk after work before going home - and it actually made a noticeable difference last night. My anxiety level only got to about a 4 instead of the usual 7-8.
+
+I'm feeling more hopeful than I have in a while. It helps knowing there are concrete things I can do.
+
+Thank you,
+Ryan",False,2026-02-05 08:47:00,2026-02-05 08:47:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c50,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440020,sms,outbound,Dr. Jennifer Martinez,Brian Antonelli,,,(412) 555-0100,(412) 555-3456,"Hi Brian, this is Dr. Martinez's office. Just a reminder about your appointment tomorrow at 2:00 PM. Please let us know if you need to reschedule.",True,2026-01-22 14:30:00,2026-01-22 14:30:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c51,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440020,sms,inbound,Brian Antonelli,Dr. Jennifer Martinez,,,(412) 555-3456,(412) 555-0100,"Thanks for the reminder. I'll be there. Quick question - should I keep a mood journal before my visit?",True,2026-01-22 15:45:00,2026-01-22 15:45:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c52,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440020,sms,outbound,Dr. Jennifer Martinez,Brian Antonelli,,,(412) 555-0100,(412) 555-3456,"That's a great idea, Brian. Even a few days of notes about your mood, sleep, and any triggers would be really helpful for our session.",True,2026-01-22 16:10:00,2026-01-22 16:10:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c53,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440020,sms,inbound,Brian Antonelli,Dr. Jennifer Martinez,,,(412) 555-3456,(412) 555-0100,"Dr. Martinez, I've been having trouble sleeping again. The racing thoughts are back, especially at night. Is there anything I can do before our next appointment?",True,2026-01-29 22:15:00,2026-01-29 22:15:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c54,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440020,sms,outbound,Dr. Jennifer Martinez,Brian Antonelli,,,(412) 555-0100,(412) 555-3456,"I'm sorry to hear that, Brian. Try the 4-7-8 breathing technique we discussed - breathe in for 4 counts, hold for 7, exhale for 8. Also, no screens 1 hour before bed. Let's discuss adjusting your treatment plan at our next session.",True,2026-01-30 08:22:00,2026-01-30 08:22:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c55,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440020,sms,inbound,Brian Antonelli,Dr. Jennifer Martinez,,,(412) 555-3456,(412) 555-0100,"Thank you. The breathing exercise helped a bit last night. I managed about 5 hours which is better than lately.",True,2026-01-31 09:05:00,2026-01-31 09:05:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c56,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440020,sms,outbound,Dr. Jennifer Martinez,Brian Antonelli,,,(412) 555-0100,(412) 555-3456,"That's progress, Brian! Small improvements add up. Keep practicing the technique. Your next appointment is Feb 5th at 3:30 PM. See you then.",True,2026-01-31 10:30:00,2026-01-31 10:30:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c57,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440020,sms,inbound,Brian Antonelli,Dr. Jennifer Martinez,,,(412) 555-3456,(412) 555-0100,"Hi Dr. Martinez, I wanted to let you know I had a really rough night. Work stress is getting to me and I couldn't stop the anxious thoughts. Should I come in earlier if possible?",False,2026-02-05 07:42:00,2026-02-05 07:42:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c58,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440020,voice,inbound,Brian Antonelli,Dr. Jennifer Martinez,,,(412) 555-3456,(412) 555-0100,"[Voice message - 0:47] Hi Dr. Martinez, it's Brian. I just wanted to follow up on my earlier message. I tried the breathing exercises you taught me and they helped a little bit, but I'm still feeling pretty anxious. I think I really need to talk through some of these work issues. If there's any way to move my appointment up today, I'd really appreciate it. Otherwise I'll see you at 3:30 as scheduled. Thanks for everything.",False,2026-02-05 08:15:00,2026-02-05 08:15:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c01,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440024,email,outbound,Dr. Jennifer Martinez,Anthony Benedetti,dr.martinez@martineztherapy.com,a.benedetti71@email.com,,,"Dear Anthony,
+
+Thank you for our session today. I wanted to follow up with some thoughts and resources we discussed regarding your ongoing work with anxiety management.
+
+As we explored, your recent promotion at the accounting firm has brought both exciting opportunities and increased stress. The panic episodes you've been experiencing during high-stakes presentations are very common among professionals facing new responsibilities. I want to emphasize that seeking help for this is a sign of strength, not weakness.
+
+For our work together, I'd like you to focus on these areas before our next session:
+
+1. **Breathing Exercises**: Practice the 4-7-8 breathing technique we learned at least twice daily, even when you're not feeling anxious. Building this habit during calm moments makes it more accessible during stressful ones.
+
+2. **Thought Journal**: Continue documenting your anxious thoughts using the CBT framework we discussed. When you notice catastrophic thinking, try to write down the evidence for and against that thought.
+
+3. **Physical Wellness**: You mentioned your sleep has been disrupted. Try to maintain a consistent bedtime routine and limit caffeine after 2pm.
+
+Please don't hesitate to reach out if you experience any particularly difficult moments before our next appointment on February 6th.
+
+Warm regards,
+Dr. Jennifer Martinez, PhD
+Licensed Clinical Psychologist",True,2026-01-20 14:30:00,2026-01-20 14:30:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c02,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440024,email,inbound,Anthony Benedetti,Dr. Jennifer Martinez,a.benedetti71@email.com,dr.martinez@martineztherapy.com,,,"Dr. Martinez,
+
+Thank you so much for the detailed follow-up. I really appreciate you taking the time to summarize everything - it helps to have it written down so I can refer back to it.
+
+I wanted to let you know that I tried the 4-7-8 breathing technique before my team meeting on Wednesday, and it actually helped quite a bit. I still felt nervous, but it was more manageable. I didn't feel like I was going to completely lose it like I have in the past.
+
+The thought journal has been interesting. I'm starting to notice patterns I didn't see before. A lot of my anxiety seems to spike on Sunday evenings when I start thinking about the week ahead. It's like my brain goes into overdrive imagining everything that could go wrong.
+
+One thing I wanted to ask about - I've been having some trouble with the sleep piece. I've been trying to go to bed at the same time, but I end up lying there with my mind racing. Would it be okay to take melatonin, or would that interfere with the other work we're doing?
+
+Also, my wife Sarah mentioned she's noticed I seem calmer this past week. That felt really good to hear.
+
+Looking forward to our session on the 6th.
+
+Best,
+Anthony",True,2026-01-23 19:45:00,2026-01-23 19:45:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c03,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440024,email,outbound,Dr. Jennifer Martinez,Anthony Benedetti,dr.martinez@martineztherapy.com,a.benedetti71@email.com,,,"Dear Anthony,
+
+What wonderful progress! I'm genuinely pleased to hear about your experience with the breathing technique before your team meeting. That's exactly the kind of real-world application that builds lasting change. The fact that you still felt nervous but it was more manageable is actually the goal - we're not trying to eliminate anxiety entirely, but rather to keep it at a level where you can still function effectively.
+
+Your observation about Sunday evenings is incredibly insightful. This anticipatory anxiety is very common and is something we can definitely work on. Your brain is essentially trying to protect you by preparing for potential threats, but it's going into overdrive. Let's discuss some specific strategies for Sunday evenings in our next session.
+
+Regarding melatonin: A low dose (1-3mg) taken about 30 minutes before bed is generally fine and won't interfere with our therapeutic work. However, I'd also like to explore some cognitive techniques for the racing thoughts. One technique to try: keep a small notepad by your bed. When thoughts race, write them down with the intention of addressing them tomorrow. This can help your brain let go because it knows the thoughts won't be forgotten.
+
+I'm so glad Sarah has noticed positive changes. Having support at home is invaluable in this process.
+
+See you Thursday!
+
+Warmly,
+Dr. Jennifer Martinez, PhD",True,2026-01-24 10:15:00,2026-01-24 10:15:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c04,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440024,email,outbound,Dr. Jennifer Martinez,Anthony Benedetti,dr.martinez@martineztherapy.com,a.benedetti71@email.com,,,"Dear Anthony,
+
+Following up on our excellent session today, I wanted to provide you with a summary of what we covered and our plan moving forward.
+
+We made significant progress today exploring the connection between your perfectionism and your anxiety symptoms. The insight that your fear of not being good enough stems from early experiences with your father's high expectations was an important breakthrough. Understanding these roots doesn't mean we blame anyone, but it helps us recognize why your brain responds the way it does.
+
+Key Takeaways:
+1. Your anxiety is not a character flaw - it's a learned response that once served a protective purpose
+2. The inner critic voice you described can be recognized as separate from your true self
+3. You have more evidence of competence than your anxious thoughts acknowledge
+
+Homework for Next Two Weeks:
+- Continue the thought journal with special attention to perfectionist thoughts
+- Practice the compassionate observer exercise we learned
+- Try one imperfect action this week - something small where you intentionally don't aim for 100% perfection
+
+I'm proud of the work you're doing, Anthony. This isn't easy, and you're showing real courage.
+
+Next session: February 20, 2026 at 2:00 PM
+
+Best regards,
+Dr. Jennifer Martinez, PhD",True,2026-02-03 16:00:00,2026-02-03 16:00:00
+a1b2c3d4-e5f6-4a7b-8c9d-0e1f2a3b4c05,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440024,email,inbound,Anthony Benedetti,Dr. Jennifer Martinez,a.benedetti71@email.com,dr.martinez@martineztherapy.com,,,"Dr. Martinez,
+
+I need to reach out because I'm having a really difficult time right now. I had a major presentation this morning to the executive team and it went terribly. I completely blanked in the middle of explaining our quarterly projections. I just stood there for what felt like forever. My boss had to step in and finish for me.
+
+I've been sitting in my car in the parking garage for the past hour because I can't face going back up there. I feel like everything I've been working on just went out the window. The breathing didn't work, the positive self-talk didn't work, nothing worked.
+
+I don't know if I can do this job. Maybe I'm not cut out for this level of responsibility. My dad was right - I'm not partner material.
+
+I'm not in any danger or anything like that, I just feel completely defeated. I don't know what to do.
+
+Sorry to email you like this outside of our session. I just needed to tell someone who would understand.
+
+Anthony",False,2026-02-05 11:47:00,2026-02-05 11:47:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d60,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440011,sms,outbound,Dr. Jennifer Martinez,Amanda Chen,,,(412) 555-0100,(412) 555-4521,"Hi Amanda, this is Dr. Martinez's office. We wanted to check in - how are you feeling after starting the new medication last week?",True,2026-01-20 11:00:00,2026-01-20 11:00:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d61,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440011,sms,inbound,Amanda Chen,Dr. Jennifer Martinez,,,(412) 555-4521,(412) 555-0100,"Hi! The first few days were a bit rough with nausea but it's getting better. I think I'm starting to notice a slight improvement in my mood.",True,2026-01-20 13:22:00,2026-01-20 13:22:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d62,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440011,sms,outbound,Dr. Jennifer Martinez,Amanda Chen,,,(412) 555-0100,(412) 555-4521,"That's very normal for the first week. The nausea should continue to decrease. Make sure you're taking it with food. If you experience any severe side effects, please call us right away.",True,2026-01-20 14:05:00,2026-01-20 14:05:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d63,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440011,sms,inbound,Amanda Chen,Dr. Jennifer Martinez,,,(412) 555-4521,(412) 555-0100,"Will do. Also I've been doing the journaling exercises you recommended. It's helping me identify some patterns I hadn't noticed before.",True,2026-01-27 16:40:00,2026-01-27 16:40:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d64,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440011,sms,outbound,Dr. Jennifer Martinez,Amanda Chen,,,(412) 555-0100,(412) 555-4521,"That's wonderful progress, Amanda! Self-awareness is such an important part of the healing process. Bring your journal to our next session - I'd love to discuss what you've discovered.",True,2026-01-27 17:15:00,2026-01-27 17:15:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d65,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440011,sms,inbound,Amanda Chen,Dr. Jennifer Martinez,,,(412) 555-4521,(412) 555-0100,"Perfect, I will! By the way, I think I need to reschedule my Feb 3rd appointment. Is there anything available on the 6th instead?",True,2026-02-01 10:30:00,2026-02-01 10:30:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d66,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440011,sms,outbound,Dr. Jennifer Martinez,Amanda Chen,,,(412) 555-0100,(412) 555-4521,"Hi Amanda, yes we have an opening on Feb 6th at 11:00 AM or 2:30 PM. Which works better for you?",True,2026-02-01 11:45:00,2026-02-01 11:45:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d67,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440011,sms,inbound,Amanda Chen,Dr. Jennifer Martinez,,,(412) 555-4521,(412) 555-0100,"11 AM works great. Thank you so much for accommodating me!",True,2026-02-04 12:02:00,2026-02-04 12:02:00
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e70,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440003,sms,outbound,Dr. Jennifer Martinez,Emily Chen,,,(412) 555-0100,(412) 555-7264,"Hi Emily, hope you're doing well. Just a reminder that your appointment is scheduled for tomorrow at 10:30 AM.",True,2026-01-23 15:00:00,2026-01-23 15:00:00
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e71,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440003,sms,inbound,Emily Chen,Dr. Jennifer Martinez,,,(412) 555-7264,(412) 555-0100,"Thanks! I'll be there. I've been practicing the grounding techniques and they really helped during my exam week.",True,2026-01-23 15:33:00,2026-01-23 15:33:00
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e72,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440003,sms,outbound,Dr. Jennifer Martinez,Emily Chen,,,(412) 555-0100,(412) 555-7264,"That's great to hear, Emily! I'm proud of you for using your coping tools during stressful times. We can talk more about what worked tomorrow.",True,2026-01-23 16:10:00,2026-01-23 16:10:00
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e73,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440003,sms,inbound,Emily Chen,Dr. Jennifer Martinez,,,(412) 555-7264,(412) 555-0100,"Dr. Martinez, I'm struggling today. My anxiety is really high and I can't seem to calm down. I keep thinking about everything that could go wrong with my internship interview next week.",True,2026-01-30 18:45:00,2026-01-30 18:45:00
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e74,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440003,sms,outbound,Dr. Jennifer Martinez,Emily Chen,,,(412) 555-0100,(412) 555-7264,"I hear you, Emily. Remember: thoughts are not facts. Try the 5-4-3-2-1 technique right now. What are 5 things you can see around you? Take it one sense at a time.",True,2026-01-30 19:02:00,2026-01-30 19:02:00
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e75,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440003,sms,inbound,Emily Chen,Dr. Jennifer Martinez,,,(412) 555-7264,(412) 555-0100,"Okay I did it. That helped bring me back to the present. Thank you for responding so quickly. I feel a bit more grounded now.",True,2026-01-30 19:28:00,2026-01-30 19:28:00
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e76,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440003,sms,outbound,Dr. Jennifer Martinez,Emily Chen,,,(412) 555-0100,(412) 555-7264,"I'm glad it helped. You're doing the work, Emily. Let's practice some interview-specific coping strategies at your appointment on Feb 5th. You've got this!",True,2026-01-30 19:45:00,2026-01-30 19:45:00
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e77,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440003,sms,inbound,Emily Chen,Dr. Jennifer Martinez,,,(412) 555-7264,(412) 555-0100,"That would be really helpful. See you Wednesday! And thank you again.",True,2026-02-04 14:10:00,2026-02-04 14:10:00
+d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f15,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440005,email,outbound,Dr. Jennifer Martinez,Jennifer Liu,dr.martinez@martineztherapy.com,jennifer.liu.pa@email.com,,,"Dear Jennifer,
+
+Following up on our session today, I want to make sure you have the resources we discussed for managing your postpartum depression and anxiety.
+
+First, please know that what you're experiencing is both real and treatable. Postpartum depression affects approximately 1 in 7 new mothers, and postpartum anxiety is equally common. These conditions are caused by a combination of hormonal changes, sleep deprivation, and the enormous life adjustment of caring for a newborn. They are not a reflection of your abilities as a mother or your love for your baby.
+
+What We Covered Today:
+- The intrusive thoughts you've been having are a symptom of postpartum anxiety. Having these thoughts does NOT mean you are a danger to your child.
+- Your feelings of being overwhelmed are very common with postpartum depression. The bond will develop.
+- Sleep deprivation is exacerbating all of your symptoms. We need to prioritize getting you more rest.
+
+You are not alone in this, Jennifer. We will get through this together.
+
+Next session: February 7th at 10:00 AM
+
+With compassion,
+Dr. Jennifer Martinez, PhD",True,2026-01-22 11:30:00,2026-01-22 11:30:00
+d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f16,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440005,email,inbound,Jennifer Liu,Dr. Jennifer Martinez,jennifer.liu.pa@email.com,dr.martinez@martineztherapy.com,,,"Dr. Martinez,
+
+Thank you for the email and for being so understanding in our session. I cried the whole way home but it wasn't sad crying exactly - it was relief crying. I think I've been so ashamed of how I've been feeling that hearing you say it's common and treatable made me feel like maybe I'm not a terrible mother after all.
+
+I talked to David about everything after the kids were asleep and he was really supportive. He said he's noticed I haven't been myself and he's been worried but didn't know how to bring it up. He's going to take over the night feedings on weekends so I can get some uninterrupted sleep. His mother also offered to come stay for a week and I actually said yes, which is huge for me.
+
+I made an appointment with Dr. Kim for next Thursday. I'm nervous about medication but I trust your recommendation. I need to feel better. The baby Emma deserves a mom who can actually enjoy being with her.
+
+Thank you for the crisis number. I don't think I'll need it but it's good to have.
+
+Jennifer",True,2026-01-24 22:15:00,2026-01-24 22:15:00
+d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f17,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440005,email,outbound,Dr. Jennifer Martinez,Jennifer Liu,dr.martinez@martineztherapy.com,jennifer.liu.pa@email.com,,,"Dear Jennifer,
+
+I'm so glad you talked to David - it sounds like that conversation went well and that you have genuine support at home. Accepting help from him and your mother-in-law is a significant step.
+
+Emma is a beautiful name. Congratulations again on your new daughter.
+
+I want to address the intrusive thoughts you mentioned. What you're describing is textbook postpartum anxiety/OCD, and I want to explain why you DON'T need to be afraid of these thoughts:
+
+The key difference is EGO-DYSTONIC vs. EGO-SYNTONIC thoughts:
+- Ego-dystonic thoughts are thoughts that feel foreign and disturbing. You have them, they horrify you, and you want them to stop. These are NOT warning signs of danger.
+- Ego-syntonic thoughts are thoughts that feel like your own desires. THESE would be concerning.
+
+The very fact that these thoughts upset you so much is evidence that you are NOT a danger to Emma.
+
+Please update me after your appointment with Dr. Kim.
+
+You're doing better than you think you are, Jennifer.
+
+Warmly,
+Dr. Martinez",True,2026-01-26 14:00:00,2026-01-26 14:00:00
+d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f18,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440005,email,inbound,Jennifer Liu,Dr. Jennifer Martinez,jennifer.liu.pa@email.com,dr.martinez@martineztherapy.com,,,"Dr. Martinez,
+
+I saw Dr. Kim yesterday and wanted to update you. She was wonderful - very warm and knowledgeable about perinatal mental health. She prescribed Zoloft and explained that it's well-studied and safe for breastfeeding.
+
+I took my first dose this morning. I felt a little nauseous but Dr. Kim said that's common and should pass in a few days.
+
+In other news - I had a moment yesterday that felt significant. I was holding Emma after her feeding and she looked up at me and smiled. And for a few seconds, I didn't feel numb. I felt... love? Joy? Something warm and real. It only lasted a moment before the anxiety came back, but it was there. It gives me hope.
+
+David's mom arrives tomorrow for her week-long visit. I'm surprisingly okay with it. I actually caught myself looking forward to having help during the day. A month ago I would have seen this as a failure. Maybe that's progress too?
+
+See you Friday.
+
+Jennifer",True,2026-01-31 10:30:00,2026-01-31 10:30:00
+d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f19,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440005,email,outbound,Dr. Jennifer Martinez,Jennifer Liu,dr.martinez@martineztherapy.com,jennifer.liu.pa@email.com,,,"Dear Jennifer,
+
+This update absolutely made my day. Yes, that moment with Emma - that IS the bond forming. And you're right that it gives us hope. As the medication begins working and your anxiety decreases, those moments will become more frequent and last longer.
+
+I love that you reframed accepting help from failure to progress. That cognitive shift is meaningful and important.
+
+Following Our Session Today (February 7):
+
+We covered a lot of ground today:
+1. Side effects are typically temporary. The mild nausea you experienced should subside within a week.
+2. Sleep is medicine. With David's mom there to help, please try to sleep when Emma sleeps.
+3. The good mother myth: We talked about how our culture perpetuates an unrealistic image of motherhood. Real motherhood includes exhaustion, doubt, and difficulty.
+4. Intrusive thought management: Continue to practice labeling the thoughts rather than engaging with them.
+
+You're on the right path, Jennifer. Keep going.
+
+Next session: February 14th at 10:00 AM
+
+With care,
+Dr. Martinez",True,2026-02-04 11:45:00,2026-02-04 11:45:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d06,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440025,email,outbound,Dr. Jennifer Martinez,Heather Donovan,dr.martinez@martineztherapy.com,heather.donovan89@email.com,,,"Dear Heather,
+
+I wanted to follow up after today's session and acknowledge how much courage it took to share what you did. Discussing the trauma from your past relationship is never easy, and I'm honored that you trust me with this part of your story.
+
+As we talked about, the symptoms you've been experiencing - the hypervigilance, difficulty sleeping, and the way you startle easily - are very common responses to what you went through. Your nervous system learned to stay on high alert to protect you.
+
+For the coming weeks, I'd like us to continue with our trauma-focused work using EMDR (Eye Movement Desensitization and Reprocessing). This approach has strong evidence for helping people process traumatic memories.
+
+In the meantime:
+1. Please continue practicing the grounding techniques we reviewed
+2. If you feel triggered or overwhelmed, remember: you are safe now
+3. Be gentle with yourself. Healing isn't linear.
+
+I also want to remind you that you are not defined by what happened to you. You are a survivor.
+
+Our next session is scheduled for February 10th at 11:00 AM.
+
+With care,
+Dr. Jennifer Martinez, PhD",True,2026-01-27 15:30:00,2026-01-27 15:30:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d07,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440025,email,inbound,Heather Donovan,Dr. Jennifer Martinez,heather.donovan89@email.com,dr.martinez@martineztherapy.com,,,"Dr. Martinez,
+
+Thank you for your email and for everything you said in our session. It's still hard for me to talk about what happened with Marcus, but I feel like for the first time someone actually believes me and doesn't think I'm being dramatic.
+
+I've been practicing the grounding techniques, and they really do help. Yesterday I was at the grocery store and I thought I saw someone who looked like him and I immediately started panicking. But I did the 5-4-3-2-1 thing and was able to calm myself down enough to finish shopping and get to my car.
+
+I'm a little nervous about the EMDR you mentioned. I looked it up online and the idea of deliberately thinking about those memories scares me. But I also know that what I'm doing now isn't working.
+
+One thing I've been wondering about - do you think I'll ever be able to have a normal relationship? Sometimes I feel like he ruined that for me forever.
+
+I'll see you on the 10th. Thank you for being patient with me.
+
+Heather",True,2026-01-30 20:12:00,2026-01-30 20:12:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d08,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440025,email,outbound,Dr. Jennifer Martinez,Heather Donovan,dr.martinez@martineztherapy.com,heather.donovan89@email.com,,,"Dear Heather,
+
+First, I want to celebrate that moment in the grocery store. What you described - noticing the panic, using your tools, and continuing with what you needed to do - that is genuine progress.
+
+Your nervousness about EMDR is completely understandable. I want to assure you that we will go at your pace. EMDR isn't about reliving the trauma in an overwhelming way - it's about processing the memories in a safe, controlled environment. We'll build up to it gradually, and you're always in control.
+
+To answer your question about relationships: Yes, Heather, I absolutely believe you can have a healthy, loving relationship in the future. I've seen many survivors of similar experiences go on to build beautiful partnerships. What you're feeling right now - the difficulty trusting, the fear - these are protective responses. They're not permanent.
+
+For now, don't put pressure on yourself about dating. Focus on your healing. The rest will follow when you're ready.
+
+I'm proud of you, Heather. See you Monday.
+
+Warmly,
+Dr. Martinez",True,2026-01-31 09:45:00,2026-01-31 09:45:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d09,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440025,email,outbound,Dr. Jennifer Martinez,Heather Donovan,dr.martinez@martineztherapy.com,heather.donovan89@email.com,,,"Dear Heather,
+
+I hope you're doing well after our first EMDR session yesterday. I wanted to check in because it's common to have some emotional or physical responses in the days following a session.
+
+You did incredibly well. I know it wasn't easy to hold that memory while following the light bar, but you stayed present and engaged.
+
+What to Expect:
+- You may have vivid dreams or fragmented memories surfacing. This is normal.
+- You might feel more emotional than usual, or conversely, you might feel relief or lightness.
+- Some people experience physical sensations - tiredness, headaches. These typically pass within a day or two.
+
+Self-Care Recommendations:
+- Get plenty of rest
+- Stay hydrated
+- Engage in gentle, grounding activities
+- Use your safe place visualization if you feel overwhelmed
+- Journal any thoughts, dreams, or memories that come up
+
+Please remember that processing continues between sessions. Your brain is doing important work.
+
+Our next session is February 17th at 11:00 AM.
+
+Take good care of yourself,
+Dr. Martinez",True,2026-02-04 10:00:00,2026-02-04 10:00:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d10,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440025,email,inbound,Heather Donovan,Dr. Jennifer Martinez,heather.donovan89@email.com,dr.martinez@martineztherapy.com,,,"Dr. Martinez,
+
+Thank you for checking in. Yesterday's session was intense but I actually feel... different? It's hard to explain.
+
+I had a dream last night about the apartment Marcus and I shared, but in the dream, I was packing up and leaving. And I wasn't scared. I was just... done. I woke up feeling strange but not bad strange. Kind of peaceful?
+
+I'm tired today like you said I might be, so I'm taking it easy. Working from home and keeping things low-key. My sister brought me dinner which was sweet of her.
+
+I did want to tell you something that feels important. Last night I was watching TV and there was a scene where a man yelled at a woman, and normally that would have sent me into a spiral. But this time I noticed it, felt uncomfortable, but I didn't have the same panicky feeling. It was more like... sadness? For the character. But also maybe for me.
+
+Is that normal? To feel sad instead of scared?
+
+I think the EMDR might be working. Or at least doing something.
+
+See you on the 17th.
+
+Heather",True,2026-02-05 14:22:00,2026-02-05 14:22:00
+b2c3d4e5-f6a7-4b8c-9d0e-1f2a3b4c5d11,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440025,voice,inbound,Heather Donovan,Dr. Jennifer Martinez,,,+14125558901,+14125550100,"[Voice message - 0:47] Hi Dr. Martinez, it's Heather. I just wanted to leave you a quick voice message because I'm feeling overwhelmed and wanted to reach out. Something happened at work today - a male coworker raised his voice in a meeting and I felt myself starting to freeze up. But then I remembered the grounding technique and I was able to stay present. I didn't run out of the room like I might have before. I'm still a little shaky but I wanted you to know. I think the EMDR is really helping. Thank you for everything. See you next week.",False,2026-02-05 16:45:00,2026-02-05 16:45:00
+d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f80,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440018,sms,outbound,Dr. Jennifer Martinez,Kevin Goldstein,,,(412) 555-0100,(412) 555-1234,"Hi Kevin, this is Dr. Martinez's office. Your prescription refill is ready at CVS. Also, your follow-up appointment is Feb 6th at 9:00 AM.",True,2026-01-21 09:30:00,2026-01-21 09:30:00
+d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f81,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440018,sms,inbound,Kevin Goldstein,Dr. Jennifer Martinez,,,(412) 555-1234,(412) 555-0100,"Thank you. I'll pick it up today. Question - I've been feeling more stable lately. Is it okay to have a glass of wine occasionally with my medication?",True,2026-01-21 12:15:00,2026-01-21 12:15:00
+d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f82,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440018,sms,outbound,Dr. Jennifer Martinez,Kevin Goldstein,,,(412) 555-0100,(412) 555-1234,"Good question, Kevin. I'd recommend avoiding alcohol while on this medication as it can intensify side effects and affect its efficacy. Let's discuss this more at your next appointment.",True,2026-01-21 13:40:00,2026-01-21 13:40:00
+d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f83,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440018,sms,inbound,Kevin Goldstein,Dr. Jennifer Martinez,,,(412) 555-1234,(412) 555-0100,"Understood, I'll hold off then. Thanks for the clarity. The stability has been really nice after so many months of ups and downs.",True,2026-01-28 16:20:00,2026-01-28 16:20:00
+d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f84,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440018,sms,outbound,Dr. Jennifer Martinez,Kevin Goldstein,,,(412) 555-0100,(412) 555-1234,"That's really encouraging to hear, Kevin. The consistency you've shown with your treatment plan is paying off. Keep up the great work with your routine.",True,2026-01-28 17:00:00,2026-01-28 17:00:00
+d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f85,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440018,sms,inbound,Kevin Goldstein,Dr. Jennifer Martinez,,,(412) 555-1234,(412) 555-0100,"Thanks Dr. Martinez. See you on the 6th. I've been keeping my mood chart updated as you suggested.",True,2026-02-04 08:30:00,2026-02-04 08:30:00
+d4e5f6a7-b8c9-4d0e-1f2a-3b4c5d6e7f86,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440018,sms,outbound,Dr. Jennifer Martinez,Kevin Goldstein,,,(412) 555-0100,(412) 555-1234,"Excellent! Looking forward to reviewing it together. See you Thursday morning.",True,2026-02-04 09:15:00,2026-02-04 09:15:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8090,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,sms,outbound,Dr. Jennifer Martinez,Marcus Johnson,,,(412) 555-0100,(412) 555-3921,"Hi Marcus, just checking in. How have you been doing with the sleep hygiene changes we discussed?",True,2026-01-19 10:00:00,2026-01-19 10:00:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8091,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,sms,inbound,Marcus Johnson,Dr. Jennifer Martinez,,,(412) 555-3921,(412) 555-0100,"Hey Dr. Martinez. Honestly it's been tough. I try to wind down but my mind keeps going back to work issues. The new management role is more stressful than I expected.",True,2026-01-19 12:34:00,2026-01-19 12:34:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8092,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,sms,outbound,Dr. Jennifer Martinez,Marcus Johnson,,,(412) 555-0100,(412) 555-3921,"That transition can definitely bring up a lot. Have you tried the worry time technique? Set aside 15 mins earlier in the evening specifically for work thoughts, then practice letting go when it's sleep time.",True,2026-01-19 13:10:00,2026-01-19 13:10:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8093,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,sms,inbound,Marcus Johnson,Dr. Jennifer Martinez,,,(412) 555-3921,(412) 555-0100,"I haven't tried that one. I'll give it a shot this week. Thanks for the suggestion.",True,2026-01-19 14:22:00,2026-01-19 14:22:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8094,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,sms,outbound,Dr. Jennifer Martinez,Marcus Johnson,,,(412) 555-0100,(412) 555-3921,"Hi Marcus, your appointment reminder: Tomorrow at 11:00 AM. We'll work on more strategies for managing the work stress.",True,2026-01-26 14:00:00,2026-01-26 14:00:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8095,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,sms,inbound,Marcus Johnson,Dr. Jennifer Martinez,,,(412) 555-3921,(412) 555-0100,"Thanks. The worry time thing actually helped a bit. Still waking up early but falling asleep has been easier. See you tomorrow.",True,2026-01-26 15:45:00,2026-01-26 15:45:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8096,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,sms,inbound,Marcus Johnson,Dr. Jennifer Martinez,,,(412) 555-3921,(412) 555-0100,"Dr. Martinez, I wanted to update you - I had a tough conversation with my team yesterday and handled it much better than I would have a few months ago. The assertiveness work is helping.",True,2026-02-04 17:20:00,2026-02-04 17:20:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8097,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,sms,outbound,Dr. Jennifer Martinez,Marcus Johnson,,,(412) 555-0100,(412) 555-3921,"Marcus, that's a significant breakthrough! I'm so glad you recognized that growth in yourself. We'll definitely explore this more in our next session. Great job advocating for yourself.",True,2026-02-04 18:05:00,2026-02-04 18:05:00
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e11,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440013,email,outbound,Dr. Jennifer Martinez,Nicole Kowalski,dr.martinez@martineztherapy.com,nicole.kowalski95@email.com,,,"Dear Nicole,
+
+Thank you for being so open in today's session. I know discussing your struggles with binge eating and body image is difficult, and I appreciate your willingness to explore these issues together.
+
+I want to reiterate something important: your worth is not determined by your appearance or your relationship with food. The patterns you've developed are coping mechanisms - ways of dealing with difficult emotions.
+
+Session Summary:
+
+Today we explored the connection between your restrictive eating during the day and your evening binges. This pattern is common and often rooted in deprivation - both physical and emotional. When you restrict all day, your body and mind rebel in the evening.
+
+We also discussed how your mother's comments about your weight during adolescence may have contributed to your current struggles.
+
+Goals for the Coming Week:
+1. Regular eating: Try to eat three meals and 2-3 snacks daily.
+2. Mindfulness practice: Before eating, pause and ask yourself: Am I physically hungry?
+3. Self-compassion: When you notice the critical inner voice, try responding as you would to a friend.
+4. Journal prompt: Write about what enough means to you.
+
+Our next session is February 11th at 3:00 PM.
+
+With warmth,
+Dr. Jennifer Martinez, PhD",True,2026-01-28 16:45:00,2026-01-28 16:45:00
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e12,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440013,email,inbound,Nicole Kowalski,Dr. Jennifer Martinez,nicole.kowalski95@email.com,dr.martinez@martineztherapy.com,,,"Dr. Martinez,
+
+This week has been challenging. I tried to do the regular eating thing, and I did okay for a few days, but then Saturday happened.
+
+I went to my cousin's engagement party and my mom was there. Within five minutes of me arriving she said Oh, you look nice! Have you lost weight? And I hadn't. So the whole night I felt disgusting and couldn't eat anything at the party, and then when I got home I ate everything in my kitchen.
+
+I know you said self-compassion, and I'm trying, but it's hard. How can I be compassionate with myself when I do things like that?
+
+The journal prompt was interesting though. I wrote a lot. I think enough is not a concept that exists in my family. There was always pressure to be better, thinner, smarter. My brother is a surgeon and my sister is a lawyer. I'm an office manager. I've always been the less than one.
+
+Sorry this email is so negative. I'm having a hard week.
+
+Nicole",True,2026-02-02 21:30:00,2026-02-02 21:30:00
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e13,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440013,email,outbound,Dr. Jennifer Martinez,Nicole Kowalski,dr.martinez@martineztherapy.com,nicole.kowalski95@email.com,,,"Dear Nicole,
+
+Please don't apologize for sharing what's real. That's exactly what this space is for.
+
+First, I want to validate how difficult that situation with your mother was. Her comment, while perhaps intended as a compliment, touched on something deeply painful for you. Your reaction - restricting at the party, then bingeing at home - makes complete sense given your history.
+
+Here's what I want you to consider: the binge wasn't the problem. The binge was a response to a problem - the pain caused by your mother's comment, the feeling of not being enough. Until we address the underlying pain, the binge will continue to be a logical response.
+
+About the how can I be compassionate when I do things like that question - this is exactly when self-compassion is most important and most difficult.
+
+You wrote something profound: Enough is not a concept that exists in my family. This is crucial insight. You've been measuring yourself against impossible standards. But Nicole - being an office manager is a valuable, respectable job. Your worth isn't determined by having MD or JD after your name.
+
+Let's talk more about this on Tuesday.
+
+With care,
+Dr. Martinez",True,2026-02-03 09:20:00,2026-02-03 09:20:00
+c3d4e5f6-a7b8-4c9d-0e1f-2a3b4c5d6e14,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440013,email,inbound,Nicole Kowalski,Dr. Jennifer Martinez,nicole.kowalski95@email.com,dr.martinez@martineztherapy.com,,,"Dr. Martinez,
+
+Thank you for your response. I read it several times. The part about the binge being a response to a problem rather than the problem itself really hit me.
+
+I've been thinking a lot about what enough would feel like. I realized I don't actually know. I've never felt it. There's always been this underlying sense that if I could just be thinner, or more successful, then I'd finally feel okay. But maybe that's not how it works?
+
+I have a question for you. Do you think it would be helpful for me to talk to my mom about how her comments affect me? Part of me wants to, but another part knows she'd probably get defensive.
+
+Also, I tried something new this week. When I felt the urge to binge after a stressful day at work, I called my friend Dana instead. We talked for an hour and by the end, the urge had passed. I still felt stressed, but I didn't feel that desperate need to eat. Is this what you mean by finding other ways to cope?
+
+I'm looking forward to our session tomorrow.
+
+Nicole",True,2026-02-04 19:45:00,2026-02-04 19:45:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a20,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440015,email,outbound,Dr. Jennifer Martinez,Jessica Martinez,dr.martinez@martineztherapy.com,jessica.martinez93@email.com,,,"Dear Jessica,
+
+Thank you for such an open and productive session today. I know it wasn't easy to discuss the patterns in your romantic relationships, but recognizing these patterns is the first step toward changing them.
+
+Session Summary:
+
+Today we explored your tendency to prioritize your partners' needs over your own. You described feeling like you become whoever they need me to be and then feeling resentful when your own needs go unmet.
+
+We also discussed the connection to your childhood, where you learned that showing your authentic self was met with criticism or dismissal. You adapted by becoming hyperaware of others' emotions while suppressing your own. This was adaptive then; it's causing problems now.
+
+Key Concepts:
+1. Boundaries are not selfish. Setting limits is a form of self-respect.
+2. Authenticity attracts the right people.
+3. Your needs matter. Wanting things in a relationship is normal and healthy.
+
+Homework:
+- Practice noticing when you suppress your own needs or opinions
+- Try expressing one small preference this week
+
+Our next session is February 4th at 4:00 PM.
+
+Warmly,
+Dr. Jennifer Martinez, PhD",True,2026-01-21 17:30:00,2026-01-21 17:30:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a21,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440015,email,inbound,Jessica Martinez,Dr. Jennifer Martinez,jessica.martinez93@email.com,dr.martinez@martineztherapy.com,,,"Dr. Martinez,
+
+I tried the homework this week and it was really uncomfortable. Ryan asked where I wanted to go for dinner and instead of saying whatever you want like I usually do, I actually said I'd like to try that new Thai place.
+
+And then I immediately felt guilty? Like I was being demanding or difficult. He just said sure, sounds good and we went and it was fine. But I spent the whole dinner feeling like I had done something wrong by having a preference.
+
+Is it always going to feel this uncomfortable? I know logically that suggesting a restaurant is the most minor thing, but it felt so hard. I can't imagine setting real boundaries if asking for Thai food makes me anxious.
+
+I've also been noticing how often I suppress my needs, like you said. It's... a lot. I didn't realize how automatic it is.
+
+See you Tuesday.
+
+Jess",True,2026-01-26 20:45:00,2026-01-26 20:45:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a22,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440015,email,outbound,Dr. Jennifer Martinez,Jessica Martinez,dr.martinez@martineztherapy.com,jessica.martinez93@email.com,,,"Dear Jessica,
+
+The discomfort you felt after suggesting Thai food is completely expected. When we start challenging deeply ingrained patterns, it feels wrong because it's unfamiliar. This discomfort will decrease with practice.
+
+Here's an important reframe: the guilt you felt wasn't evidence that you did something wrong. It was evidence that you did something NEW. Those are very different things.
+
+Let me ask you some questions to consider before our session:
+1. What do you imagine would have happened if you had expressed a preference? Really picture it.
+2. Has Ryan ever expressed that he doesn't want you to express needs or preferences?
+3. Where did you learn that your needs were an inconvenience?
+
+I suspect the answers to these questions will lead us back to your family of origin.
+
+You're doing important work, Jessica. The discomfort is temporary; the growth is permanent.
+
+See you soon,
+Dr. Martinez",True,2026-01-28 10:15:00,2026-01-28 10:15:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a23,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440015,email,inbound,Jessica Martinez,Dr. Jennifer Martinez,jessica.martinez93@email.com,dr.martinez@martineztherapy.com,,,"Dr. Martinez,
+
+Your questions really made me think. I actually asked Ryan about the TV thing - like hypothetically, how would he feel if I walked in front of it. He looked at me like I was crazy and said I would pause it? Like a normal person? He seemed genuinely confused about why I would even ask.
+
+So I guess the answer to your second question is no - he hasn't expressed that. I've been projecting. This whole time I've been acting like he's my mom, who definitely DID make me feel like my needs were inconvenient. But Ryan isn't my mom.
+
+That realization hit pretty hard.
+
+I talked to him about some of this - in a limited way - and he was really receptive. He said he's noticed I tend to go along with everything and he thought I was just easygoing, but now he wonders if I've actually had opinions the whole time that I wasn't sharing. Which... yeah. I have.
+
+We had a really good conversation about it. He wants me to tell him what I actually want more often.
+
+I don't know why this is making me emotional but it is.
+
+Thank you for pushing me on this.
+
+Jess",True,2026-02-01 19:30:00,2026-02-01 19:30:00
+e5f6a7b8-c9d0-4e1f-2a3b-4c5d6e7f8a24,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440015,email,outbound,Dr. Jennifer Martinez,Jessica Martinez,dr.martinez@martineztherapy.com,jessica.martinez93@email.com,,,"Dear Jessica,
+
+What a beautiful breakthrough. I'm so proud of you for taking the risk to talk to Ryan, and I'm moved by his response. He WANTS access to the real you. Your authenticity isn't a burden to him; it's a gift he's been waiting for.
+
+It makes complete sense that you're emotional. You've spent so much of your life operating under the belief that your true self is too much, too risky to reveal. And you just got concrete evidence that with the right person, the opposite is true.
+
+I want to name something explicitly: your mom's response to your needs isn't how everyone will respond. It was about her limitations as a parent. You adapted to survive that environment, and now you're learning those adaptations are no longer serving you.
+
+A gentle caution: This is wonderful progress, and I encourage you to keep opening up with Ryan. But please pace yourself. Years of suppression don't need to be undone in a week.
+
+Homework for next week:
+- Express one need or preference per day
+- Notice Ryan's responses and write them down
+- When you feel the urge to suppress, pause and ask: Is this actually dangerous, or just unfamiliar?
+
+I'm excited to hear how this continues to unfold.
+
+With warmth,
+Dr. Martinez",True,2026-02-04 11:00:00,2026-02-04 11:00:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f809010,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,sms,outbound,Dr. Jennifer Martinez,Sarah Mitchell,,,(412) 555-0100,(412) 555-2847,"Hi Sarah, this is Dr. Martinez's office. We have you scheduled for your initial consultation on Jan 24th at 1:00 PM. Please arrive 15 minutes early to complete paperwork.",True,2026-01-22 09:00:00,2026-01-22 09:00:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f809011,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,sms,inbound,Sarah Mitchell,Dr. Jennifer Martinez,,,(412) 555-2847,(412) 555-0100,"Thank you! I'm a bit nervous but I know this is a good step. Is there anything I should prepare or think about before coming in?",True,2026-01-22 10:30:00,2026-01-22 10:30:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f809012,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,sms,outbound,Dr. Jennifer Martinez,Sarah Mitchell,,,(412) 555-0100,(412) 555-2847,"It's completely normal to feel nervous. Just come as you are. It might help to think about what you'd like to focus on in therapy, but there's no pressure. We'll figure it out together.",True,2026-01-22 11:15:00,2026-01-22 11:15:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f809013,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,sms,inbound,Sarah Mitchell,Dr. Jennifer Martinez,,,(412) 555-2847,(412) 555-0100,"Thank you, that makes me feel better. See you Friday!",True,2026-01-22 11:45:00,2026-01-22 11:45:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f809014,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,sms,outbound,Dr. Jennifer Martinez,Sarah Mitchell,,,(412) 555-0100,(412) 555-2847,"Hi Sarah, I wanted to check in after our first session. How are you feeling about everything we discussed?",True,2026-01-27 14:30:00,2026-01-27 14:30:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f809015,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,sms,inbound,Sarah Mitchell,Dr. Jennifer Martinez,,,(412) 555-2847,(412) 555-0100,"Hi Dr. Martinez! I've been processing a lot. It felt really good to finally talk about some of these things. I started the thought log you suggested.",True,2026-01-27 16:10:00,2026-01-27 16:10:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f809016,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,sms,outbound,Dr. Jennifer Martinez,Sarah Mitchell,,,(412) 555-0100,(412) 555-2847,"That's wonderful, Sarah. Processing takes time and it's okay to have mixed feelings. I'm glad you started the thought log - bring it to our next session on Feb 5th.",True,2026-01-27 16:45:00,2026-01-27 16:45:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f809017,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,sms,inbound,Sarah Mitchell,Dr. Jennifer Martinez,,,(412) 555-2847,(412) 555-0100,"Will do! I'm actually looking forward to it. It feels good to have support.",True,2026-02-03 09:20:00,2026-02-03 09:20:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b25,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440027,email,outbound,Dr. Jennifer Martinez,Olivia McCarthy,dr.martinez@martineztherapy.com,olivia.mccarthy97@email.com,,,"Dear Olivia,
+
+It was good to meet you today. I understand that starting therapy can feel like a big step, especially when you're used to handling everything on your own.
+
+Based on our initial session, I want to summarize my understanding:
+
+Presenting Concerns:
+- Chronic feelings of emptiness and boredom
+- Difficulty maintaining long-term friendships and romantic relationships
+- Rapid mood shifts, especially in interpersonal contexts
+- History of impulsive behaviors
+- Intense fear of abandonment combined with tendency to push people away
+- Unstable sense of self
+
+Initial Assessment:
+
+Olivia, the pattern you've described is consistent with Borderline Personality Disorder traits. I want to be clear: this is not a character flaw or a permanent sentence. BPD is a condition that develops in response to invalidating environments, and it's highly treatable.
+
+Recommended Treatment: DBT (Dialectical Behavior Therapy)
+
+DBT was developed specifically for the experiences you've described. I'd like to recommend a DBT skills group in addition to our individual sessions.
+
+Our next session is January 30th at 1:00 PM.
+
+With hope,
+Dr. Jennifer Martinez, PhD",True,2026-01-23 14:30:00,2026-01-23 14:30:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b26,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440027,email,inbound,Olivia McCarthy,Dr. Jennifer Martinez,olivia.mccarthy97@email.com,dr.martinez@martineztherapy.com,,,"Dr. Martinez,
+
+I spent a while googling BPD after our session and honestly I had a lot of feelings about it. At first I was kind of angry - like oh great, now I have a label. But then I read some stuff written by people who have it and... it was like reading about myself.
+
+I did the homework. Here's what I noticed:
+
+MONDAY: Fine all day, then my roommate said she was moving out in March and I completely spiraled. Locked myself in my room, cried for three hours. Looking back, her moving isn't even a big deal - we're not that close - but in the moment it felt like the world was ending.
+
+WEDNESDAY: Had a great date with this guy from Hinge. Felt on top of the world. Got home and he hadn't texted and suddenly I was furious.
+
+FRIDAY: Just... empty. Sat on my couch for hours not knowing what to do with myself.
+
+Is it always this intense? How do normal people manage their emotions?
+
+Olivia",True,2026-01-27 23:15:00,2026-01-27 23:15:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b27,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440027,email,outbound,Dr. Jennifer Martinez,Olivia McCarthy,dr.martinez@martineztherapy.com,olivia.mccarthy97@email.com,,,"Dear Olivia,
+
+First, thank you for such honest and detailed observations. What you wrote is incredibly insightful.
+
+About the diagnosis: It's completely normal to have mixed feelings. A diagnosis is a tool, not a verdict. It does NOT define your worth or your future.
+
+Your observations were excellent:
+
+The roommate situation: You noticed that the intensity of your reaction didn't match the actual event. This is the emotional dysregulation pattern of BPD - emotions that are more intense, more reactive, and slower to return to baseline.
+
+The date situation: Notice how quickly you went from idealization to rage. This black-and-white thinking is also characteristic. The good news: you DIDN'T send the message. That moment of pause is a skill you already have.
+
+The emptiness: This chronic emptiness is often described as the most painful part of BPD.
+
+How do normal people manage emotions?
+
+They typically have a wider window of tolerance. BUT this is learnable. The skills we'll develop in DBT will literally change how your brain processes emotions over time.
+
+You're not broken, Olivia. We're going to help you thrive.
+
+See you Thursday.
+
+With care,
+Dr. Martinez",True,2026-01-28 09:30:00,2026-01-28 09:30:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b28,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440027,email,inbound,Olivia McCarthy,Dr. Jennifer Martinez,olivia.mccarthy97@email.com,dr.martinez@martineztherapy.com,,,"Dr. Martinez,
+
+I wanted to update you on something that happened this weekend. Remember that guy from Hinge I mentioned? We've gone on a few more dates and things were going really well. Then Saturday night he said he needed to stay in and couldn't see me.
+
+A month ago, I would have assumed he was lying, that he'd lost interest. I would have either sent him a manipulative text or ghosted him preemptively before he could reject me. That's my pattern.
+
+But I remembered what you said about black-and-white thinking. And I tried to find the gray. Him needing space doesn't mean he doesn't like me.
+
+It was HARD. I still felt that panic in my chest. I called my sister instead and told her about it. I didn't text him anything crazy. I said no problem, let's do something next week.
+
+He texted me Sunday morning apologizing for being boring and asked if I wanted to get brunch. We had brunch! It was great!
+
+I know this sounds small but for me it feels huge. I didn't self-sabotage. I used a skill and I tolerated the distress.
+
+I started the DBT group you recommended. It's uncomfortable being around other people with similar issues but also kind of validating?
+
+See you Thursday.
+
+Olivia",True,2026-02-03 21:00:00,2026-02-03 21:00:00
+f6a7b8c9-d0e1-4f2a-3b4c-5d6e7f8a9b29,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440027,email,outbound,Dr. Jennifer Martinez,Olivia McCarthy,dr.martinez@martineztherapy.com,olivia.mccarthy97@email.com,,,"Dear Olivia,
+
+This email absolutely made my week. What you did is NOT small - it's exactly the kind of breakthrough that changes lives.
+
+Let me break down what you accomplished:
+
+1. Recognized the trigger
+2. Noticed your emotional response
+3. Identified your usual pattern
+4. Chose a different response
+5. Tolerated the discomfort without acting on the urge
+6. Responded in a healthy way
+7. Experienced a positive outcome
+
+This is the ENTIRE therapeutic process in one situation. You literally rewired a neural pathway. Every time you do this, you're building new patterns that will eventually become automatic.
+
+I also want to highlight that you used your sister as a support. This is healthy dependence - reaching out to safe people when you're struggling.
+
+I'm so glad you started the group. Yes, it's uncomfortable at first, but being around others who truly understand your experience can be profoundly healing.
+
+Keep doing what you're doing, Olivia. Real change is happening.
+
+See you tomorrow.
+
+With pride,
+Dr. Martinez",True,2026-02-05 10:30:00,2026-02-05 10:30:00

@@ -91,6 +91,21 @@ CREATE TABLE IF NOT EXISTS prioritized_actions (
   created_at TIMESTAMPTZ DEFAULT now()
 );
 
+-- Create reviews table if it doesn't exist
+CREATE TABLE IF NOT EXISTS reviews (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  practice_id UUID NOT NULL REFERENCES practices(id) ON DELETE CASCADE,
+  patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+  reviewer_name TEXT,
+  review_type TEXT NOT NULL CHECK (review_type IN ('treatment_outcome', 'care_quality', 'provider_feedback', 'general')),
+  rating INTEGER NOT NULL CHECK (rating >= 1 AND rating <= 5),
+  title TEXT NOT NULL,
+  review_text TEXT NOT NULL,
+  is_anonymous BOOLEAN NOT NULL DEFAULT FALSE,
+  review_date DATE NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT now()
+);
+
 -- Add missing columns to patients table if they don't exist
 DO $$
 BEGIN
@@ -248,6 +263,7 @@ ALTER TABLE communications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE clinical_notes ENABLE ROW LEVEL SECURITY;
 ALTER TABLE visit_summaries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE prioritized_actions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_medications_patient_id ON medications(patient_id);
@@ -259,3 +275,14 @@ CREATE INDEX IF NOT EXISTS idx_visit_summaries_practice_id ON visit_summaries(pr
 CREATE INDEX IF NOT EXISTS idx_visit_summaries_patient_id ON visit_summaries(patient_id);
 CREATE INDEX IF NOT EXISTS idx_prioritized_actions_practice_id ON prioritized_actions(practice_id);
 CREATE INDEX IF NOT EXISTS idx_prioritized_actions_patient_id ON prioritized_actions(patient_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_practice_id ON reviews(practice_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_patient_id ON reviews(patient_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_type ON reviews(review_type);
+
+-- Create RLS policy for reviews (demo only - allows all)
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'reviews' AND policyname = 'demo_reviews_all') THEN
+    CREATE POLICY demo_reviews_all ON reviews FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;

@@ -36,7 +36,10 @@ export function ScheduleRowCard({
     .join("");
 
   return (
-    <Card className={cn("p-3 transition-all sm:p-4", className)}>
+    <Card
+      opacity="transparent"
+      className={cn("p-3 transition-all hover:bg-white/70 hover:shadow-md sm:p-4", className)}
+    >
       <div className="flex items-center gap-4">
         {/* Time */}
         <div className="flex shrink-0 items-center gap-1.5">

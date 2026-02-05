@@ -22,7 +22,10 @@ export function PatientStatCard({
   className,
 }: PatientStatCardProps) {
   return (
-    <Card className={cn("flex items-center gap-3 p-3 sm:gap-4 sm:p-4", className)}>
+    <Card
+      opacity="default"
+      className={cn("flex items-center gap-3 p-3 sm:gap-4 sm:p-4", className)}
+    >
       {Icon && (
         <div className="bg-accent/50 flex h-10 w-10 shrink-0 items-center justify-center rounded-full sm:h-12 sm:w-12">
           <Icon className="text-teal h-4 w-4 sm:h-5 sm:w-5" />

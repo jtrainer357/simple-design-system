@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { ScheduleRowCard } from "@/design-system/components/ui/schedule-row-card";
 import { Heading, Text } from "@/design-system/components/ui/typography";
 import { Loader2 } from "lucide-react";
@@ -9,6 +8,7 @@ import { cn } from "@/design-system/lib/utils";
 import { getTodayAppointments } from "@/src/lib/queries/appointments";
 import { isDatabasePopulated } from "@/src/lib/queries/practice";
 import type { AppointmentWithPatient } from "@/src/lib/queries/appointments";
+import type { OrchestrationContext } from "@/src/lib/orchestration/types";
 
 type AppointmentStatus = "ENDED" | "IN PROGRESS" | "CHECKED IN" | "SCHEDULED";
 
@@ -40,11 +40,37 @@ function formatTime(time: string): string {
   return `${displayHours}:${String(minutes).padStart(2, "0")} ${period}`;
 }
 
-interface TodaysPatientsListProps {
-  className?: string;
+// Convert appointment to OrchestrationContext for the detail view
+function appointmentToContext(apt: AppointmentWithPatient): OrchestrationContext {
+  const patient = apt.patient;
+  return {
+    patient: {
+      id: patient.id,
+      name: `${patient.first_name} ${patient.last_name}`,
+      mrn: patient.id.substring(0, 8),
+      dob: patient.date_of_birth,
+      age: Math.floor(
+        (Date.now() - new Date(patient.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)
+      ),
+      primaryDiagnosis: apt.service_type || "General Visit",
+      avatar: patient.avatar_url || `https://i.pravatar.cc/150?u=${patient.id}`,
+    },
+    trigger: {
+      type: "appointment",
+      title: `${apt.service_type} Appointment`,
+      urgency: "medium",
+    },
+    clinicalData: {},
+    suggestedActions: [],
+  };
 }
 
-export function TodaysPatientsList({ className }: TodaysPatientsListProps) {
+interface TodaysPatientsListProps {
+  className?: string;
+  onSelectPatient?: (context: OrchestrationContext) => void;
+}
+
+export function TodaysPatientsList({ className, onSelectPatient }: TodaysPatientsListProps) {
   const [appointments, setAppointments] = React.useState<AppointmentWithPatient[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [dbReady, setDbReady] = React.useState<boolean | null>(null);
@@ -120,9 +146,20 @@ export function TodaysPatientsList({ className }: TodaysPatientsListProps) {
         Today&apos;s Patients ({appointments.length})
       </Heading>
 
-      <div className="-mx-2 min-h-0 flex-1 space-y-2 overflow-y-auto px-2">
+      <div className="-mx-2 min-h-0 flex-1 space-y-2 overflow-y-auto px-2 pb-2">
         {appointments.map((apt) => (
-          <Link key={apt.id} href={`/patients/${apt.patient_id}`} className="block">
+          <div
+            key={apt.id}
+            onClick={() => onSelectPatient?.(appointmentToContext(apt))}
+            className="block cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                onSelectPatient?.(appointmentToContext(apt));
+              }
+            }}
+          >
             <ScheduleRowCard
               time={formatTime(apt.start_time)}
               patient={`${apt.patient.first_name} ${apt.patient.last_name}`}
@@ -132,7 +169,7 @@ export function TodaysPatientsList({ className }: TodaysPatientsListProps) {
               room={apt.location || "Main Office"}
               avatarSrc={apt.patient.avatar_url || undefined}
             />
-          </Link>
+          </div>
         ))}
       </div>
     </div>

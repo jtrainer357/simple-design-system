@@ -56,6 +56,7 @@ export function LeftNav({ activePage = "home" }: LeftNavProps) {
         name: "Dr. Sarah Chen",
         avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/32.jpg", // Asian middle-aged female
       }}
+      isHomePage={activePage === "home"}
     />
   );
 }

@@ -72,3 +72,9 @@ id,patient_id,measure_type,score,date_administered,administered_by,notes,created
 750e8400-e29b-41d4-a716-446655440073,550e8400-e29b-41d4-a716-446655440026,GAD-7,11,2026-01-16,Dr. Jennifer Martinez,Continued improvement,2026-01-16 14:00:00
 750e8400-e29b-41d4-a716-446655440074,550e8400-e29b-41d4-a716-446655440027,GAD-7,16,2025-12-02,Dr. Jennifer Martinez,Initial anxiety - moderately severe,2025-12-02 10:30:00
 750e8400-e29b-41d4-a716-446655440075,550e8400-e29b-41d4-a716-446655440027,GAD-7,13,2026-01-18,Dr. Jennifer Martinez,Moderate improvement,2026-01-18 10:45:00
+750e8400-e29b-41d4-a716-446655440076,550e8400-e29b-41d4-a716-446655440003,PHQ-9,16,2025-10-08,Dr. Jennifer Martinez,Initial assessment - moderately severe depression with work-related stress,2025-10-08 14:00:00
+750e8400-e29b-41d4-a716-446655440077,550e8400-e29b-41d4-a716-446655440003,GAD-7,14,2025-10-08,Dr. Jennifer Martinez,Initial assessment - moderate anxiety co-occurring with depression,2025-10-08 14:15:00
+750e8400-e29b-41d4-a716-446655440078,550e8400-e29b-41d4-a716-446655440003,PHQ-9,12,2025-12-10,Dr. Jennifer Martinez,Good response to CBT and medication - moderate improvement,2025-12-10 14:00:00
+750e8400-e29b-41d4-a716-446655440079,550e8400-e29b-41d4-a716-446655440003,GAD-7,11,2025-12-10,Dr. Jennifer Martinez,Continued improvement in anxiety symptoms,2025-12-10 14:15:00
+750e8400-e29b-41d4-a716-446655440080,550e8400-e29b-41d4-a716-446655440003,PHQ-9,9,2026-01-28,Dr. Jennifer Martinez,Significant improvement - mild symptoms remaining,2026-01-28 14:00:00
+750e8400-e29b-41d4-a716-446655440081,550e8400-e29b-41d4-a716-446655440003,GAD-7,8,2026-01-28,Dr. Jennifer Martinez,Good progress - mild anxiety well-managed,2026-01-28 14:15:00

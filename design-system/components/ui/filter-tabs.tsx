@@ -31,8 +31,8 @@ export function FilterTabs({ tabs, activeTab, onTabChange, className }: FilterTa
           className={cn(
             "rounded-full px-4 py-1.5 text-sm font-medium transition-all duration-200",
             activeTab === tab.id
-              ? "text-foreground bg-white shadow-sm"
-              : "text-muted-foreground hover:text-foreground"
+              ? "text-foreground border border-gray-300 bg-white"
+              : "text-muted-foreground hover:text-foreground border border-transparent"
           )}
         >
           {tab.label}
