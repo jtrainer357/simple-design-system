@@ -82,7 +82,7 @@ export const demoContext: OrchestrationContext = {
     dob: "11/15/1973",
     age: 52,
     primaryDiagnosis: "Type 2 Diabetes",
-    avatar: "https://randomuser.me/api/portraits/men/75.jpg",
+    avatar: "https://xsgames.co/randomusers/assets/avatars/male/32.jpg", // Asian middle-aged male
   },
   trigger: {
     type: "lab_result",

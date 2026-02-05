@@ -5,6 +5,10 @@
 
 import { createClient } from "@/src/lib/supabase/client";
 import type { Practice } from "@/src/lib/supabase/types";
+import { getDemoToday, DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SupabaseAny = any;
 
 /**
  * Get the demo practice (first practice in the database)
@@ -12,7 +16,11 @@ import type { Practice } from "@/src/lib/supabase/types";
 export async function getDemoPractice(): Promise<Practice | null> {
   const supabase = createClient();
 
-  const { data, error } = await supabase.from("practices").select("*").limit(1).single();
+  const { data, error } = await supabase
+    .from("practices")
+    .select("*")
+    .eq("id", DEMO_PRACTICE_ID)
+    .single();
 
   if (error) {
     console.error("Failed to fetch demo practice:", error);
@@ -25,15 +33,14 @@ export async function getDemoPractice(): Promise<Practice | null> {
 /**
  * Get practice ID for queries
  */
-export async function getPracticeId(): Promise<string | null> {
-  const practice = await getDemoPractice();
-  return practice?.id || null;
+export async function getPracticeId(): Promise<string> {
+  return DEMO_PRACTICE_ID;
 }
 
 /**
  * Get dashboard statistics for a practice
  */
-export async function getDashboardStats(practiceId: string): Promise<{
+export async function getDashboardStats(practiceId: string = DEMO_PRACTICE_ID): Promise<{
   patientCount: number;
   activePatientCount: number;
   highRiskCount: number;
@@ -43,7 +50,7 @@ export async function getDashboardStats(practiceId: string): Promise<{
   outstandingBalance: number;
 }> {
   const supabase = createClient();
-  const today = new Date().toISOString().split("T")[0] as string;
+  const today = getDemoToday();
 
   // Run all queries in parallel
   const [patientsResult, todayApptsResult, messagesResult, actionsResult, invoicesResult] =
@@ -54,20 +61,20 @@ export async function getDashboardStats(practiceId: string): Promise<{
       // Today's appointments
       supabase.from("appointments").select("id").eq("practice_id", practiceId).eq("date", today),
 
-      // Unread messages
-      supabase
-        .from("messages")
+      // Unread messages (try communications table which is what demo uses)
+      (supabase as SupabaseAny)
+        .from("communications")
         .select("id")
         .eq("practice_id", practiceId)
         .eq("direction", "inbound")
-        .eq("read", false),
+        .eq("is_read", false),
 
-      // Pending actions
-      supabase
-        .from("priority_actions")
+      // Pending actions (use prioritized_actions table)
+      (supabase as SupabaseAny)
+        .from("prioritized_actions")
         .select("id")
         .eq("practice_id", practiceId)
-        .eq("status", "pending"),
+        .or("status.eq.pending,status.is.null"),
 
       // Outstanding balance
       supabase.from("invoices").select("balance").eq("practice_id", practiceId).gt("balance", 0),

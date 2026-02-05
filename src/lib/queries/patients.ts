@@ -4,32 +4,40 @@
  */
 
 import { createClient } from "@/src/lib/supabase/client";
-import type {
-  Patient,
-  Appointment,
-  OutcomeMeasure,
-  Message,
-  Invoice,
-} from "@/src/lib/supabase/types";
+import type { Patient, Appointment, OutcomeMeasure, Invoice } from "@/src/lib/supabase/types";
+import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type SupabaseAny = any;
+
+// Communication type for messages
+export interface Communication {
+  id: string;
+  practice_id: string;
+  patient_id: string;
+  channel: string;
+  direction: string;
+  sender: string | null;
+  recipient: string | null;
+  message_body: string | null;
+  is_read: boolean;
+  sent_at: string | null;
+  created_at: string;
+}
 
 /**
  * Get all patients for a practice
  */
-export async function getPatients(practiceId?: string): Promise<Patient[]> {
+export async function getPatients(practiceId: string = DEMO_PRACTICE_ID): Promise<Patient[]> {
   const supabase = createClient();
 
-  let query = supabase
+  const { data, error } = await supabase
     .from("patients")
     .select("*")
+    .eq("practice_id", practiceId)
     .eq("status", "Active")
     .order("last_name", { ascending: true })
     .order("first_name", { ascending: true });
-
-  if (practiceId) {
-    query = query.eq("practice_id", practiceId);
-  }
-
-  const { data, error } = await query;
 
   if (error) {
     console.error("Failed to fetch patients:", error);
@@ -117,16 +125,16 @@ export async function getPatientOutcomeMeasures(patientId: string): Promise<Outc
 }
 
 /**
- * Get patient messages
+ * Get patient communications/messages
  */
-export async function getPatientMessages(patientId: string): Promise<Message[]> {
+export async function getPatientMessages(patientId: string): Promise<Communication[]> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
-    .from("messages")
+  const { data, error } = await (supabase as SupabaseAny)
+    .from("communications")
     .select("*")
     .eq("patient_id", patientId)
-    .order("timestamp", { ascending: false })
+    .order("sent_at", { ascending: false })
     .limit(50);
 
   if (error) {
@@ -164,7 +172,7 @@ export async function getPatientDetails(patientId: string): Promise<{
   patient: Patient;
   appointments: Appointment[];
   outcomeMeasures: OutcomeMeasure[];
-  messages: Message[];
+  messages: Communication[];
   invoices: Invoice[];
 } | null> {
   const patient = await getPatientById(patientId);
@@ -189,23 +197,21 @@ export async function getPatientDetails(patientId: string): Promise<{
 /**
  * Search patients by name
  */
-export async function searchPatients(query: string, practiceId?: string): Promise<Patient[]> {
+export async function searchPatients(
+  query: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<Patient[]> {
   const supabase = createClient();
 
   // Use ilike for case-insensitive search
-  let dbQuery = supabase
+  const { data, error } = await supabase
     .from("patients")
     .select("*")
+    .eq("practice_id", practiceId)
     .or(`first_name.ilike.%${query}%,last_name.ilike.%${query}%`)
     .eq("status", "Active")
     .order("last_name", { ascending: true })
     .limit(20);
-
-  if (practiceId) {
-    dbQuery = dbQuery.eq("practice_id", practiceId);
-  }
-
-  const { data, error } = await dbQuery;
 
   if (error) {
     console.error("Failed to search patients:", error);
@@ -218,21 +224,18 @@ export async function searchPatients(query: string, practiceId?: string): Promis
 /**
  * Get high-risk patients
  */
-export async function getHighRiskPatients(practiceId?: string): Promise<Patient[]> {
+export async function getHighRiskPatients(
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<Patient[]> {
   const supabase = createClient();
 
-  let query = supabase
+  const { data, error } = await supabase
     .from("patients")
     .select("*")
+    .eq("practice_id", practiceId)
     .eq("risk_level", "high")
     .eq("status", "Active")
     .order("last_name", { ascending: true });
-
-  if (practiceId) {
-    query = query.eq("practice_id", practiceId);
-  }
-
-  const { data, error } = await query;
 
   if (error) {
     console.error("Failed to fetch high-risk patients:", error);

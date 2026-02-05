@@ -17,6 +17,7 @@ interface Conversation {
   unreadCount?: number;
   avatarSrc?: string;
   countryFlag?: string;
+  channel?: "sms" | "email";
   pinned?: boolean;
 }
 
@@ -28,65 +29,73 @@ interface ConversationListProps {
   className?: string;
 }
 
+// Sample conversations with demographically-appropriate avatars
 const sampleConversations: Conversation[] = [
   {
+    // Jonas Smith: Male, young, Caucasian
     id: "1",
     name: "Jonas Smith",
     preview: "I believe a subtle blue or green would be...",
     time: "Jul 2024",
     unreadCount: 3,
-    avatarSrc: "https://randomuser.me/api/portraits/men/52.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/1.jpg",
     pinned: true,
   },
   {
+    // Herry Brooks: Male, middle-aged, African American
     id: "2",
     name: "Herry Brooks",
     preview: "I believe a subtle blue or green would be...",
     time: "Jul 2024",
     unreadCount: 3,
-    avatarSrc: "https://randomuser.me/api/portraits/men/22.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/9.jpg",
     pinned: true,
   },
   {
+    // Sahid Ajmol: Male, young, South Asian
     id: "3",
     name: "Sahid Ajmol",
     preview: "Ready your last final project",
     time: "Jul 2024",
-    avatarSrc: "https://randomuser.me/api/portraits/men/35.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/35.jpg",
     pinned: true,
   },
   {
+    // Joe Roots: Male, young, Caucasian/British
     id: "4",
     name: "Joe Roots",
     preview: "I believe a subtle blue or green would be...",
     time: "Jul 2024",
     unreadCount: 3,
-    avatarSrc: "https://randomuser.me/api/portraits/men/41.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/8.jpg",
     countryFlag: "🇬🇧",
   },
   {
+    // Janson Roy: Male, young, Caucasian
     id: "5",
     name: "Janson Roy",
     preview: "are you ready for new project",
     time: "Jul 2024",
-    avatarSrc: "https://randomuser.me/api/portraits/men/18.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/15.jpg",
   },
   {
+    // Azam Khan: Male, young, South Asian/Pakistani
     id: "6",
     name: "Azam Khan",
     preview: "I believe a subtle blue or green would be...",
     time: "Jul 2024",
     unreadCount: 3,
-    avatarSrc: "https://randomuser.me/api/portraits/men/29.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/42.jpg",
     countryFlag: "🇵🇰",
   },
   {
+    // David Willey: Male, middle-aged, Caucasian
     id: "7",
     name: "David Willey",
     preview: "great id i can try it's",
     time: "Jul 2024",
     unreadCount: 3,
-    avatarSrc: "https://randomuser.me/api/portraits/men/56.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/3.jpg",
   },
   {
     id: "8",
@@ -104,11 +113,12 @@ const sampleConversations: Conversation[] = [
     countryFlag: "🇬🇧",
   },
   {
+    // Henry Killer: Male, middle-aged, Caucasian
     id: "10",
     name: "Henry Killer",
     preview: "Thanks for the update",
     time: "Jul 2024",
-    avatarSrc: "https://randomuser.me/api/portraits/men/64.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/10.jpg",
   },
 ];
 
@@ -152,6 +162,7 @@ export function ConversationList({
                   unreadCount={conversation.unreadCount}
                   avatarSrc={conversation.avatarSrc}
                   countryFlag={conversation.countryFlag}
+                  channel={conversation.channel}
                   selected={selectedId === conversation.id}
                   onClick={() => handleSelect(conversation.id)}
                 />
@@ -178,6 +189,7 @@ export function ConversationList({
                 unreadCount={conversation.unreadCount}
                 avatarSrc={conversation.avatarSrc}
                 countryFlag={conversation.countryFlag}
+                channel={conversation.channel}
                 selected={selectedId === conversation.id}
                 onClick={() => handleSelect(conversation.id)}
               />

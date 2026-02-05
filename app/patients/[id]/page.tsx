@@ -4,7 +4,6 @@ import * as React from "react";
 import { useParams } from "next/navigation";
 import { Loader2 } from "lucide-react";
 import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
-import { ScrollArea } from "@/design-system/components/ui/scroll-area";
 import {
   PatientRoster,
   PatientHeader,
@@ -25,14 +24,12 @@ import {
   type PrioritizedAction,
 } from "@/src/components/patients";
 import { getPatients, getPatientDetails } from "@/src/lib/queries/patients";
-import { getPatientPriorityActions } from "@/src/lib/queries/priority-actions";
+import {
+  getPatientPriorityActions,
+  type PatientPriorityAction,
+} from "@/src/lib/queries/priority-actions";
 import { isDatabasePopulated } from "@/src/lib/queries/practice";
-import type {
-  Patient,
-  Appointment,
-  PriorityAction as DbPriorityAction,
-  Invoice,
-} from "@/src/lib/supabase/types";
+import type { Patient, Appointment, Invoice } from "@/src/lib/supabase/types";
 
 // Convert database patient to roster item
 function patientToRosterItem(patient: Patient): PatientRosterItem {
@@ -126,19 +123,17 @@ function createPatientMetrics(
 }
 
 // Convert database action to UI action
-function dbActionToUiAction(action: DbPriorityAction): PrioritizedAction {
-  const suggestedActions = Array.isArray(action.suggested_actions)
-    ? (action.suggested_actions as string[])
-    : [];
+function dbActionToUiAction(action: PatientPriorityAction): PrioritizedAction {
+  const suggestedActions = Array.isArray(action.suggested_actions) ? action.suggested_actions : [];
 
   return {
     id: action.id,
     title: action.title,
-    description: action.description || action.clinical_context || "",
+    description: action.clinical_context || "",
     urgency: action.urgency,
     timeframe: (action.timeframe as PrioritizedAction["timeframe"]) || "This week",
     confidence: action.confidence_score || 85,
-    icon: (action.icon as PrioritizedAction["icon"]) || "clipboard",
+    icon: "clipboard",
     patientId: action.patient_id,
     suggestedActions,
   };
@@ -156,7 +151,7 @@ export default function PatientDetailPage() {
     appointments: Appointment[];
     invoices: Invoice[];
   } | null>(null);
-  const [actions, setActions] = React.useState<DbPriorityAction[]>([]);
+  const [actions, setActions] = React.useState<PatientPriorityAction[]>([]);
 
   React.useEffect(() => {
     async function loadData() {
@@ -267,10 +262,10 @@ export default function PatientDetailPage() {
   const uiActions = actions.map(dbActionToUiAction);
 
   return (
-    <div className="flex h-full flex-col lg:flex-row">
+    <div className="flex h-screen flex-col lg:flex-row">
       {/* Sidebar - Patient Roster */}
-      <aside className="border-synapse-2 w-full border-b lg:w-72 lg:border-r lg:border-b-0">
-        <div className="h-64 lg:h-full">
+      <aside className="border-synapse-2 w-full shrink-0 border-b lg:w-72 lg:border-r lg:border-b-0">
+        <div className="h-64 overflow-auto lg:h-screen">
           <PatientRoster
             patients={rosterItems}
             selectedPatientId={patientId}
@@ -281,48 +276,46 @@ export default function PatientDetailPage() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 overflow-hidden">
-        <ScrollArea className="h-full">
-          <div className="space-y-4 p-4 lg:space-y-6 lg:p-6">
-            {/* Patient Header */}
-            <PatientHeader patient={headerData} />
+      <main className="min-h-0 flex-1 overflow-auto">
+        <div className="space-y-4 p-4 pb-8 lg:space-y-6 lg:p-6 lg:pb-12">
+          {/* Patient Header */}
+          <PatientHeader patient={headerData} />
 
-            {/* Patient Metrics */}
-            <PatientMetrics metrics={metricsData} />
+          {/* Patient Metrics */}
+          <PatientMetrics metrics={metricsData} />
 
-            {/* Tabs Section */}
-            <CardWrapper className="min-h-[400px]">
-              <PatientTabs defaultValue="overview">
-                {/* Overview Tab */}
-                <TabsContent value="overview" className="mt-0 space-y-6">
-                  {/* Prioritized Actions - KILLER FEATURE */}
-                  {uiActions.length > 0 ? (
-                    <PrioritizedActionsSection
-                      actions={uiActions}
-                      onActionClick={handleActionClick}
-                    />
-                  ) : (
-                    <div className="border-muted-foreground/30 bg-muted/10 rounded-lg border border-dashed p-6 text-center">
-                      <p className="text-muted-foreground text-sm">
-                        No priority actions for this patient
-                      </p>
-                    </div>
-                  )}
+          {/* Tabs Section */}
+          <CardWrapper className="min-h-[400px]">
+            <PatientTabs defaultValue="overview">
+              {/* Overview Tab */}
+              <TabsContent value="overview" className="mt-0 space-y-6">
+                {/* Prioritized Actions - KILLER FEATURE */}
+                {uiActions.length > 0 ? (
+                  <PrioritizedActionsSection
+                    actions={uiActions}
+                    onActionClick={handleActionClick}
+                  />
+                ) : (
+                  <div className="border-muted-foreground/30 bg-muted/10 rounded-lg border border-dashed p-6 text-center">
+                    <p className="text-muted-foreground text-sm">
+                      No priority actions for this patient
+                    </p>
+                  </div>
+                )}
 
-                  {/* Recent Activity Timeline */}
-                  <RecentActivityTimeline activities={demoActivities} />
-                </TabsContent>
+                {/* Recent Activity Timeline */}
+                <RecentActivityTimeline activities={demoActivities} />
+              </TabsContent>
 
-                {/* Other tabs */}
-                <AppointmentsTabContent />
-                <MedicalRecordsTabContent />
-                <MessagesTabContent />
-                <BillingTabContent />
-                <ReviewsTabContent />
-              </PatientTabs>
-            </CardWrapper>
-          </div>
-        </ScrollArea>
+              {/* Other tabs */}
+              <AppointmentsTabContent />
+              <MedicalRecordsTabContent />
+              <MessagesTabContent />
+              <BillingTabContent />
+              <ReviewsTabContent />
+            </PatientTabs>
+          </CardWrapper>
+        </div>
       </main>
     </div>
   );

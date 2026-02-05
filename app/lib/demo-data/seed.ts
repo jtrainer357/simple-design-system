@@ -76,9 +76,10 @@ export const demoPatients: DemoPatient[] = [
     },
     primaryCondition: "Type 2 Diabetes",
     status: "ACTIVE",
-    avatarSrc: "https://randomuser.me/api/portraits/men/75.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/32.jpg", // Asian middle-aged male
   },
   {
+    // Sarah Johnson: Female, 33yo (young), Caucasian
     id: "patient-2",
     firstName: "Sarah",
     lastName: "Johnson",
@@ -94,9 +95,10 @@ export const demoPatients: DemoPatient[] = [
     },
     primaryCondition: "New Patient",
     status: "NEW",
-    avatarSrc: "https://randomuser.me/api/portraits/women/44.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/1.jpg", // Caucasian young female
   },
   {
+    // Margaret Williams: Female, 70yo (senior), Caucasian
     id: "patient-3",
     firstName: "Margaret",
     lastName: "Williams",
@@ -112,9 +114,10 @@ export const demoPatients: DemoPatient[] = [
     },
     primaryCondition: "Hypertension",
     status: "ACTIVE",
-    avatarSrc: "https://randomuser.me/api/portraits/women/68.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/5.jpg", // Caucasian senior female
   },
   {
+    // Robert Martinez: Male, 47yo (middle-aged), Hispanic
     id: "patient-4",
     firstName: "Robert",
     lastName: "Martinez",
@@ -130,7 +133,7 @@ export const demoPatients: DemoPatient[] = [
     },
     primaryCondition: "Major Depressive Disorder",
     status: "ACTIVE",
-    avatarSrc: "https://randomuser.me/api/portraits/men/45.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/62.jpg", // Hispanic middle-aged male
   },
 ];
 

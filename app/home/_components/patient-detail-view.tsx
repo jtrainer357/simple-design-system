@@ -66,7 +66,14 @@ export interface PatientDetail {
   };
   upcomingAppointments: Array<{
     id: string;
-    status: "Scheduled" | "Confirmed" | "Checked In" | "In Progress" | "Completed" | "Cancelled";
+    status:
+      | "Scheduled"
+      | "Confirmed"
+      | "Checked In"
+      | "In Progress"
+      | "Completed"
+      | "Cancelled"
+      | "No-Show";
     date: string;
     time: string;
     type: string;

@@ -26,12 +26,12 @@ export default function HomePage() {
           <PageTransition>
             <div className="mx-auto flex max-w-[1600px] flex-col gap-2 lg:h-[calc(100vh-8.5rem)] lg:flex-row">
               {/* Main Content Area - Unified Card with Dynamic Canvas */}
-              <CardWrapper className="flex min-h-0 flex-1 flex-col overflow-hidden">
+              <CardWrapper className="flex min-h-0 flex-1 flex-col overflow-auto">
                 <DynamicCanvas className="flex min-h-0 flex-1 flex-col" />
               </CardWrapper>
 
               {/* Right Sidebar Widgets */}
-              <aside className="flex w-full flex-col gap-2 lg:w-[380px]">
+              <aside className="flex w-full shrink-0 flex-col gap-2 overflow-auto lg:w-[380px]">
                 <MessagesWidget />
                 {/* <OutstandingItemsWidget /> */}
                 <BillingUpsellWidget />

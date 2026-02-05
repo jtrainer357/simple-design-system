@@ -12,194 +12,88 @@ import { CalendarDateStrip } from "@/design-system/components/ui/calendar-date-s
 import { FilterTabs } from "@/design-system/components/ui/filter-tabs";
 import { PageTransition } from "@/design-system/components/ui/page-transition";
 import { Button } from "@/design-system/components/ui/button";
-import { Plus, Calendar, Trash2 } from "lucide-react";
+import { Text } from "@/design-system/components/ui/typography";
+import { Plus, Calendar, Trash2, Loader2 } from "lucide-react";
 import {
   addDays,
   startOfWeek,
   endOfWeek,
   format,
-  setHours,
-  setMinutes,
   subWeeks,
   addWeeks,
   isSameDay,
+  parseISO,
 } from "date-fns";
+import {
+  getUpcomingAppointments,
+  type AppointmentWithPatient,
+} from "@/src/lib/queries/appointments";
+import { DEMO_DATE_OBJECT } from "@/src/lib/utils/demo-date";
 
-// Sample patient appointments for healthcare practice
-const createSampleEvents = (baseDate: Date): CalendarEvent[] => {
-  const weekStart = startOfWeek(baseDate, { weekStartsOn: 1 });
+// Color mapping based on appointment type
+function getEventColor(serviceType: string, status: string): CalendarEvent["color"] {
+  if (status === "Completed") return "gray";
+  if (status === "Cancelled" || status === "No-Show") return "pink";
+  if (serviceType.toLowerCase().includes("initial") || serviceType.toLowerCase().includes("intake"))
+    return "green";
+  if (serviceType.toLowerCase().includes("crisis")) return "pink";
+  return "blue";
+}
 
-  return [
-    // Monday - Patient Appointments
-    {
-      id: "1",
-      title: "Michael Chen - Follow-up",
-      startTime: setMinutes(setHours(weekStart, 8), 0),
-      endTime: setMinutes(setHours(weekStart, 8), 30),
-      color: "blue",
-    },
-    {
-      id: "2",
-      title: "Sarah Johnson - New Patient",
-      startTime: setMinutes(setHours(weekStart, 9), 0),
-      endTime: setMinutes(setHours(weekStart, 10), 0),
-      color: "green",
-    },
-    {
-      id: "3",
-      title: "Margaret Williams - BP Check",
-      startTime: setMinutes(setHours(weekStart, 10), 30),
-      endTime: setMinutes(setHours(weekStart, 11), 0),
-      color: "purple",
-    },
-    {
-      id: "4",
-      title: "Team Huddle",
-      startTime: setMinutes(setHours(weekStart, 12), 0),
-      endTime: setMinutes(setHours(weekStart, 12), 30),
-      color: "gray",
-    },
-    {
-      id: "5",
-      title: "Michael Chen - Diabetes Mgmt",
-      startTime: setMinutes(setHours(weekStart, 14), 0),
-      endTime: setMinutes(setHours(weekStart, 14), 45),
-      color: "blue",
-    },
-    // Tuesday
-    {
-      id: "6",
-      title: "Sarah Johnson - Lab Review",
-      startTime: setMinutes(setHours(addDays(weekStart, 1), 8), 30),
-      endTime: setMinutes(setHours(addDays(weekStart, 1), 9), 0),
-      color: "green",
-    },
-    {
-      id: "7",
-      title: "New Patient - James Wilson",
-      startTime: setMinutes(setHours(addDays(weekStart, 1), 10), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 1), 11), 0),
-      color: "pink",
-    },
-    {
-      id: "8",
-      title: "Margaret Williams - Cardiology",
-      startTime: setMinutes(setHours(addDays(weekStart, 1), 13), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 1), 14), 0),
-      color: "purple",
-      hasNotification: true,
-    },
-    {
-      id: "9",
-      title: "Telehealth - Robert Brown",
-      startTime: setMinutes(setHours(addDays(weekStart, 1), 15), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 1), 15), 30),
-      color: "blue",
-    },
-    // Wednesday
-    {
-      id: "10",
-      title: "Michael Chen - A1C Review",
-      startTime: setMinutes(setHours(addDays(weekStart, 2), 9), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 2), 9), 30),
-      color: "blue",
-    },
-    {
-      id: "11",
-      title: "Staff Training",
-      startTime: setMinutes(setHours(addDays(weekStart, 2), 12), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 2), 13), 0),
-      color: "gray",
-    },
-    {
-      id: "12",
-      title: "Margaret Williams - Follow-up",
-      startTime: setMinutes(setHours(addDays(weekStart, 2), 14), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 2), 14), 30),
-      color: "purple",
-    },
-    {
-      id: "13",
-      title: "Sarah Johnson - Wellness",
-      startTime: setMinutes(setHours(addDays(weekStart, 2), 15), 30),
-      endTime: setMinutes(setHours(addDays(weekStart, 2), 16), 30),
-      color: "green",
-    },
-    // Thursday
-    {
-      id: "14",
-      title: "New Patient - Emily Davis",
-      startTime: setMinutes(setHours(addDays(weekStart, 3), 8), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 3), 9), 0),
-      color: "pink",
-    },
-    {
-      id: "15",
-      title: "Michael Chen - Nutrition",
-      startTime: setMinutes(setHours(addDays(weekStart, 3), 10), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 3), 10), 45),
-      color: "blue",
-    },
-    {
-      id: "16",
-      title: "Lunch & Learn",
-      startTime: setMinutes(setHours(addDays(weekStart, 3), 12), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 3), 13), 0),
-      color: "yellow",
-    },
-    {
-      id: "17",
-      title: "Telehealth - Lisa Anderson",
-      startTime: setMinutes(setHours(addDays(weekStart, 3), 14), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 3), 14), 30),
-      color: "blue",
-    },
-    {
-      id: "18",
-      title: "Margaret Williams - Med Review",
-      startTime: setMinutes(setHours(addDays(weekStart, 3), 16), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 3), 16), 30),
-      color: "purple",
-      hasNotification: true,
-    },
-    // Friday
-    {
-      id: "19",
-      title: "Sarah Johnson - Physical",
-      startTime: setMinutes(setHours(addDays(weekStart, 4), 9), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 4), 10), 0),
-      color: "green",
-    },
-    {
-      id: "20",
-      title: "Michael Chen - Lab Follow-up",
-      startTime: setMinutes(setHours(addDays(weekStart, 4), 11), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 4), 11), 30),
-      color: "blue",
-    },
-    {
-      id: "21",
-      title: "Admin Time",
-      startTime: setMinutes(setHours(addDays(weekStart, 4), 14), 0),
-      endTime: setMinutes(setHours(addDays(weekStart, 4), 16), 0),
-      color: "gray",
-    },
-  ];
-};
+// Convert DB appointment to CalendarEvent
+function appointmentToEvent(apt: AppointmentWithPatient): CalendarEvent {
+  const [hours, minutes] = apt.start_time.split(":").map(Number);
+  const [endHours, endMinutes] = apt.end_time.split(":").map(Number);
+  const date = parseISO(apt.date);
+
+  const startTime = new Date(date);
+  startTime.setHours(hours!, minutes!, 0, 0);
+
+  const endTime = new Date(date);
+  endTime.setHours(endHours!, endMinutes!, 0, 0);
+
+  return {
+    id: apt.id,
+    title: `${apt.patient.first_name} ${apt.patient.last_name} - ${apt.service_type}`,
+    startTime,
+    endTime,
+    color: getEventColor(apt.service_type, apt.status),
+    hasNotification: apt.patient.risk_level === "high",
+  };
+}
 
 const filterTabs = [
   { id: "all", label: "All Appointments" },
-  { id: "inperson", label: "In-Person" },
-  { id: "telehealth", label: "Telehealth" },
-  { id: "pending", label: "Pending" },
+  { id: "scheduled", label: "Scheduled" },
+  { id: "completed", label: "Completed" },
 ];
 
 export default function SchedulePage() {
-  const [currentDate, setCurrentDate] = React.useState(new Date());
-  const [selectedDate, setSelectedDate] = React.useState(new Date());
+  // Use demo date as starting point
+  const [currentDate, setCurrentDate] = React.useState(DEMO_DATE_OBJECT);
+  const [selectedDate, setSelectedDate] = React.useState(DEMO_DATE_OBJECT);
   const [viewType, setViewType] = React.useState<CalendarViewType>("week");
   const [activeFilter, setActiveFilter] = React.useState("all");
   const [completedEvents, setCompletedEvents] = React.useState<Set<string>>(new Set());
+  const [appointments, setAppointments] = React.useState<AppointmentWithPatient[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  // Load appointments from Supabase
+  React.useEffect(() => {
+    async function loadAppointments() {
+      try {
+        setLoading(true);
+        // Fetch 2 weeks of appointments (all statuses for filter tabs to work)
+        const data = await getUpcomingAppointments(undefined, 14, "all");
+        setAppointments(data);
+      } catch (err) {
+        console.error("Failed to load appointments:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadAppointments();
+  }, []);
 
   // Calculate week days
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
@@ -212,7 +106,16 @@ export default function SchedulePage() {
     return days;
   }, [weekStart]);
 
-  const events = React.useMemo(() => createSampleEvents(currentDate), [currentDate]);
+  // Convert appointments to calendar events
+  const events: CalendarEvent[] = React.useMemo(() => {
+    return appointments
+      .filter((apt) => {
+        if (activeFilter === "scheduled") return apt.status === "Scheduled";
+        if (activeFilter === "completed") return apt.status === "Completed";
+        return true;
+      })
+      .map(appointmentToEvent);
+  }, [appointments, activeFilter]);
 
   const dateRange = `${format(weekStart, "MMM d, yyyy")} - ${format(weekEnd, "MMM d, yyyy")}`;
 
@@ -225,8 +128,8 @@ export default function SchedulePage() {
   };
 
   const handleToday = () => {
-    setCurrentDate(new Date());
-    setSelectedDate(new Date());
+    setCurrentDate(DEMO_DATE_OBJECT);
+    setSelectedDate(DEMO_DATE_OBJECT);
   };
 
   const handleEventToggle = (eventId: string, completed: boolean) => {
@@ -278,85 +181,101 @@ export default function SchedulePage() {
 
               {/* Calendar Card */}
               <CardWrapper className="flex flex-1 flex-col overflow-hidden p-4 sm:p-6">
-                {/* Desktop View */}
-                <div className="hidden h-full flex-col lg:flex">
-                  <CalendarHeader
-                    currentDate={currentDate}
-                    dateRange={dateRange}
-                    viewType={viewType}
-                    onViewTypeChange={setViewType}
-                    onPrevious={handlePrevious}
-                    onNext={handleNext}
-                    onToday={handleToday}
-                    className="mb-6"
-                  />
-
-                  <CalendarWeekView
-                    weekDays={weekDays}
-                    events={events}
-                    startHour={8}
-                    endHour={18}
-                    className="min-h-0 flex-1"
-                  />
-
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Calendar className="h-3.5 w-3.5" />
-                      Connect Google
-                    </Button>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Calendar className="h-3.5 w-3.5" />
-                      Connect Outlook
-                    </Button>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Calendar className="h-3.5 w-3.5" />
-                      Connect Apple
-                    </Button>
+                {/* Loading State */}
+                {loading ? (
+                  <div className="flex flex-1 items-center justify-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <Loader2 className="text-primary h-8 w-8 animate-spin" />
+                      <Text size="sm" muted>
+                        Loading schedule...
+                      </Text>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    {/* Desktop View */}
+                    <div className="hidden h-full flex-col lg:flex">
+                      <CalendarHeader
+                        currentDate={currentDate}
+                        dateRange={dateRange}
+                        viewType={viewType}
+                        onViewTypeChange={setViewType}
+                        onPrevious={handlePrevious}
+                        onNext={handleNext}
+                        onToday={handleToday}
+                        className="mb-6"
+                      />
 
-                {/* Mobile/Tablet View */}
-                <div className="lg:hidden">
-                  {/* Mobile Header */}
-                  <div className="mb-4 flex items-center justify-between">
-                    <h2 className="text-lg font-semibold">{format(currentDate, "MMMM yyyy")}</h2>
-                    <Button variant="ghost" size="sm" onClick={handleToday}>
-                      Today
-                    </Button>
-                  </div>
+                      <CalendarWeekView
+                        weekDays={weekDays}
+                        events={events}
+                        startHour={8}
+                        endHour={18}
+                        className="min-h-0 flex-1"
+                      />
 
-                  {/* Date Strip */}
-                  <CalendarDateStrip
-                    dates={weekDays}
-                    selectedDate={selectedDate}
-                    onDateSelect={setSelectedDate}
-                    className="mb-4"
-                  />
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <Calendar className="h-3.5 w-3.5" />
+                          Connect Google
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <Calendar className="h-3.5 w-3.5" />
+                          Connect Outlook
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <Calendar className="h-3.5 w-3.5" />
+                          Connect Apple
+                        </Button>
+                      </div>
+                    </div>
 
-                  {/* Day View */}
-                  <div className="border-border bg-card rounded-lg border p-3">
-                    <CalendarDayView
-                      date={selectedDate}
-                      events={dayEvents}
-                      onEventToggle={handleEventToggle}
-                    />
-                  </div>
+                    {/* Mobile/Tablet View */}
+                    <div className="lg:hidden">
+                      {/* Mobile Header */}
+                      <div className="mb-4 flex items-center justify-between">
+                        <h2 className="text-lg font-semibold">
+                          {format(currentDate, "MMMM yyyy")}
+                        </h2>
+                        <Button variant="ghost" size="sm" onClick={handleToday}>
+                          Today
+                        </Button>
+                      </div>
 
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Calendar className="h-3.5 w-3.5" />
-                      Connect Google
-                    </Button>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Calendar className="h-3.5 w-3.5" />
-                      Connect Outlook
-                    </Button>
-                    <Button variant="outline" size="sm" className="gap-2">
-                      <Calendar className="h-3.5 w-3.5" />
-                      Connect Apple
-                    </Button>
-                  </div>
-                </div>
+                      {/* Date Strip */}
+                      <CalendarDateStrip
+                        dates={weekDays}
+                        selectedDate={selectedDate}
+                        onDateSelect={setSelectedDate}
+                        className="mb-4"
+                      />
+
+                      {/* Day View */}
+                      <div className="border-border bg-card rounded-lg border p-3">
+                        <CalendarDayView
+                          date={selectedDate}
+                          events={dayEvents}
+                          onEventToggle={handleEventToggle}
+                        />
+                      </div>
+
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <Calendar className="h-3.5 w-3.5" />
+                          Connect Google
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <Calendar className="h-3.5 w-3.5" />
+                          Connect Outlook
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-2">
+                          <Calendar className="h-3.5 w-3.5" />
+                          Connect Apple
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </CardWrapper>
 
               {/* Mobile FAB */}

@@ -1,0 +1,191 @@
+id,practice_id,patient_id,clinical_note_id,visit_date,patient_name,appointment_type,visit_summary,created_at
+1e41f30e-08e8-446f-8e3b-b945db4f45e7,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,feb4730e-5341-4618-baca-bc2aabe0d6a6,2025-06-12,Sarah Mitchell,Initial Intake,"Initial Intake - 2025-06-12
+
+Session Focus:
+Patient presents with chief complaint of persistent depressed mood over past 8 months. States ""I feel empty, like nothing matters anymore."" Denies suicidal ideation but endorses anhedonia (no longer enjoying yoga, time with friends). Sleep: 5-6 hours nightly, early morning awakening. Appetite: decre...
+
+Assessment:
+Major Depressive Disorder, moderate-to-severe. Recent stressor: work conflict 8 months ago. Good insight. Denies substance use. No contraindications to antidepressant therapy....
+
+Next Steps:
+Start Sertraline 50mg daily. Behavioral activation: assigned 3 pleasant activities this week. Weekly individual therapy (cognitive behavioral therapy). Return in 2 weeks for medication check-in. Discu...",2026-02-05 04:17:39.123746
+e5a1ec16-a374-4a45-aae5-1480d3741795,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,2989946b-50a2-4343-8486-22a60db23552,2025-08-14,Sarah Mitchell,Individual Therapy,"Individual Therapy - 2025-08-14
+
+Session Focus:
+Patient reports ""things are getting better, but still not great."" Mood improved from 2/10 to 5/10. Sleep improving: 7 hours most nights. Appetite normalized, weight stable. Participated in yoga once (first time in months). Work engagement still limited but no longer dreading it. Denies suicidal idea...
+
+Assessment:
+Major Depressive Disorder, mild severity. Good response to combined pharmacotherapy + CBT. Continue current treatment course. Prognosis: favorable. Treatment compliance excellent....
+
+Next Steps:
+Continue Sertraline 100mg daily. Continue weekly therapy focusing on behavioral activation and cognitive work. Increase pleasant activities to 4-5 per week. Return in 3 weeks. Consider tapering anxiou...",2026-02-05 04:17:39.123865
+3313dc4a-f65c-4688-b8f9-b4d1cab72677,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440001,90052019-ddb9-4bb8-b896-4cdcf4a90e4e,2025-09-25,Sarah Mitchell,Individual Therapy,"Individual Therapy - 2025-09-25
+
+Session Focus:
+Patient reports significant improvement: ""I feel like myself again."" Mood 8/10 consistently. Sleep 8 hours nightly, appetite normal, normal energy. Re-engaged with yoga (2x/week), renewed friendships, social outings increasing. Work: back to baseline productivity, no longer taking excess time off. ""...
+
+Assessment:
+Major Depressive Disorder, in remission. Excellent response to treatment. Full functional recovery achieved. Maintenance phase appropriate....
+
+Next Steps:
+Continue Sertraline 100mg daily (maintain for minimum 12 months after symptom resolution). Continue weekly therapy for relapse prevention and consolidation of gains. Patient educated on warning signs....",2026-02-05 04:17:39.123963
+7a1a5082-d139-409c-b038-678ff4c45320,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,c11238fe-fd28-4578-bcf3-2e47e1b1f68d,2025-09-22,Marcus Johnson,Initial Intake,"Initial Intake - 2025-09-22
+
+Session Focus:
+Patient presents with complaint: ""I worry about everything constantly."" Reports excessive worry about work performance, health, finances for past 6 months. Worry is difficult to control (6+ hours daily). Physical symptoms: tension headaches, muscle tension (especially neck/shoulders), difficulty con...
+
+Assessment:
+Generalized Anxiety Disorder, moderate severity. Onset 6 months ago (correlates with job promotion stress). No prior psychiatric history. Good insight. No active substance use....
+
+Next Steps:
+Start Escitalopram 5mg daily, titrate to 10mg in 1 week. Teach relaxation skills: progressive muscle relaxation, box breathing. Weekly individual therapy (CBT). Behavioral: reduce caffeine (patient cu...",2026-02-05 04:17:39.124059
+a994a92b-a3f1-4091-a01b-63dd44ff5184,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,3003b61d-cd56-414b-874e-13c6986ef18c,2025-11-10,Marcus Johnson,Individual Therapy,"Individual Therapy - 2025-11-10
+
+Session Focus:
+Patient reports: ""It's not as bad, but I still worry a lot."" Worry duration now 2-3 hours daily (down from 6+). Physical tension decreased by 50%, headaches less frequent. Sleep improved: falls asleep in 20 minutes most nights. Work concentration better. ""I feel like I can focus on my job promotion ...
+
+Assessment:
+Generalized Anxiety Disorder, responding well to treatment. About 50% symptom improvement. Prognosis excellent given medication response and engagement in therapy....
+
+Next Steps:
+Continue Escitalopram 10mg daily. Continue weekly therapy, shift focus to cognitive restructuring and worry exposure. Patient doing great with behavioral techniques - continue homework. Job interview ...",2026-02-05 04:17:39.124143
+f44a6b1d-499f-4606-8f24-2e52bcad7c29,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440002,632bc618-25d2-44d8-a0e9-134901ff1366,2026-01-19,Marcus Johnson,Individual Therapy,"Individual Therapy - 2026-01-19
+
+Session Focus:
+Patient: ""Things are really better now. I got the promotion!"" Worry now minimal, 30 minutes or less daily. No longer impacts functioning. Sleep normal. Physical tension resolved. ""I'm using the coping skills automatically now."" Job going great - even took on a challenging project. Dating: recently s...
+
+Assessment:
+Generalized Anxiety Disorder, in remission. Excellent treatment response to combined pharmacotherapy and CBT. Patient has incorporated coping skills into daily life. Maintenance phase appropriate....
+
+Next Steps:
+Continue Escitalopram 10mg daily (maintain for 12 months minimum). Transition to monthly therapy for relapse prevention and life maintenance. Discussed tapering plan (would begin in 6 months if remain...",2026-02-05 04:17:39.124205
+fc5411d5-b7f1-4ef5-b149-10eb165e3eda,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440003,5fc3cfa6-353c-4740-9862-3a844d062eaa,2026-01-28,Emily Chen,Intake Paperwork,"Intake Paperwork - 2026-01-28
+
+Session Focus:
+Patient completed intake paperwork (provided at 1/28 appointment). Chief complaint: anxiety following job loss 6 weeks ago. Reports difficulty sleeping, persistent worry about finances, low self-esteem. Denies suicidal ideation. Recent stressor: company downsizing, was laid off. Family history: moth...
+
+Assessment:
+Adjustment Disorder with Anxiety, likely. Presenting stressor: job loss. Safety: no active suicidal/homicidal ideation. Ready for initial therapy session....
+
+Next Steps:
+First therapy session scheduled for Feb 6, 2026 at 2:00 PM with Dr. Jennifer Martinez. Provided crisis resources and therapist information. Discussed confidentiality and therapy process....",2026-02-05 04:17:39.124265
+820edb50-b117-4c34-9257-bb1697b70693,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440004,35a7dcff-2860-47fe-8ff7-39d83c491133,2024-08-22,David Rodriguez,Initial Intake,"Initial Intake - 2024-08-22
+
+Session Focus:
+Patient: 42-year-old veteran (Army, 8 years, deployed 2x Afghanistan). Presenting complaint: PTSD symptoms 12+ years post-discharge. Intrusive combat memories, nightmares 4-5x weekly, hypervigilance, avoidance of crowded places. Denies current substance use (previously used alcohol heavily 2008-2015...
+
+Assessment:
+PTSD, chronic (12+ years post-trauma). Early sobriety success (9 years sober). Good employment and housing stability. No current depression. Ready for trauma-focused therapy....
+
+Next Steps:
+Start CPT (Cognitive Processing Therapy) for PTSD. Weekly sessions. Psychoeducation about PTSD. Will monitor for depression given high comorbidity risk. Discussed medication: offered but patient prefe...",2026-02-05 04:17:39.124323
+6a1f5e46-1d07-49c9-94c5-5560d739c446,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440004,3f1c37a9-7e6d-4b13-babe-f1a50b772945,2025-12-15,David Rodriguez,Individual Therapy,"Individual Therapy - 2025-12-15
+
+Session Focus:
+Patient: 16-month PTSD therapy, shows some progress but concerning NEW symptoms emerging over past 4 weeks. ""I don't know what's wrong with me."" Reports pervasive sadness, anhedonia (stopped going to gym, lost interest in work tasks), fatigue, weight loss (10 lbs in 2 months), increased isolation. ""...
+
+Assessment:
+PTSD, chronic (ongoing). NEW: Major Depressive Disorder, mild-to-moderate, co-occurring. Comorbid PTSD+Depression indicates higher risk. Passive SI present - critical safety consideration. Possible de...
+
+Next Steps:
+CRITICAL: Comprehensive safety assessment and safety planning completed. Crisis hotline provided. Discussed need for medication (antidepressant). Contact PCP for medication initiation and possible psy...",2026-02-05 04:17:39.124387
+a3bbcbb8-4194-4b10-ae2e-994546586ec2,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440004,b015e58c-df62-409e-a43d-ace5e9753760,2026-01-21,David Rodriguez,Individual Therapy,"Individual Therapy - 2026-01-21
+
+Session Focus:
+Patient follow-up on depression/SI management. Started Sertraline 50mg (via PCP referral, 12/20/25). States: ""The medication is helping a little."" Passive SI frequency decreased from ""few times weekly"" to ""once or twice weekly."" Still struggling with anhedonia but engaging more (went to gym yesterda...
+
+Assessment:
+PTSD, chronic (ongoing CPT). Major Depressive Disorder, responding to early medication intervention. SI decreased but still present - requires continued monitoring and safety protocols....
+
+Next Steps:
+Continue CPT for PTSD. Continue Sertraline 50mg (communicating with PCP about possible increase to 100mg if no improvement by week 4). Increase therapy frequency to weekly (from current schedule). Beh...",2026-02-05 04:17:39.124469
+0fddaa17-3485-4d4a-814f-a7de5ef1892d,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440005,7829068f-0bcf-4579-9d63-7558fda493f2,2024-08-05,Jennifer Liu,Individual Therapy,"Individual Therapy - 2024-08-05
+
+Session Focus:
+Patient: ongoing maintenance therapy, 8 months into current treatment plan. Diagnosis: Persistent Depressive Disorder (Dysthymia) since age 22 (now 52, 30-year history). Patient reports: ""It's still there but I've learned to manage it."" Currently: mood stable 4-5/10 (baseline for her), able to work ...
+
+Assessment:
+Persistent Depressive Disorder (Dysthymia), chronic (30 years). Stable on current medication. Functional improvement with life activities. Prognosis: good with continued maintenance. Realistic goal: m...
+
+Next Steps:
+Continue Sertraline 150mg daily. Maintenance therapy monthly. Patient encouraged to continue book club and social engagement - these are life-sustaining. Discussed that dysthymia is chronic but manage...",2026-02-05 04:17:39.124533
+f567fe28-d7f4-4e57-8b40-c4b1599c5e21,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440005,81000ed7-d185-4dd1-8edd-0daaf3d3c2f4,2025-11-10,Jennifer Liu,Monthly Maintenance,"Monthly Maintenance - 2025-11-10
+
+Session Focus:
+Patient: ongoing well. ""Book club is my anchor now."" Attending monthly, has become friends with two members. Recently went on lunch outing with book club friends. States mood is ""as good as it gets for me"" (5/10). Sleep stable 7 hours. Work: reliable, nothing exciting. Describes life as ""small but g...
+
+Assessment:
+Persistent Depressive Disorder, well-managed. Patient achieving what is realistic and meaningful for her: stability, small circle of connection, purpose. This is success....
+
+Next Steps:
+Continue Sertraline 150mg daily. Continue monthly therapy. Patient doing well - celebrate small victories. Discussed value of social connection for chronic depression. Next visit: discuss holiday plan...",2026-02-05 04:17:39.124615
+e68f4647-48d5-4173-a2cc-9b5ed58bf5df,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440005,c7d3afab-6682-4a51-a841-471eed8325f0,2026-01-26,Jennifer Liu,Monthly Maintenance,"Monthly Maintenance - 2026-01-26
+
+Session Focus:
+Patient: ""Winter is hard but I'm managing."" States seasonal mood dip but milder than previous years. Book club provides structure and social engagement. ""My friends checked on me a lot this year."" Denies SI. Mood baseline maintained 5/10 with occasional dips to 3/10 during darker weeks. Plans: book ...
+
+Assessment:
+Persistent Depressive Disorder, in maintenance phase. Patient showing improved resilience and social connection as protective factors. 18-month review approaching - comprehensive re-assessment appropr...
+
+Next Steps:
+Continue Sertraline 150mg daily. Discuss comprehensive 18-month check-in (review treatment goals, medication efficacy, life satisfaction). Encourage winter mood management strategies. Social connectio...",2026-02-05 04:17:39.124815
+37a63b60-e2bc-4f12-8fc2-9a5af113d8b7,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440006,da74c684-de55-4bdd-80dc-7b1cba4beeb0,2025-09-08,Aisha Patel,Initial Intake,"Initial Intake - 2025-09-08
+
+Session Focus:
+Patient: 31-year-old, presents with social anxiety. ""I've always been shy but it's gotten worse."" Avoids social situations, work networking events, eating in public. Symptoms: anticipatory anxiety, fear of judgment, physical symptoms (blushing, trembling, voice shaking). Avoids dating. Works in tech...
+
+Assessment:
+Social Anxiety Disorder. No prior treatment. Avoidance maintaining the anxiety cycle....
+
+Next Steps:
+Start Escitalopram 5mg (titrate to 10mg weekly). CBT with exposure therapy focus. Behavioral experiments: start small exposures (ask for coffee at new place, attend work event). Weekly therapy. Discus...",2026-02-05 04:17:39.125018
+cac3718f-7f03-4b75-982b-56a8fb3371b6,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440006,b3da85f7-b4a6-4b35-bc67-322e0aedaa4a,2025-12-01,Aisha Patel,Individual Therapy,"Individual Therapy - 2025-12-01
+
+Session Focus:
+Patient: ""I'm doing things I never thought I could do."" Attended work networking event in October (major win). Attended company holiday party (12/1). Reports: ""People were nice to me."" Spoke with 5 different people. Slight anxiety beforehand but managed it. Exposure ladder progressing: eating lunch ...
+
+Assessment:
+Social Anxiety Disorder, responding well to combined treatment. Excellent progress with exposures....
+
+Next Steps:
+Continue Escitalopram 10mg. Continue exposure hierarchy work. Next exposures: initiate lunch invitation to coworker, volunteer for presentation. Patient demonstrating courage - reinforce success. Cons...",2026-02-05 04:17:39.125111
+2c0c4d51-e624-40ce-8654-09686ef3c537,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440006,1107aca6-cd15-43ad-989c-933a79940bbc,2026-01-16,Aisha Patel,Individual Therapy,"Individual Therapy - 2026-01-16
+
+Session Focus:
+Patient: significant transformation. ""I went to a networking mixer yesterday and actually enjoyed it!"" Major wins: initiated lunch with coworker (now doing this 2x/week), attended company holiday party + stayed for 2 hours (vs avoidance previously), initiated first date (nervous but did it). Anxiety...
+
+Assessment:
+Social Anxiety Disorder, in remission. Outstanding response to combined pharmacotherapy + exposure therapy....
+
+Next Steps:
+Continue Escitalopram 10mg. Continue monthly therapy (transition from weekly for relapse prevention). Discuss medication timeline (12-month maintenance minimum). Patient has excellent prognosis. Celeb...",2026-02-05 04:17:39.125198
+0039ed52-7984-40b5-85f2-c5543d93a016,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440007,ff5c696e-3361-493c-9444-9ef3f52f3805,2025-10-13,Robert Thompson,Initial Intake,"Initial Intake - 2025-10-13
+
+Session Focus:
+Patient: 29-year-old, reports panic attacks for past 4 months. First attack: ""came out of nowhere"" while at grocery store. Since then: avoids grocery stores, malls, crowded places. ""What if I have a panic attack and can't escape?"" Develops agoraphobic avoidance. Anxiety anticipatory. Describes panic...
+
+Assessment:
+Panic Disorder with Agoraphobia, new onset (4 months). No prior psychiatric history....
+
+Next Steps:
+Start Fluoxetine 20mg daily. Teach panic physiology (anxiety sensitivity education). Breathing techniques (slow breathing). Interoceptive exposure (trigger bodily sensations in controlled way). Behavi...",2026-02-05 04:17:39.125277
+d0a2f910-d67f-447d-bcc5-d78cfc40798b,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440007,d21ca40e-1cb8-4ccf-9d64-8f566c4bb7bc,2025-12-08,Robert Thompson,Individual Therapy,"Individual Therapy - 2025-12-08
+
+Session Focus:
+Patient: ""I'm doing better. Had one panic attack last week but I managed it instead of avoiding."" Exposure work: returned to grocery store with therapist (8 weeks into treatment), completed it without major attack. Anxiety during exposure but tolerated it. Panic frequency: was 3-4x weekly, now 1x we...
+
+Assessment:
+Panic Disorder with Agoraphobia, responding to treatment. About 50% improvement. Exposures contributing significantly to progress....
+
+Next Steps:
+Continue Fluoxetine 20mg. Continue exposure hierarchy. Next exposures: go to mall unaccompanied, try movie theater (crowded enclosed space). Discussed: avoidance is the problem, exposure is the cure. ...",2026-02-05 04:17:39.125349
+3e714aa2-792a-4764-bab1-f10d3aa340ee,550e8400-e29b-41d4-a716-446655440000,550e8400-e29b-41d4-a716-446655440007,5c955b8f-501e-46b0-b89d-e0165d4a4538,2026-01-12,Robert Thompson,Individual Therapy,"Individual Therapy - 2026-01-12
+
+Session Focus:
+Patient: ""I went to the mall and browsed for an hour! I can't believe it."" Major wins: visited shopping mall unaccompanied and for extended period. Attended movie (minor anxiety, manageable). Returned to work without limitations (had been taking days off). Panic attacks: now 1x per month vs 3-4x wee...
+
+Assessment:
+Panic Disorder with Agoraphobia, excellent treatment response. Exposure work is ""working"" - patient experiencing real-world progress....
+
+Next Steps:
+Continue Fluoxetine 20mg. Transition to monthly therapy (patient ready for this). Continue exposure practice independently (patient is doing exposure homework). Discussed medication timeline: 12-month...",2026-02-05 04:17:39.125432

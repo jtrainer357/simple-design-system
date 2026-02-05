@@ -7,7 +7,10 @@ import { ConversationList, type Conversation } from "./conversation-list";
 import { ChatThread, type Message } from "./chat-thread";
 import { Button } from "@/design-system/components/ui/button";
 import { FilterTabs } from "@/design-system/components/ui/filter-tabs";
-import { ArrowLeft, Plus } from "lucide-react";
+import { Text } from "@/design-system/components/ui/typography";
+import { ArrowLeft, Plus, Loader2 } from "lucide-react";
+import { getCommunicationThreads, type Communication } from "@/src/lib/queries/communications";
+import { formatDemoDate, DEMO_DATE_OBJECT } from "@/src/lib/utils/demo-date";
 
 const messageFilterTabs = [
   { id: "all", label: "All Messages" },
@@ -20,147 +23,99 @@ interface CommunicationsPageProps {
   className?: string;
 }
 
-const sampleConversations: Conversation[] = [
-  {
-    id: "1",
-    name: "Michael Chen",
-    preview: "Thank you for the prescription refill reminder...",
-    time: "Today",
-    unreadCount: 2,
-    avatarSrc: "https://randomuser.me/api/portraits/men/52.jpg",
-    pinned: true,
-  },
-  {
-    id: "2",
-    name: "Sarah Johnson",
-    preview: "Can I reschedule my appointment to next week?",
-    time: "Today",
-    unreadCount: 1,
-    avatarSrc: "https://randomuser.me/api/portraits/women/44.jpg",
-    pinned: true,
-  },
-  {
-    id: "3",
-    name: "Margaret Williams",
-    preview: "My blood pressure readings from this morning...",
-    time: "Yesterday",
-    avatarSrc: "https://randomuser.me/api/portraits/women/65.jpg",
-    pinned: true,
-  },
-  {
-    id: "4",
-    name: "James Wilson",
-    preview: "I have a question about my lab results",
-    time: "Yesterday",
-    unreadCount: 1,
-    avatarSrc: "https://randomuser.me/api/portraits/men/41.jpg",
-  },
-  {
-    id: "5",
-    name: "Emily Davis",
-    preview: "Confirming my new patient appointment for...",
-    time: "Feb 2",
-    avatarSrc: "https://randomuser.me/api/portraits/women/32.jpg",
-  },
-  {
-    id: "6",
-    name: "Robert Brown",
-    preview: "Is my telehealth link still the same?",
-    time: "Feb 1",
-    unreadCount: 1,
-    avatarSrc: "https://randomuser.me/api/portraits/men/29.jpg",
-  },
-  {
-    id: "7",
-    name: "Lisa Anderson",
-    preview: "Thank you for the care plan summary",
-    time: "Jan 31",
-    avatarSrc: "https://randomuser.me/api/portraits/women/56.jpg",
-  },
-  {
-    id: "8",
-    name: "David Martinez",
-    preview: "Called about insurance coverage question",
-    time: "Jan 30",
-  },
-  {
-    id: "9",
-    name: "Jennifer Taylor",
-    preview: "Appointment reminder received, will be there",
-    time: "Jan 29",
-    avatarSrc: "https://randomuser.me/api/portraits/women/28.jpg",
-  },
-  {
-    id: "10",
-    name: "Thomas Moore",
-    preview: "Requesting medical records for specialist",
-    time: "Jan 28",
-    avatarSrc: "https://randomuser.me/api/portraits/men/64.jpg",
-  },
-];
+// Format date relative to demo date
+function formatMessageTime(dateStr: string | null): string {
+  if (!dateStr) return "";
+  const date = new Date(dateStr);
+  const demo = DEMO_DATE_OBJECT;
+  const diffDays = Math.floor((demo.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
 
-const sampleMessages: Message[] = [
-  {
-    id: "1",
-    content: "Hi Dr. Chen's office,",
-    time: "Feb 3, 2026",
-    isOwn: false,
-    senderName: "Sarah Johnson",
-    senderAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
-  },
-  {
-    id: "2",
-    content:
-      "I received the appointment reminder for next Monday at 9 AM. Unfortunately, something came up at work and I need to reschedule. Would it be possible to move my appointment to later in the week?",
-    time: "",
-    isOwn: false,
-    senderName: "Sarah Johnson",
-    senderAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
-  },
-  {
-    id: "3",
-    content: "Thank you,\nSarah Johnson",
-    time: "10:44",
-    isOwn: false,
-    senderName: "Sarah Johnson",
-    senderAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
-    status: "read",
-  },
-  {
-    id: "4",
-    content: "Hello Sarah!",
-    time: "Feb 3, 2026",
-    isOwn: true,
-    senderName: "You",
-  },
-  {
-    id: "5",
-    content:
-      "Thank you for letting us know in advance. I'd be happy to help you reschedule.\n\nWe have availability on Wednesday at 2:30 PM or Thursday at 10:00 AM. Would either of those work for you?\n\nPlease let me know and I'll get you confirmed right away.\n\nBest,\nDr. Chen's Office",
-    time: "11:02",
-    isOwn: true,
-    senderName: "You",
-    status: "read",
-  },
-  {
-    id: "6",
-    content: "Thursday at 10 AM would be perfect! Thank you so much for accommodating me.",
-    time: "11:15",
-    isOwn: false,
-    senderName: "Sarah Johnson",
-    senderAvatar: "https://randomuser.me/api/portraits/women/44.jpg",
-    status: "read",
-  },
-];
+  if (diffDays === 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  if (diffDays < 7) return date.toLocaleDateString("en-US", { weekday: "long" });
+  return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+}
+
+// Convert DB thread to conversation list item
+function threadToConversation(thread: {
+  patient: { id: string; first_name: string; last_name: string; avatar_url: string | null };
+  messages: Communication[];
+  unreadCount: number;
+  lastMessage: Communication | null;
+}): Conversation {
+  // Determine channel from last message (normalize to sms or email)
+  const lastChannel = thread.lastMessage?.channel?.toLowerCase();
+  const channel: "sms" | "email" | undefined =
+    lastChannel === "sms" ? "sms" : lastChannel === "email" ? "email" : undefined;
+
+  return {
+    id: thread.patient.id,
+    name: `${thread.patient.first_name} ${thread.patient.last_name}`,
+    preview: thread.lastMessage?.message_body?.substring(0, 50) || "No messages",
+    time: formatMessageTime(thread.lastMessage?.sent_at || null),
+    unreadCount: thread.unreadCount,
+    avatarSrc: thread.patient.avatar_url || undefined,
+    channel,
+    pinned: thread.unreadCount > 0,
+  };
+}
+
+// Convert DB communication to chat message
+function commToMessage(
+  comm: Communication,
+  patient: { first_name: string; last_name: string; avatar_url: string | null }
+): Message {
+  const isOutbound = comm.direction === "outbound";
+  return {
+    id: comm.id,
+    content: comm.message_body || "",
+    time: comm.sent_at
+      ? new Date(comm.sent_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })
+      : "",
+    isOwn: isOutbound,
+    senderName: isOutbound ? "You" : `${patient.first_name} ${patient.last_name}`,
+    senderAvatar: isOutbound ? undefined : patient.avatar_url || undefined,
+    status: comm.is_read ? "read" : "sent",
+  };
+}
 
 type MobileView = "list" | "chat";
 
+interface ThreadData {
+  patient: { id: string; first_name: string; last_name: string; avatar_url: string | null };
+  messages: Communication[];
+  unreadCount: number;
+  lastMessage: Communication | null;
+}
+
 export function CommunicationsPage({ className }: CommunicationsPageProps) {
-  const [selectedConversation, setSelectedConversation] = React.useState<string>("2");
+  const [selectedConversation, setSelectedConversation] = React.useState<string>("");
   const [activeSection, setActiveSection] = React.useState<string>("unassigned");
   const [activeContact, setActiveContact] = React.useState<string | undefined>();
   const [mobileView, setMobileView] = React.useState<MobileView>("list");
   const [activeFilter, setActiveFilter] = React.useState("all");
+  const [threads, setThreads] = React.useState<ThreadData[]>([]);
+  const [loading, setLoading] = React.useState(true);
+
+  // Load communications from Supabase
+  React.useEffect(() => {
+    async function loadCommunications() {
+      try {
+        setLoading(true);
+        const data = await getCommunicationThreads();
+        setThreads(data);
+        // Select first thread by default
+        if (data.length > 0 && !selectedConversation) {
+          setSelectedConversation(data[0]!.patient.id);
+        }
+      } catch (err) {
+        console.error("Failed to load communications:", err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadCommunications();
+  }, []);
 
   const handleSendMessage = (_message: string) => {
     // Message sending will be implemented
@@ -174,6 +129,37 @@ export function CommunicationsPage({ className }: CommunicationsPageProps) {
   const handleBackToList = () => {
     setMobileView("list");
   };
+
+  // Get conversations for list
+  const conversations: Conversation[] = React.useMemo(() => {
+    return threads
+      .filter((t) => {
+        if (activeFilter === "unread") return t.unreadCount > 0;
+        return true;
+      })
+      .map(threadToConversation);
+  }, [threads, activeFilter]);
+
+  // Get selected thread
+  const selectedThread = threads.find((t) => t.patient.id === selectedConversation);
+  const messages: Message[] = React.useMemo(() => {
+    if (!selectedThread) return [];
+    return selectedThread.messages.map((m) => commToMessage(m, selectedThread.patient)).reverse(); // Show oldest first
+  }, [selectedThread]);
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className={cn("flex h-full items-center justify-center", className)}>
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="text-primary h-8 w-8 animate-spin" />
+          <Text size="sm" muted>
+            Loading messages...
+          </Text>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={cn("flex h-full flex-col overflow-hidden", className)}>
@@ -211,7 +197,7 @@ export function CommunicationsPage({ className }: CommunicationsPageProps) {
           )}
         >
           <ConversationList
-            conversations={sampleConversations}
+            conversations={conversations}
             selectedId={selectedConversation}
             onSelect={handleSelectConversation}
             className="h-full"
@@ -232,14 +218,22 @@ export function CommunicationsPage({ className }: CommunicationsPageProps) {
               Back to conversations
             </Button>
           </div>
-          <ChatThread
-            contactName="Sarah Johnson"
-            contactRole="Patient"
-            contactAvatar="https://randomuser.me/api/portraits/women/44.jpg"
-            messages={sampleMessages}
-            onSendMessage={handleSendMessage}
-            className="h-full sm:h-full"
-          />
+          {selectedThread ? (
+            <ChatThread
+              contactName={`${selectedThread.patient.first_name} ${selectedThread.patient.last_name}`}
+              contactRole="Patient"
+              contactAvatar={selectedThread.patient.avatar_url || undefined}
+              messages={messages}
+              onSendMessage={handleSendMessage}
+              className="h-full sm:h-full"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center">
+              <Text size="sm" muted>
+                Select a conversation to view messages
+              </Text>
+            </div>
+          )}
         </div>
       </div>
     </div>

@@ -5,6 +5,12 @@
 
 import { createClient } from "@/src/lib/supabase/client";
 import type { Appointment, Patient } from "@/src/lib/supabase/types";
+import {
+  getDemoToday,
+  getDemoDaysFromNow,
+  getDemoDaysAgo,
+  DEMO_PRACTICE_ID,
+} from "@/src/lib/utils/demo-date";
 
 export type AppointmentWithPatient = Appointment & {
   patient: Pick<Patient, "id" | "first_name" | "last_name" | "avatar_url" | "risk_level">;
@@ -12,12 +18,15 @@ export type AppointmentWithPatient = Appointment & {
 
 /**
  * Get today's appointments with patient details
+ * Uses demo date (Feb 6, 2026) for consistent demo experience
  */
-export async function getTodayAppointments(practiceId?: string): Promise<AppointmentWithPatient[]> {
+export async function getTodayAppointments(
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<AppointmentWithPatient[]> {
   const supabase = createClient();
-  const today = new Date().toISOString().split("T")[0] as string;
+  const today = getDemoToday();
 
-  let query = supabase
+  const { data, error } = await supabase
     .from("appointments")
     .select(
       `
@@ -31,14 +40,9 @@ export async function getTodayAppointments(practiceId?: string): Promise<Appoint
       )
     `
     )
+    .eq("practice_id", practiceId)
     .eq("date", today)
     .order("start_time", { ascending: true });
-
-  if (practiceId) {
-    query = query.eq("practice_id", practiceId);
-  }
-
-  const { data, error } = await query;
 
   if (error) {
     console.error("Failed to fetch today's appointments:", error);
@@ -49,17 +53,20 @@ export async function getTodayAppointments(practiceId?: string): Promise<Appoint
 }
 
 /**
- * Get upcoming appointments (next 7 days)
+ * Get upcoming appointments (next N days from demo date)
+ * @param practiceId - The practice ID to filter by
+ * @param days - Number of days to look ahead
+ * @param statusFilter - Optional status filter. If not provided, returns only "Scheduled" appointments.
+ *                       Pass "all" to get appointments of any status.
  */
 export async function getUpcomingAppointments(
-  practiceId?: string,
-  days = 7
+  practiceId: string = DEMO_PRACTICE_ID,
+  days = 7,
+  statusFilter: "Scheduled" | "all" = "Scheduled"
 ): Promise<AppointmentWithPatient[]> {
   const supabase = createClient();
-  const today = new Date().toISOString().split("T")[0] as string;
-  const futureDate = new Date();
-  futureDate.setDate(futureDate.getDate() + days);
-  const endDate = futureDate.toISOString().split("T")[0] as string;
+  const today = getDemoToday();
+  const endDate = getDemoDaysFromNow(days);
 
   let query = supabase
     .from("appointments")
@@ -75,17 +82,18 @@ export async function getUpcomingAppointments(
       )
     `
     )
+    .eq("practice_id", practiceId)
     .gte("date", today)
-    .lte("date", endDate)
-    .eq("status", "Scheduled")
-    .order("date", { ascending: true })
-    .order("start_time", { ascending: true });
+    .lte("date", endDate);
 
-  if (practiceId) {
-    query = query.eq("practice_id", practiceId);
+  // Only filter by status if not "all"
+  if (statusFilter !== "all") {
+    query = query.eq("status", statusFilter);
   }
 
-  const { data, error } = await query;
+  const { data, error } = await query
+    .order("date", { ascending: true })
+    .order("start_time", { ascending: true });
 
   if (error) {
     console.error("Failed to fetch upcoming appointments:", error);
@@ -96,19 +104,17 @@ export async function getUpcomingAppointments(
 }
 
 /**
- * Get recent appointments (past 30 days)
+ * Get recent appointments (past N days from demo date)
  */
 export async function getRecentAppointments(
-  practiceId?: string,
+  practiceId: string = DEMO_PRACTICE_ID,
   days = 30
 ): Promise<AppointmentWithPatient[]> {
   const supabase = createClient();
-  const today = new Date().toISOString().split("T")[0] as string;
-  const pastDate = new Date();
-  pastDate.setDate(pastDate.getDate() - days);
-  const startDate = pastDate.toISOString().split("T")[0] as string;
+  const today = getDemoToday();
+  const startDate = getDemoDaysAgo(days);
 
-  let query = supabase
+  const { data, error } = await supabase
     .from("appointments")
     .select(
       `
@@ -122,16 +128,11 @@ export async function getRecentAppointments(
       )
     `
     )
+    .eq("practice_id", practiceId)
     .lt("date", today)
     .gte("date", startDate)
     .order("date", { ascending: false })
     .order("start_time", { ascending: false });
-
-  if (practiceId) {
-    query = query.eq("practice_id", practiceId);
-  }
-
-  const { data, error } = await query;
 
   if (error) {
     console.error("Failed to fetch recent appointments:", error);
@@ -144,7 +145,7 @@ export async function getRecentAppointments(
 /**
  * Get appointment statistics
  */
-export async function getAppointmentStats(practiceId?: string): Promise<{
+export async function getAppointmentStats(practiceId: string = DEMO_PRACTICE_ID): Promise<{
   todayCount: number;
   completedToday: number;
   scheduledToday: number;
@@ -152,33 +153,24 @@ export async function getAppointmentStats(practiceId?: string): Promise<{
   cancelledThisWeek: number;
 }> {
   const supabase = createClient();
-  const today = new Date().toISOString().split("T")[0] as string;
-  const weekAgo = new Date();
-  weekAgo.setDate(weekAgo.getDate() - 7);
-  const weekStart = weekAgo.toISOString().split("T")[0] as string;
+  const today = getDemoToday();
+  const weekStart = getDemoDaysAgo(7);
 
   // Get today's appointments
-  let todayQuery = supabase.from("appointments").select("status").eq("date", today);
-
-  if (practiceId) {
-    todayQuery = todayQuery.eq("practice_id", practiceId);
-  }
-
-  const { data: todayData } = await todayQuery;
-
-  // Get week's no-shows and cancellations
-  let weekQuery = supabase
+  const { data: todayData } = await supabase
     .from("appointments")
     .select("status")
+    .eq("practice_id", practiceId)
+    .eq("date", today);
+
+  // Get week's no-shows and cancellations
+  const { data: weekData } = await supabase
+    .from("appointments")
+    .select("status")
+    .eq("practice_id", practiceId)
     .gte("date", weekStart)
     .lte("date", today)
     .in("status", ["No-Show", "Cancelled"]);
-
-  if (practiceId) {
-    weekQuery = weekQuery.eq("practice_id", practiceId);
-  }
-
-  const { data: weekData } = await weekQuery;
 
   const todayAppts = todayData || [];
   const weekAppts = weekData || [];

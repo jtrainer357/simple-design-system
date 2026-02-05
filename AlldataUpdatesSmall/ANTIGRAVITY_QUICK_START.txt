@@ -1,0 +1,227 @@
+================================================================================
+                    🚀 ANTIGRAVITY AUTOMATION - QUICK START
+         Load All MHMVP Demo Data in 5 Minutes with Claude Code
+================================================================================
+
+STEP-BY-STEP INSTRUCTIONS:
+
+STEP 1: Get Your Supabase Credentials (2 min)
+─────────────────────────────────────────────────────────────────────────────
+a) Go to your Supabase dashboard
+   https://app.supabase.com
+
+b) Find your project (MHMVP project)
+
+c) Go to Settings → API
+   Look for:
+   • Project URL: https://[YOUR_PROJECT_ID].supabase.co
+   • Anon Key (Public): starts with "eyJ..."
+
+d) Copy both and keep them handy (you'll paste into Claude Code)
+
+STEP 2: Open Antigravity IDE (1 min)
+─────────────────────────────────────────────────────────────────────────────
+a) Open Antigravity IDE (wherever your team uses it)
+
+b) Create a NEW AGENT or open Claude Code
+
+c) You should see a text editor where you can paste prompts
+
+STEP 3: Copy the Load Prompt (30 sec)
+─────────────────────────────────────────────────────────────────────────────
+a) In /outputs folder, find: ANTIGRAVITY_LOAD_PROMPT.md
+
+b) Open it and copy EVERYTHING inside the code block
+
+c) It starts with: "You are an expert Supabase data engineer..."
+
+d) It ends with: "...Let me know when you're ready and I'll execute this!"
+
+STEP 4: Paste into Claude Code (30 sec)
+─────────────────────────────────────────────────────────────────────────────
+a) Go back to Antigravity Claude Code editor
+
+b) Paste the entire prompt
+
+c) You should see the full prompt in the editor
+
+STEP 5: Provide Your Credentials (1 min)
+─────────────────────────────────────────────────────────────────────────────
+When Claude Code says: "What is your Supabase URL and key?"
+
+Respond with:
+  Project URL: https://[YOUR_PROJECT_ID].supabase.co
+  Anon Key: [YOUR_ANON_KEY]
+
+(Claude Code will securely handle these - won't display them)
+
+STEP 6: Let It Run (5-10 min)
+─────────────────────────────────────────────────────────────────────────────
+Claude Code will now:
+
+✓ Validate data files
+✓ Connect to Supabase
+✓ Load Practice (Dr. Jennifer Martinez)
+✓ Load 23 Patients
+✓ Load 89 Appointments
+✓ Load 23 Medications
+✓ Load 73 Outcome Measures
+✓ Load 66 Communications
+✓ Load 98 Invoices
+✓ Load 21 Clinical Notes ← (THIS IS NEW!)
+✓ Load 5 Priority Actions
+✓ Verify all relationships (no orphans)
+✓ Print success report
+
+Watch the progress in the Claude Code output.
+
+STEP 7: Verify Success (1 min)
+─────────────────────────────────────────────────────────────────────────────
+You should see output like:
+
+  ✅ MHMVP DEMO DATA LOADED SUCCESSFULLY
+     Practice: Dr. Jennifer Martinez, PsyD
+     System Date: Friday, February 6, 2026
+     
+     📊 DATA COUNTS:
+     • Patients: 23 ✓
+     • Appointments: 89 ✓
+     • Medications: 23 ✓
+     • Outcome Measures: 73 ✓
+     • Communications: 66 ✓
+     • Invoices: 98 ✓
+     • Clinical Notes: 21 ✓
+     • Priority Actions: 5 ✓
+     
+     ✅ All relationships verified
+     ✅ All data integrity checks passed
+     ✅ Ready for demo!
+
+If you see this → YOU'RE DONE! ✓
+
+STEP 8: Test in Your App (2 min)
+─────────────────────────────────────────────────────────────────────────────
+a) Go to your MHMVP app
+
+b) Navigate to Patients page
+
+c) You should see all 23 patients
+
+d) Click on "Sarah Mitchell"
+
+e) You should see her details + clinical progression
+
+f) Go back, click "David Rodriguez"
+
+g) Look at his appointment history
+
+DONE! 🎉
+
+================================================================================
+IF SOMETHING GOES WRONG
+================================================================================
+
+Error: "Supabase connection failed"
+→ Check your URL and key are correct
+→ Make sure you have the right project selected
+→ Try again
+
+Error: "Foreign key constraint failed"
+→ This means data relationships are broken
+→ Run the reset script and try again
+→ Or use manual supabase_demo_seed.sql as fallback
+
+Error: "File not found"
+→ Make sure all CSV files are in the same folder
+→ Check file names match exactly (demo_patients.csv, etc.)
+
+Error: Data loaded but something looks wrong
+→ You can reset and reload in 30 seconds
+→ Or manually inspect Supabase dashboard
+
+The BACKUP option: supabase_demo_seed.sql
+→ If Claude Code has issues, just use the SQL script
+→ Open Supabase SQL Editor → paste SQL → run
+→ All data loads in 30 seconds with zero issues
+
+================================================================================
+WHAT TO HAVE READY FOR DEMO
+================================================================================
+
+After data loads successfully:
+
+□ Your MHMVP app running
+□ Demo Narrative printout (from CLINICAL_NOTES_SUMMARY.txt)
+□ Screenshot of all 23 patients (backup)
+□ Reset/reload script ready (in case demo crashes)
+□ Notes on the 7 story patients:
+  ✓ Sarah Mitchell - depression remission arc
+  ✓ Marcus Johnson - anxiety success + promotion
+  ✓ Emily Chen - new patient
+  ✓ David Rodriguez - PTSD + emerging depression (KEY DEMO MOMENT)
+  ✓ Aisha Patel - social anxiety + behavioral wins
+  ✓ Jennifer Liu - chronic dysthymia management
+  ✓ Robert Thompson - panic disorder exposure success
+
+================================================================================
+EXPECTED TIMELINE
+================================================================================
+
+T+0:00  Start Antigravity Claude Code
+T+0:30  Paste prompt
+T+1:00  Provide Supabase credentials
+T+1:05  Claude Code starts loading
+T+5:00  Data loading complete (Phase 1-2)
+T+7:00  Verification complete (Phase 3-4)
+T+8:00  Success report printed
+T+10:00 Total time: 10 minutes
+
+Then you have ~30 min to test before demo.
+
+================================================================================
+DEMO DAY (T minus 30 minutes)
+================================================================================
+
+1. Run Antigravity load again (confirms everything works)
+   a) Paste prompt (takes 30 seconds)
+   b) Provide credentials (10 seconds)
+   c) Let it verify (5 minutes)
+   d) Check success report (30 seconds)
+
+2. Quick smoke test (5 minutes)
+   a) Open MHMVP app
+   b) Check 23 patients visible
+   c) Click Sarah Mitchell → see her notes
+   d) Click David Rodriguez → see his safety escalation
+   e) Check priority actions are visible
+
+3. You're ready! (15 min buffer for contingencies)
+
+If anything breaks: Reset and reload in 30 seconds. You've got backups.
+
+================================================================================
+FINAL CHECKLIST BEFORE YOU START
+================================================================================
+
+□ Supabase project created and working
+□ MHMVP app deployed and accessible
+□ Your Supabase URL ready (https://[PROJECT].supabase.co)
+□ Your Supabase Anon Key ready (eyJ...)
+□ Antigravity IDE open and accessible
+□ Claude Code available in Antigravity
+□ All CSV data files in /outputs/ folder
+□ ANTIGRAVITY_LOAD_PROMPT.md ready to copy
+□ Demo narrative notes (CLINICAL_NOTES_SUMMARY.txt) printed or on screen
+
+Ready? Let's go! 🚀
+
+================================================================================
+
+Questions before you start?
+
+1. Do you have your Supabase URL?
+2. Do you have your Supabase Anon Key?
+3. Is your MHMVP app deployed and running?
+
+If yes to all three → You're ready to paste the prompt and go!
+

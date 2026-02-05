@@ -14,51 +14,45 @@ interface DocumentMatch {
   documentType: string;
 }
 
-const MOCK_DOCUMENTS: DocumentMatch[] = [
+const EXAMPLE_DOCUMENTS: DocumentMatch[] = [
   {
     id: "1",
-    filename: "Johnson_Sarah_IntakeAssessment_2024.pdf",
-    detectedPatient: "Sarah Johnson",
+    filename: "PatientA_IntakeAssessment_2024.pdf",
+    detectedPatient: "Patient A",
     confidence: 97,
     documentType: "Intake Assessment",
   },
   {
     id: "2",
-    filename: "Chen_Michael_ProgressNote_20240315.pdf",
-    detectedPatient: "Michael Chen",
+    filename: "PatientB_ProgressNote_20240315.pdf",
+    detectedPatient: "Patient B",
     confidence: 95,
     documentType: "Progress Note",
   },
   {
     id: "3",
-    filename: "Williams_Emily_TreatmentPlan_2024.pdf",
-    detectedPatient: "Emily Williams",
+    filename: "PatientC_TreatmentPlan_2024.pdf",
+    detectedPatient: "Patient C",
     confidence: 98,
     documentType: "Treatment Plan",
   },
   {
     id: "4",
-    filename: "Brown_James_PHQ9_20240401.pdf",
-    detectedPatient: "James Brown",
+    filename: "PatientD_PHQ9_20240401.pdf",
+    detectedPatient: "Patient D",
     confidence: 93,
     documentType: "PHQ-9 Screening",
   },
   {
     id: "5",
-    filename: "Garcia_M_GAD7_20240220.pdf",
-    detectedPatient: "Maria Garcia",
+    filename: "PatientE_GAD7_20240220.pdf",
+    detectedPatient: "Patient E",
     confidence: 78,
     documentType: "GAD-7 Screening",
   },
 ];
 
-const PATIENT_OPTIONS = [
-  "Sarah Johnson",
-  "Michael Chen",
-  "Emily Williams",
-  "James Brown",
-  "Maria Garcia",
-];
+const PATIENT_OPTIONS = ["Patient A", "Patient B", "Patient C", "Patient D", "Patient E"];
 
 function getMatchStatus(doc: DocumentMatch) {
   if (!doc.detectedPatient) return "unmatched" as const;
@@ -67,7 +61,7 @@ function getMatchStatus(doc: DocumentMatch) {
 }
 
 export function DocumentMatchingStep({ onComplete }: { onComplete: () => void }) {
-  const [documents, setDocuments] = React.useState(MOCK_DOCUMENTS);
+  const [documents, setDocuments] = React.useState(EXAMPLE_DOCUMENTS);
 
   const matched = documents.filter((d) => getMatchStatus(d) === "matched").length;
   const review = documents.filter((d) => getMatchStatus(d) === "review").length;

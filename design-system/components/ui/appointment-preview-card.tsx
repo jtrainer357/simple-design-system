@@ -13,7 +13,8 @@ type AppointmentStatus =
   | "Checked In"
   | "In Progress"
   | "Completed"
-  | "Cancelled";
+  | "Cancelled"
+  | "No-Show";
 
 interface AppointmentPreviewCardProps {
   status: AppointmentStatus;

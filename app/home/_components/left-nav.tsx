@@ -54,7 +54,7 @@ export function LeftNav({ activePage = "home" }: LeftNavProps) {
       user={{
         initials: "DR",
         name: "Dr. Sarah Chen",
-        avatarSrc: "https://randomuser.me/api/portraits/women/45.jpg",
+        avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/32.jpg", // Asian middle-aged female
       }}
     />
   );

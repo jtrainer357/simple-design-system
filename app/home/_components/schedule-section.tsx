@@ -6,8 +6,10 @@ import { AIActionCard } from "@/design-system/components/ui/ai-action-card";
 import { ScheduleRowCard } from "@/design-system/components/ui/schedule-row-card";
 import { Heading, Text } from "@/design-system/components/ui/typography";
 
+// Appointments with demographically-appropriate avatars
 const appointments = [
   {
+    // Michael Chen: Male, 52yo (middle-aged), Asian
     id: "apt-4",
     time: "9:30 AM",
     patient: "Michael Chen",
@@ -15,9 +17,10 @@ const appointments = [
     provider: "Dr. Patel",
     status: "IN PROGRESS" as const,
     room: "Room 101",
-    avatarSrc: "https://randomuser.me/api/portraits/men/75.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/32.jpg",
   },
   {
+    // Emma Johnson: Female, young, Caucasian (sports physical implies young)
     id: "apt-5",
     time: "9:45 AM",
     patient: "Emma Johnson",
@@ -25,9 +28,10 @@ const appointments = [
     provider: "Dr. Chen",
     status: "CHECKED IN" as const,
     room: "Room 103",
-    avatarSrc: "https://randomuser.me/api/portraits/women/63.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/8.jpg",
   },
   {
+    // Emily Rodriguez: Female, middle-aged, Hispanic
     id: "apt-6",
     time: "10:00 AM",
     patient: "Emily Rodriguez",
@@ -35,9 +39,10 @@ const appointments = [
     provider: "Dr. Patel",
     status: "SCHEDULED" as const,
     room: "Room 101",
-    avatarSrc: "https://randomuser.me/api/portraits/women/28.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/62.jpg",
   },
   {
+    // James Wilson: Male, middle-aged (BP check), Caucasian
     id: "apt-7",
     time: "10:15 AM",
     patient: "James Wilson",
@@ -45,8 +50,10 @@ const appointments = [
     provider: "Dr. Morrison",
     status: "SCHEDULED" as const,
     room: "Room 201",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/3.jpg",
   },
   {
+    // Lisa Thompson: Female, young/middle (prenatal), Caucasian
     id: "apt-8",
     time: "10:30 AM",
     patient: "Lisa Thompson",
@@ -54,9 +61,10 @@ const appointments = [
     provider: "Dr. Chen",
     status: "SCHEDULED" as const,
     room: "Room 103",
-    avatarSrc: "https://randomuser.me/api/portraits/women/17.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/15.jpg",
   },
   {
+    // Robert Garcia: Male, middle-aged, Hispanic
     id: "apt-9",
     time: "10:45 AM",
     patient: "Robert Garcia",
@@ -64,8 +72,10 @@ const appointments = [
     provider: "Dr. Patel",
     status: "SCHEDULED" as const,
     room: "Room 101",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/69.jpg",
   },
   {
+    // Amanda Lee: Female, young (new patient), Asian
     id: "apt-10",
     time: "11:00 AM",
     patient: "Amanda Lee",
@@ -73,9 +83,10 @@ const appointments = [
     provider: "Dr. Morrison",
     status: "SCHEDULED" as const,
     room: "Room 201",
-    avatarSrc: "https://randomuser.me/api/portraits/women/51.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/30.jpg",
   },
   {
+    // Daniel Brown: Male, middle-aged (skin check), Caucasian
     id: "apt-11",
     time: "11:15 AM",
     patient: "Daniel Brown",
@@ -83,8 +94,10 @@ const appointments = [
     provider: "Dr. Chen",
     status: "SCHEDULED" as const,
     room: "Room 103",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/10.jpg",
   },
   {
+    // Jennifer Davis: Female, middle-aged (lab review), Caucasian
     id: "apt-12",
     time: "11:30 AM",
     patient: "Jennifer Davis",
@@ -92,7 +105,7 @@ const appointments = [
     provider: "Dr. Patel",
     status: "SCHEDULED" as const,
     room: "Room 101",
-    avatarSrc: "https://randomuser.me/api/portraits/women/33.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/17.jpg",
   },
 ];
 
@@ -115,7 +128,7 @@ export function ScheduleSection() {
           title="Michael Chen is arriving"
           subtitle="9:30 AM appointment • Room 101"
           avatarInitials="MC"
-          avatarSrc="https://randomuser.me/api/portraits/men/75.jpg"
+          avatarSrc="https://xsgames.co/randomusers/assets/avatars/male/32.jpg"
           buttonText="Begin Check-in"
         />
 
@@ -123,7 +136,7 @@ export function ScheduleSection() {
         <div className="space-y-2">
           <AIActionCard
             patientName="Michael Chen"
-            avatarSrc="https://randomuser.me/api/portraits/men/75.jpg"
+            avatarSrc="https://xsgames.co/randomusers/assets/avatars/male/32.jpg"
             mainAction="A1C results available: 7.2% (↓ from 8.1%)"
             statusIndicators="EXCELLENT PROGRESS ON TYPE 2 DIABETES MANAGEMENT"
             readyStatus="Content ready"
@@ -133,7 +146,7 @@ export function ScheduleSection() {
           />
           <AIActionCard
             patientName="Sarah Johnson"
-            avatarSrc="https://randomuser.me/api/portraits/women/44.jpg"
+            avatarSrc="https://xsgames.co/randomusers/assets/avatars/female/1.jpg"
             mainAction="9:00 AM Annual Physical"
             statusIndicators="INSURANCE VERIFIED • 2 CARE GAPS IDENTIFIED • RECENT MESSAGE FLAGGED"
             readyStatus="Everything pre-configured"
@@ -143,7 +156,7 @@ export function ScheduleSection() {
           />
           <AIActionCard
             patientName="Margaret Williams"
-            avatarSrc="https://randomuser.me/api/portraits/women/68.jpg"
+            avatarSrc="https://xsgames.co/randomusers/assets/avatars/female/5.jpg"
             mainAction="Metformin 500mg: 5 days remaining"
             statusIndicators="SCHEDULED TODAY AT 10 AM • SAFETY CHECKS COMPLETE"
             readyStatus="One-click approval"

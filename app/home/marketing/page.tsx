@@ -128,7 +128,7 @@ export default function MarketingPage() {
                   value="3"
                   subtitle="AI Overview Appearances"
                   icon={Sparkles}
-                  iconColor="text-purple-600"
+                  iconColor="text-teal-600"
                 />
               </div>
 

@@ -105,6 +105,7 @@ export interface ActivityItem {
 
 export const DEMO_PATIENTS: DemoPatient[] = [
   {
+    // Michael Chen: Male, 52yo (middle-aged), Asian
     id: "michael-chen",
     firstName: "Michael",
     lastName: "Chen",
@@ -122,11 +123,12 @@ export const DEMO_PATIENTS: DemoPatient[] = [
     conditions: ["Type 2 Diabetes", "Hypertension"],
     primaryCondition: "Type 2 Diabetes",
     status: "ACTIVE",
-    avatarSrc: "https://randomuser.me/api/portraits/men/75.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/32.jpg", // Asian middle-aged male
     triggerBadge: "RESULTS READY",
     badgeVariant: "default",
   },
   {
+    // Sarah Johnson: Female, 33yo (young), Caucasian
     id: "sarah-johnson",
     firstName: "Sarah",
     lastName: "Johnson",
@@ -144,11 +146,12 @@ export const DEMO_PATIENTS: DemoPatient[] = [
     conditions: ["Anxiety Disorder", "Insomnia"],
     primaryCondition: "New Patient",
     status: "NEW",
-    avatarSrc: "https://randomuser.me/api/portraits/women/44.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/1.jpg", // Caucasian young female
     triggerBadge: "FIRST APPT TODAY",
     badgeVariant: "success",
   },
   {
+    // Margaret Williams: Female, 70yo (senior), Caucasian
     id: "margaret-williams",
     firstName: "Margaret",
     lastName: "Williams",
@@ -166,11 +169,12 @@ export const DEMO_PATIENTS: DemoPatient[] = [
     conditions: ["Hypertension", "Type 2 Diabetes", "Chronic Pain"],
     primaryCondition: "Hypertension",
     status: "ACTIVE",
-    avatarSrc: "https://randomuser.me/api/portraits/women/68.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/5.jpg", // Caucasian senior female
     triggerBadge: "URGENT REFILL",
     badgeVariant: "urgent",
   },
   {
+    // Robert Martinez: Male, 47yo (middle-aged), Hispanic
     id: "robert-martinez",
     firstName: "Robert",
     lastName: "Martinez",
@@ -188,7 +192,7 @@ export const DEMO_PATIENTS: DemoPatient[] = [
     conditions: ["Major Depressive Disorder", "Generalized Anxiety"],
     primaryCondition: "Major Depressive Disorder",
     status: "ACTIVE",
-    avatarSrc: "https://randomuser.me/api/portraits/men/45.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/62.jpg", // Hispanic middle-aged male
     triggerBadge: "HIGH",
     badgeVariant: "warning",
   },
@@ -785,7 +789,7 @@ export const DEMO_ORCHESTRATION_CONTEXTS: Record<string, OrchestrationContext> =
       dob: "11/15/1973",
       age: 52,
       primaryDiagnosis: "Type 2 Diabetes",
-      avatar: "https://randomuser.me/api/portraits/men/75.jpg",
+      avatar: "https://xsgames.co/randomusers/assets/avatars/male/32.jpg", // Asian middle-aged male
     },
     trigger: {
       type: "lab_result",
@@ -843,7 +847,7 @@ export const DEMO_ORCHESTRATION_CONTEXTS: Record<string, OrchestrationContext> =
       dob: "08/22/1992",
       age: 33,
       primaryDiagnosis: "New Patient - Anxiety",
-      avatar: "https://randomuser.me/api/portraits/women/44.jpg",
+      avatar: "https://xsgames.co/randomusers/assets/avatars/female/1.jpg", // Caucasian young female
     },
     trigger: {
       type: "appointment",
@@ -889,7 +893,7 @@ export const DEMO_ORCHESTRATION_CONTEXTS: Record<string, OrchestrationContext> =
       dob: "11/08/1955",
       age: 70,
       primaryDiagnosis: "Hypertension",
-      avatar: "https://randomuser.me/api/portraits/women/68.jpg",
+      avatar: "https://xsgames.co/randomusers/assets/avatars/female/5.jpg", // Caucasian senior female
     },
     trigger: {
       type: "refill",
@@ -947,7 +951,7 @@ export const DEMO_ORCHESTRATION_CONTEXTS: Record<string, OrchestrationContext> =
       dob: "05/20/1978",
       age: 47,
       primaryDiagnosis: "Major Depressive Disorder",
-      avatar: "https://randomuser.me/api/portraits/men/45.jpg",
+      avatar: "https://xsgames.co/randomusers/assets/avatars/male/62.jpg", // Hispanic middle-aged male
     },
     trigger: {
       type: "screening",

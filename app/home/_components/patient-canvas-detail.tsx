@@ -68,10 +68,7 @@ export function PatientCanvasDetail({
       <div className="border-border/50 border-b p-4 sm:p-6">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
           <Avatar className="border-border h-12 w-12 shrink-0 border-2 sm:h-14 sm:w-14">
-            <AvatarImage
-              src="https://randomuser.me/api/portraits/men/75.jpg"
-              alt={context.patient.name}
-            />
+            <AvatarImage src={context.patient.avatar} alt={context.patient.name} />
             <AvatarFallback className="bg-avatar-fallback text-white">{initials}</AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">

@@ -51,10 +51,10 @@ export function DynamicCanvas({ className }: DynamicCanvasProps) {
   };
 
   return (
-    <div className={className}>
+    <div className={className + " overflow-auto"}>
       {/* Animated content area - only swaps cards/detail, auto height */}
       {/* Use padding to allow room for shadows, negative margin to maintain layout */}
-      <div className="relative -mx-4 -my-2 overflow-hidden px-4 py-2">
+      <div className="relative -mx-4 -my-2 px-4 py-2">
         <AnimatePresence mode="popLayout" initial={false}>
           {view === "actions" ? (
             <motion.div
@@ -89,7 +89,7 @@ export function DynamicCanvas({ className }: DynamicCanvasProps) {
       </div>
 
       {/* Today's Patients - always visible below */}
-      <TodaysPatientsList className="mt-6 min-h-0 flex-1 overflow-y-auto" />
+      <TodaysPatientsList className="mt-6 pb-4" />
     </div>
   );
 }

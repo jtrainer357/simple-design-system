@@ -4,6 +4,9 @@ import * as React from "react";
 import { Card } from "@/design-system/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/design-system/components/ui/avatar";
 import { cn } from "@/design-system/lib/utils";
+import { Mail, MessageSquare } from "lucide-react";
+
+type ChannelType = "sms" | "email";
 
 interface ConversationCardProps {
   name: string;
@@ -12,6 +15,7 @@ interface ConversationCardProps {
   unreadCount?: number;
   avatarSrc?: string;
   countryFlag?: string;
+  channel?: ChannelType;
   selected?: boolean;
   pinned?: boolean;
   onClick?: () => void;
@@ -25,6 +29,7 @@ export function ConversationCard({
   unreadCount,
   avatarSrc,
   countryFlag,
+  channel,
   selected = false,
   onClick,
   className,
@@ -59,7 +64,26 @@ export function ConversationCard({
 
         <div className="min-w-0 flex-1">
           <div className="mb-0.5 flex items-center justify-between gap-2">
-            <h5 className="truncate text-sm font-bold">{name}</h5>
+            <div className="flex min-w-0 items-center gap-2">
+              <h5 className="truncate text-sm font-bold">{name}</h5>
+              {channel && (
+                <span
+                  className={cn(
+                    "flex shrink-0 items-center gap-1 rounded-full px-1.5 py-0.5 text-[10px] font-medium",
+                    channel === "sms"
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-purple-100 text-purple-700"
+                  )}
+                >
+                  {channel === "sms" ? (
+                    <MessageSquare className="h-3 w-3" />
+                  ) : (
+                    <Mail className="h-3 w-3" />
+                  )}
+                  {channel.toUpperCase()}
+                </span>
+              )}
+            </div>
             <div className="flex shrink-0 items-center gap-2">
               <span className="text-muted-foreground text-xs whitespace-nowrap">{time}</span>
               {unreadCount && unreadCount > 0 && (

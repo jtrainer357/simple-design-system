@@ -55,31 +55,36 @@ const connectItems: NavItem[] = [
   { id: "spam", label: "Spam", icon: ExclamationTriangleIcon },
 ];
 
+// Direct messages with demographically-appropriate avatars
 const directMessages: DirectMessage[] = [
   {
+    // Adam Mccall: Male, middle-aged, Caucasian
     id: "adam",
     name: "Adam Mccall",
     initials: "AM",
-    avatarSrc: "https://randomuser.me/api/portraits/men/32.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/3.jpg",
   },
   {
+    // Tahsan Khan: Male, young, South Asian
     id: "tahsan",
     name: "Tahsan Khan",
     initials: "TK",
-    avatarSrc: "https://randomuser.me/api/portraits/men/46.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/35.jpg",
     online: true,
   },
   {
+    // Joe Roots: Male, middle-aged, Caucasian
     id: "joe",
     name: "Joe Roots",
     initials: "JR",
-    avatarSrc: "https://randomuser.me/api/portraits/men/67.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/17.jpg",
   },
   {
+    // Herry Brooks: Male, middle-aged, African American
     id: "herry",
     name: "Herry Brooks",
     initials: "HB",
-    avatarSrc: "https://randomuser.me/api/portraits/men/22.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/16.jpg",
   },
   { id: "kane", name: "Herry Kane", initials: "HK" },
 ];

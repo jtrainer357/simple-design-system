@@ -3074,7 +3074,8 @@ function MyForm() {
   })
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values)
+    // Form submission handler - values available here
+    void values;
   }
 
   return (
@@ -3233,7 +3234,7 @@ function MyForm() {
                 <div className="space-y-3">
                   <AIActionCard
                     patientName="Michael Chen"
-                    avatarSrc="https://randomuser.me/api/portraits/men/75.jpg"
+                    avatarSrc="https://xsgames.co/randomusers/assets/avatars/male/32.jpg"
                     mainAction="A1C results available: 7.2% (↓ from 8.1%)"
                     statusIndicators="EXCELLENT PROGRESS ON TYPE 2 DIABETES MANAGEMENT"
                     readyStatus="Content ready"
@@ -3243,7 +3244,7 @@ function MyForm() {
                   />
                   <AIActionCard
                     patientName="Sarah Johnson"
-                    avatarSrc="https://randomuser.me/api/portraits/women/44.jpg"
+                    avatarSrc="https://xsgames.co/randomusers/assets/avatars/female/1.jpg"
                     mainAction="9:00 AM Annual Physical"
                     statusIndicators="INSURANCE VERIFIED • 2 CARE GAPS IDENTIFIED"
                     readyStatus="Everything pre-configured"
@@ -3253,7 +3254,7 @@ function MyForm() {
                   />
                   <AIActionCard
                     patientName="Margaret Williams"
-                    avatarSrc="https://randomuser.me/api/portraits/women/68.jpg"
+                    avatarSrc="https://xsgames.co/randomusers/assets/avatars/female/5.jpg"
                     mainAction="Metformin 500mg: 5 days remaining"
                     statusIndicators="SCHEDULED TODAY AT 10 AM • SAFETY CHECKS COMPLETE"
                     readyStatus="One-click approval"
@@ -3265,7 +3266,7 @@ function MyForm() {
               <CodeBlock
                 code={`<AIActionCard
   patientName="Michael Chen"
-  avatarSrc="https://randomuser.me/api/portraits/men/75.jpg"
+  avatarSrc="https://xsgames.co/randomusers/assets/avatars/male/32.jpg"
   mainAction="A1C results available: 7.2% (↓ from 8.1%)"
   statusIndicators="EXCELLENT PROGRESS ON TYPE 2 DIABETES MANAGEMENT"
   readyStatus="Content ready"

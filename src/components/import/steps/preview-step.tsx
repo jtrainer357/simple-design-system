@@ -71,15 +71,15 @@ export function PreviewStep({
         <h4 className="font-semibold text-gray-900">Import Preview (First 3 Records)</h4>
         <div className="space-y-2 text-sm text-gray-600">
           <div className="flex justify-between rounded border border-gray-200 bg-white p-2">
-            <span>Johnson, Sarah (DOB: 1985-03-12)</span>
+            <span>Patient A (DOB: 1985-03-12)</span>
             <Badge className="bg-emerald-600 text-white">Ready</Badge>
           </div>
           <div className="flex justify-between rounded border border-gray-200 bg-white p-2">
-            <span>Chen, Michael (DOB: 1990-07-22)</span>
+            <span>Patient B (DOB: 1990-07-22)</span>
             <Badge className="bg-emerald-600 text-white">Ready</Badge>
           </div>
           <div className="flex justify-between rounded border border-gray-200 bg-white p-2">
-            <span>Williams, Emily (DOB: 1978-11-30)</span>
+            <span>Patient C (DOB: 1978-11-30)</span>
             <Badge className="bg-amber-500 text-white">Duplicate?</Badge>
           </div>
         </div>

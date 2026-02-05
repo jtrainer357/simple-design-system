@@ -24,7 +24,7 @@ const actionIcons: Record<ActionType, React.ComponentType<{ className?: string }
 
 const actionColors: Record<ActionType, string> = {
   message: "text-blue-600 bg-blue-50",
-  order: "text-purple-600 bg-purple-50",
+  order: "text-teal-600 bg-teal-50",
   medication: "text-emerald-600 bg-emerald-50",
   task: "text-amber-600 bg-amber-50",
   document: "text-stone-600 bg-stone-50",

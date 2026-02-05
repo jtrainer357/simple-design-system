@@ -35,12 +35,13 @@ const messages: Message[] = [
     icon: Building2,
   },
   {
+    // Sarah Johnson: Female, 33yo (young), Caucasian
     id: "msg-2",
     name: "Sarah Johnson",
     text: "Need to reschedule Tuesday appointment",
     time: "12 MIN AGO",
     unread: true,
-    avatarSrc: "https://randomuser.me/api/portraits/women/44.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/1.jpg",
   },
   {
     id: "msg-3",
@@ -51,20 +52,22 @@ const messages: Message[] = [
     icon: Shield,
   },
   {
+    // Dr. Patel: Male, middle-aged, South Asian
     id: "msg-4",
     name: "Dr. Patel",
     text: "Can you check supply order status?",
     time: "35 MIN AGO",
     unread: true,
-    avatarSrc: "https://randomuser.me/api/portraits/men/46.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/36.jpg",
   },
   {
+    // Marcus Williams: Male, middle-aged, African American
     id: "msg-5",
     name: "Marcus Williams",
     text: "Question about copay amount from last...",
     time: "48 MIN AGO",
     unread: true,
-    avatarSrc: "https://randomuser.me/api/portraits/men/22.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/9.jpg",
   },
   {
     id: "msg-6",
@@ -83,20 +86,22 @@ const messages: Message[] = [
     icon: Pill,
   },
   {
+    // Dr. Chen: Female, middle-aged, Asian
     id: "msg-8",
     name: "Dr. Chen",
     text: "Please review patient notes before 3 PM",
     time: "2 HR AGO",
     unread: false,
-    avatarSrc: "https://randomuser.me/api/portraits/women/79.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/32.jpg",
   },
   {
+    // Emily Rodriguez: Female, middle-aged, Hispanic
     id: "msg-9",
     name: "Emily Rodriguez",
     text: "Confirming appointment for next week",
     time: "2 HR AGO",
     unread: false,
-    avatarSrc: "https://randomuser.me/api/portraits/women/28.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/female/62.jpg",
   },
   {
     id: "msg-10",
@@ -115,12 +120,13 @@ const messages: Message[] = [
     icon: Receipt,
   },
   {
+    // Dr. Morrison: Male, senior, Caucasian
     id: "msg-12",
     name: "Dr. Morrison",
     text: "Patient referral documents attached",
     time: "4 HR AGO",
     unread: false,
-    avatarSrc: "https://randomuser.me/api/portraits/men/85.jpg",
+    avatarSrc: "https://xsgames.co/randomusers/assets/avatars/male/5.jpg",
   },
 ];
 

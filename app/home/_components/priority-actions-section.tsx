@@ -10,6 +10,7 @@ import { Button } from "@/design-system/components/ui/button";
 import { getPriorityActions } from "@/src/lib/queries/priority-actions";
 import { getTodayAppointments } from "@/src/lib/queries/appointments";
 import { isDatabasePopulated } from "@/src/lib/queries/practice";
+import { formatDemoDate } from "@/src/lib/utils/demo-date";
 import type { PriorityActionWithPatient } from "@/src/lib/supabase/types";
 import type { AppointmentWithPatient } from "@/src/lib/queries/appointments";
 import type { OrchestrationContext } from "@/src/lib/orchestration/types";
@@ -116,13 +117,8 @@ export function PriorityActionsSection({
     loadData();
   }, []);
 
-  // Format today's date
-  const today = new Date();
-  const formattedDate = today.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "short",
-    day: "numeric",
-  });
+  // Format demo date (Feb 6, 2026)
+  const formattedDate = formatDemoDate("long");
 
   // Get the first arriving/scheduled patient
   const arrivingPatient = todayAppts.find((a) => a.status === "Scheduled") || todayAppts[0];

@@ -8,13 +8,28 @@ import {
   Brain,
   Clock,
   Sparkles,
+  TrendingUp,
+  TrendingDown,
+  MessageCircle,
+  DollarSign,
+  ClipboardList,
+  HelpCircle,
   type LucideIcon,
 } from "lucide-react";
 import { Badge } from "@/design-system/components/ui/badge";
 import { cn } from "@/design-system/lib/utils";
 
 export type UrgencyLevel = "urgent" | "high" | "medium" | "low";
-export type ActionIcon = "alert-triangle" | "pill" | "calendar" | "brain";
+export type ActionIcon =
+  | "alert-triangle"
+  | "pill"
+  | "calendar"
+  | "brain"
+  | "trending-up"
+  | "trending-down"
+  | "message-circle"
+  | "dollar-sign"
+  | "clipboard";
 export type Timeframe =
   | "Immediate"
   | "Today"
@@ -46,6 +61,11 @@ const iconMap: Record<ActionIcon, LucideIcon> = {
   pill: Pill,
   calendar: Calendar,
   brain: Brain,
+  "trending-up": TrendingUp,
+  "trending-down": TrendingDown,
+  "message-circle": MessageCircle,
+  "dollar-sign": DollarSign,
+  clipboard: ClipboardList,
 };
 
 const iconColorMap: Record<ActionIcon, string> = {
@@ -53,6 +73,11 @@ const iconColorMap: Record<ActionIcon, string> = {
   pill: "text-primary bg-primary/10",
   calendar: "text-teal bg-teal/10",
   brain: "text-chart-5 bg-chart-5/10",
+  "trending-up": "text-orange-500 bg-orange-500/10",
+  "trending-down": "text-emerald-500 bg-emerald-500/10",
+  "message-circle": "text-blue-500 bg-blue-500/10",
+  "dollar-sign": "text-amber-500 bg-amber-500/10",
+  clipboard: "text-teal-500 bg-teal-500/10",
 };
 
 const urgencyBadgeStyles: Record<UrgencyLevel, string> = {
@@ -70,8 +95,9 @@ const urgencyCardStyles: Record<UrgencyLevel, string> = {
 };
 
 export function PrioritizedActionCard({ action, onClick, className }: PrioritizedActionCardProps) {
-  const Icon = iconMap[action.icon];
-  const iconColor = iconColorMap[action.icon];
+  // Fallback to HelpCircle if icon is not in map
+  const Icon = iconMap[action.icon] || HelpCircle;
+  const iconColor = iconColorMap[action.icon] || "text-gray-500 bg-gray-500/10";
 
   const handleClick = () => {
     onClick?.(action);
