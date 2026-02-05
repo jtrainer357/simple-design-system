@@ -28,7 +28,7 @@ export function MessageRowCard({
   return (
     <Card
       className={cn(
-        "cursor-pointer p-3 transition-all hover:border-white hover:bg-[#F6F3EB]/70 hover:shadow-md",
+        "hover:bg-card-hover/70 cursor-pointer p-3 transition-all hover:border-white hover:shadow-md",
         className
       )}
     >
@@ -36,7 +36,10 @@ export function MessageRowCard({
         <Avatar className="h-10 w-10">
           {avatarSrc && <AvatarImage src={avatarSrc} alt={name} />}
           <AvatarFallback
-            className={cn("text-sm text-white", Icon ? "bg-[#079CB2]/70" : "bg-[#8CA7A2]/70")}
+            className={cn(
+              "text-sm text-white",
+              Icon ? "bg-message-icon-bg/70" : "bg-avatar-fallback/70"
+            )}
           >
             {Icon ? <Icon className="h-5 w-5" /> : name[0]}
           </AvatarFallback>

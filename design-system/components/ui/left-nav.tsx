@@ -93,9 +93,9 @@ export function LeftNav({
               </>
             );
             const buttonClassName = cn(
-              "h-12 w-12 rounded-full border-[0.5px] border-[#B3C6C4] text-[#195B63] transition-all hover:bg-white/50",
+              "h-12 w-12 rounded-full border-[0.5px] border-selected-border text-teal-dark transition-all hover:bg-white/50",
               item.active &&
-                "border-0 bg-[#195B63] text-white shadow-xl hover:bg-[#195B63] hover:text-white"
+                "border-0 bg-teal-dark text-white shadow-xl hover:bg-teal-dark hover:text-white"
             );
 
             if (item.href) {
@@ -127,7 +127,7 @@ export function LeftNav({
               variant="ghost"
               size="icon"
               onClick={onNotificationsClick}
-              className="relative h-12 w-12 rounded-full border-[0.5px] border-[#B3C6C4] text-[#195B63] hover:bg-white/50"
+              className="border-selected-border text-teal-dark relative h-12 w-12 rounded-full border-[0.5px] hover:bg-white/50"
             >
               <Bell className="h-6 w-6" />
               {notificationCount && notificationCount > 0 && (
@@ -140,7 +140,7 @@ export function LeftNav({
           )}
           {user && (
             <Avatar
-              className="h-12 w-12 cursor-pointer rounded-full border-[0.5px] border-[#B3C6C4] transition-all hover:bg-white/50"
+              className="border-selected-border h-12 w-12 cursor-pointer rounded-full border-[0.5px] transition-all hover:bg-white/50"
               onClick={user.onClick}
             >
               {user.avatarSrc && <AvatarImage src={user.avatarSrc} alt={user.name} />}
@@ -162,9 +162,9 @@ export function LeftNav({
             </>
           );
           const mobileButtonClassName = cn(
-            "h-11 w-11 rounded-full border-[0.5px] border-[#B3C6C4] text-[#195B63] transition-all hover:bg-white/50",
+            "h-11 w-11 rounded-full border-[0.5px] border-selected-border text-teal-dark transition-all hover:bg-white/50",
             item.active &&
-              "border-0 bg-[#195B63] text-white shadow-xl hover:bg-[#195B63] hover:text-white"
+              "border-0 bg-teal-dark text-white shadow-xl hover:bg-teal-dark hover:text-white"
           );
 
           if (item.href) {
@@ -198,7 +198,7 @@ export function LeftNav({
             variant="ghost"
             size="icon"
             onClick={onNotificationsClick}
-            className="relative h-11 w-11 rounded-full border-[0.5px] border-[#B3C6C4] text-[#195B63] hover:bg-white/50"
+            className="border-selected-border text-teal-dark relative h-11 w-11 rounded-full border-[0.5px] hover:bg-white/50"
           >
             <Bell className="h-5 w-5" />
             {notificationCount && notificationCount > 0 && (

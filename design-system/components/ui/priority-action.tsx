@@ -32,13 +32,18 @@ export function PriorityAction({
   className,
 }: PriorityActionProps) {
   return (
-    <Card className={cn("overflow-hidden border-0 bg-[#FFCFBF]/50 backdrop-blur-xl", className)}>
+    <Card
+      className={cn(
+        "bg-priority-bg/50 cursor-pointer overflow-hidden border-0 shadow-md backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-md",
+        className
+      )}
+    >
       <CardContent className="p-6 sm:p-8">
         <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-4 sm:gap-5">
             <Avatar className="h-16 w-16 shrink-0 border-4 border-white sm:h-20 sm:w-20">
               {avatarSrc && <AvatarImage src={avatarSrc} />}
-              <AvatarFallback className="bg-[#8CA7A2] text-base text-white sm:text-lg">
+              <AvatarFallback className="bg-avatar-fallback text-base text-white sm:text-lg">
                 {avatarInitials}
               </AvatarFallback>
             </Avatar>

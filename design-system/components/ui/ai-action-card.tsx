@@ -47,7 +47,10 @@ export function AIActionCard({
   return (
     <Card
       opacity="solid"
-      className={cn("border-0 shadow-md transition-all hover:shadow-lg", className)}
+      className={cn(
+        "cursor-pointer border-0 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-md",
+        className
+      )}
     >
       <CardContent className="p-4 sm:p-5">
         {/* Three column table: avatar | content | badge */}
@@ -56,7 +59,7 @@ export function AIActionCard({
           <div className="table-cell w-[100px] align-middle">
             <Avatar className="h-16 w-16 border-4 border-white sm:h-20 sm:w-20">
               {avatarSrc && <AvatarImage src={avatarSrc} alt={patientName} />}
-              <AvatarFallback className="bg-[#8CA7A2] text-base font-semibold text-white sm:text-lg">
+              <AvatarFallback className="bg-avatar-fallback text-base font-semibold text-white sm:text-lg">
                 {initials}
               </AvatarFallback>
             </Avatar>

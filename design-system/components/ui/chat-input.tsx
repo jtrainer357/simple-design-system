@@ -74,11 +74,11 @@ export function ChatInput({
               "disabled:cursor-not-allowed disabled:opacity-50"
             )}
           />
-          <div className="flex items-center gap-0.5">
+          <div className="flex items-center">
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground hover:text-foreground h-7 w-7"
+              className="text-muted-foreground hover:text-foreground relative h-8 w-8 before:absolute before:inset-[-4px] before:content-['']"
               onClick={onAttachFile}
               disabled={disabled}
             >
@@ -88,7 +88,7 @@ export function ChatInput({
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground hover:text-foreground h-7 w-7"
+              className="text-muted-foreground hover:text-foreground relative h-8 w-8 before:absolute before:inset-[-4px] before:content-['']"
               onClick={onAttachImage}
               disabled={disabled}
             >
@@ -98,7 +98,7 @@ export function ChatInput({
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground hover:text-foreground h-7 w-7"
+              className="text-muted-foreground hover:text-foreground relative h-8 w-8 before:absolute before:inset-[-4px] before:content-['']"
               onClick={onAiAssist}
               disabled={disabled}
             >
@@ -108,7 +108,7 @@ export function ChatInput({
             <Button
               variant="ghost"
               size="icon"
-              className="text-muted-foreground hover:text-foreground h-7 w-7"
+              className="text-muted-foreground hover:text-foreground relative h-8 w-8 before:absolute before:inset-[-4px] before:content-['']"
               onClick={onEmoji}
               disabled={disabled}
             >

@@ -13,7 +13,9 @@ import { FilterTabs } from "@/design-system/components/ui/filter-tabs";
 import { PageTransition } from "@/design-system/components/ui/page-transition";
 import { Button } from "@/design-system/components/ui/button";
 import { Text } from "@/design-system/components/ui/typography";
-import { Plus, Calendar, Trash2, Loader2 } from "lucide-react";
+import { Plus, Calendar, Trash2, AlertTriangle, RefreshCw, CalendarX } from "lucide-react";
+import { Skeleton } from "@/design-system/components/ui/skeleton";
+import { Heading } from "@/design-system/components/ui/typography";
 import {
   addDays,
   startOfWeek,
@@ -62,6 +64,396 @@ function appointmentToEvent(apt: AppointmentWithPatient): CalendarEvent {
   };
 }
 
+// Helper to create a date at a specific time
+function createDateTime(baseDate: Date, dayOffset: number, hour: number, minute: number = 0): Date {
+  const date = addDays(baseDate, dayOffset);
+  const result = new Date(date);
+  result.setHours(hour, minute, 0, 0);
+  return result;
+}
+
+// Generate hardcoded demo events for a realistic-looking calendar
+function generateDemoEvents(weekStart: Date): CalendarEvent[] {
+  const demoEvents: CalendarEvent[] = [];
+
+  // Patient names for demo - diverse and realistic
+  const patients = [
+    { name: "Marcus Johnson", type: "Follow-up Session", color: "blue" as const },
+    { name: "Sarah Chen", type: "Initial Assessment", color: "green" as const },
+    { name: "Emily Rodriguez", type: "Therapy Session", color: "blue" as const },
+    { name: "David Kim", type: "Crisis Follow-up", color: "pink" as const },
+    { name: "Amanda Foster", type: "CBT Session", color: "blue" as const },
+    { name: "James Wilson", type: "Medication Review", color: "neutral" as const },
+    { name: "Lisa Thompson", type: "Couples Therapy", color: "blue" as const },
+    { name: "Michael Brown", type: "Intake Evaluation", color: "green" as const },
+    { name: "Jennifer Davis", type: "EMDR Session", color: "blue" as const },
+    { name: "Robert Garcia", type: "Group Prep", color: "neutral" as const },
+    { name: "Michelle Lee", type: "Family Session", color: "blue" as const },
+    { name: "Christopher Martinez", type: "Follow-up Session", color: "blue" as const },
+    { name: "Ashley Williams", type: "DBT Session", color: "blue" as const },
+    { name: "Daniel Anderson", type: "Initial Consult", color: "green" as const },
+    { name: "Jessica Taylor", type: "Progress Review", color: "neutral" as const },
+    { name: "Matthew Jackson", type: "Therapy Session", color: "blue" as const },
+    { name: "Rachel White", type: "Crisis Session", color: "pink" as const, hasNotification: true },
+    { name: "Kevin Harris", type: "Anxiety Treatment", color: "blue" as const },
+    { name: "Stephanie Clark", type: "Depression Follow-up", color: "blue" as const },
+    { name: "Andrew Lewis", type: "Trauma Processing", color: "blue" as const },
+  ];
+
+  // Monday (day 0) - Full day
+  demoEvents.push(
+    {
+      id: "demo-mon-1",
+      title: `${patients[0]!.name} - ${patients[0]!.type}`,
+      startTime: createDateTime(weekStart, 0, 7, 0),
+      endTime: createDateTime(weekStart, 0, 8, 0),
+      color: patients[0]!.color,
+    },
+    {
+      id: "demo-mon-2",
+      title: `${patients[1]!.name} - ${patients[1]!.type}`,
+      startTime: createDateTime(weekStart, 0, 8, 30),
+      endTime: createDateTime(weekStart, 0, 9, 30),
+      color: patients[1]!.color,
+    },
+    {
+      id: "demo-mon-3",
+      title: `${patients[2]!.name} - ${patients[2]!.type}`,
+      startTime: createDateTime(weekStart, 0, 10, 0),
+      endTime: createDateTime(weekStart, 0, 11, 0),
+      color: patients[2]!.color,
+    },
+    {
+      id: "demo-mon-block-1",
+      title: "Chart Notes & Documentation",
+      startTime: createDateTime(weekStart, 0, 11, 0),
+      endTime: createDateTime(weekStart, 0, 12, 0),
+      color: "gray" as const,
+    },
+    {
+      id: "demo-mon-4",
+      title: `${patients[3]!.name} - ${patients[3]!.type}`,
+      startTime: createDateTime(weekStart, 0, 13, 0),
+      endTime: createDateTime(weekStart, 0, 14, 0),
+      color: patients[3]!.color,
+      hasNotification: true,
+    },
+    {
+      id: "demo-mon-5",
+      title: `${patients[4]!.name} - ${patients[4]!.type}`,
+      startTime: createDateTime(weekStart, 0, 14, 30),
+      endTime: createDateTime(weekStart, 0, 15, 30),
+      color: patients[4]!.color,
+    },
+    {
+      id: "demo-mon-6",
+      title: `${patients[5]!.name} - ${patients[5]!.type}`,
+      startTime: createDateTime(weekStart, 0, 16, 0),
+      endTime: createDateTime(weekStart, 0, 16, 30),
+      color: patients[5]!.color,
+    },
+    {
+      id: "demo-mon-7",
+      title: `${patients[6]!.name} - ${patients[6]!.type}`,
+      startTime: createDateTime(weekStart, 0, 17, 0),
+      endTime: createDateTime(weekStart, 0, 18, 30),
+      color: patients[6]!.color,
+    }
+  );
+
+  // Tuesday (day 1) - Busy morning, lighter afternoon
+  demoEvents.push(
+    {
+      id: "demo-tue-1",
+      title: `${patients[7]!.name} - ${patients[7]!.type}`,
+      startTime: createDateTime(weekStart, 1, 6, 30),
+      endTime: createDateTime(weekStart, 1, 8, 0),
+      color: patients[7]!.color,
+    },
+    {
+      id: "demo-tue-2",
+      title: `${patients[8]!.name} - ${patients[8]!.type}`,
+      startTime: createDateTime(weekStart, 1, 8, 30),
+      endTime: createDateTime(weekStart, 1, 9, 30),
+      color: patients[8]!.color,
+    },
+    {
+      id: "demo-tue-3",
+      title: `${patients[9]!.name} - ${patients[9]!.type}`,
+      startTime: createDateTime(weekStart, 1, 10, 0),
+      endTime: createDateTime(weekStart, 1, 11, 0),
+      color: patients[9]!.color,
+    },
+    {
+      id: "demo-tue-block-1",
+      title: "Staff Meeting",
+      startTime: createDateTime(weekStart, 1, 11, 30),
+      endTime: createDateTime(weekStart, 1, 12, 30),
+      color: "gray" as const,
+    },
+    {
+      id: "demo-tue-4",
+      title: `${patients[10]!.name} - ${patients[10]!.type}`,
+      startTime: createDateTime(weekStart, 1, 13, 30),
+      endTime: createDateTime(weekStart, 1, 15, 0),
+      color: patients[10]!.color,
+    },
+    {
+      id: "demo-tue-block-2",
+      title: "Peer Supervision",
+      startTime: createDateTime(weekStart, 1, 15, 30),
+      endTime: createDateTime(weekStart, 1, 17, 0),
+      color: "gray" as const,
+    },
+    {
+      id: "demo-tue-5",
+      title: `${patients[11]!.name} - ${patients[11]!.type}`,
+      startTime: createDateTime(weekStart, 1, 17, 30),
+      endTime: createDateTime(weekStart, 1, 18, 30),
+      color: patients[11]!.color,
+    },
+    {
+      id: "demo-tue-6",
+      title: `${patients[12]!.name} - ${patients[12]!.type}`,
+      startTime: createDateTime(weekStart, 1, 19, 0),
+      endTime: createDateTime(weekStart, 1, 20, 0),
+      color: patients[12]!.color,
+    }
+  );
+
+  // Wednesday (day 2) - Mixed day
+  demoEvents.push(
+    {
+      id: "demo-wed-block-1",
+      title: "Morning Admin Block",
+      startTime: createDateTime(weekStart, 2, 6, 0),
+      endTime: createDateTime(weekStart, 2, 7, 30),
+      color: "gray" as const,
+    },
+    {
+      id: "demo-wed-1",
+      title: `${patients[13]!.name} - ${patients[13]!.type}`,
+      startTime: createDateTime(weekStart, 2, 8, 0),
+      endTime: createDateTime(weekStart, 2, 9, 0),
+      color: patients[13]!.color,
+    },
+    {
+      id: "demo-wed-2",
+      title: `${patients[14]!.name} - ${patients[14]!.type}`,
+      startTime: createDateTime(weekStart, 2, 9, 30),
+      endTime: createDateTime(weekStart, 2, 10, 30),
+      color: patients[14]!.color,
+    },
+    {
+      id: "demo-wed-3",
+      title: `${patients[15]!.name} - ${patients[15]!.type}`,
+      startTime: createDateTime(weekStart, 2, 11, 0),
+      endTime: createDateTime(weekStart, 2, 12, 0),
+      color: patients[15]!.color,
+    },
+    {
+      id: "demo-wed-4",
+      title: `${patients[16]!.name} - ${patients[16]!.type}`,
+      startTime: createDateTime(weekStart, 2, 13, 0),
+      endTime: createDateTime(weekStart, 2, 14, 0),
+      color: patients[16]!.color,
+      hasNotification: true,
+    },
+    {
+      id: "demo-wed-5",
+      title: `${patients[17]!.name} - ${patients[17]!.type}`,
+      startTime: createDateTime(weekStart, 2, 14, 30),
+      endTime: createDateTime(weekStart, 2, 15, 30),
+      color: patients[17]!.color,
+    },
+    {
+      id: "demo-wed-6",
+      title: `${patients[18]!.name} - ${patients[18]!.type}`,
+      startTime: createDateTime(weekStart, 2, 16, 0),
+      endTime: createDateTime(weekStart, 2, 17, 0),
+      color: patients[18]!.color,
+    },
+    {
+      id: "demo-wed-block-2",
+      title: "Treatment Planning",
+      startTime: createDateTime(weekStart, 2, 17, 30),
+      endTime: createDateTime(weekStart, 2, 19, 0),
+      color: "gray" as const,
+    },
+    {
+      id: "demo-wed-7",
+      title: `${patients[19]!.name} - ${patients[19]!.type}`,
+      startTime: createDateTime(weekStart, 2, 19, 30),
+      endTime: createDateTime(weekStart, 2, 20, 30),
+      color: patients[19]!.color,
+    }
+  );
+
+  // Thursday (day 3) - Heavy day
+  demoEvents.push(
+    {
+      id: "demo-thu-1",
+      title: `${patients[0]!.name} - ${patients[0]!.type}`,
+      startTime: createDateTime(weekStart, 3, 7, 0),
+      endTime: createDateTime(weekStart, 3, 8, 0),
+      color: patients[0]!.color,
+    },
+    {
+      id: "demo-thu-2",
+      title: `${patients[2]!.name} - ${patients[2]!.type}`,
+      startTime: createDateTime(weekStart, 3, 8, 30),
+      endTime: createDateTime(weekStart, 3, 9, 30),
+      color: patients[2]!.color,
+    },
+    {
+      id: "demo-thu-3",
+      title: `${patients[4]!.name} - ${patients[4]!.type}`,
+      startTime: createDateTime(weekStart, 3, 10, 0),
+      endTime: createDateTime(weekStart, 3, 11, 0),
+      color: patients[4]!.color,
+    },
+    {
+      id: "demo-thu-4",
+      title: `${patients[6]!.name} - ${patients[6]!.type}`,
+      startTime: createDateTime(weekStart, 3, 11, 30),
+      endTime: createDateTime(weekStart, 3, 13, 0),
+      color: patients[6]!.color,
+    },
+    {
+      id: "demo-thu-5",
+      title: `${patients[8]!.name} - ${patients[8]!.type}`,
+      startTime: createDateTime(weekStart, 3, 13, 30),
+      endTime: createDateTime(weekStart, 3, 14, 30),
+      color: patients[8]!.color,
+    },
+    {
+      id: "demo-thu-6",
+      title: `${patients[10]!.name} - ${patients[10]!.type}`,
+      startTime: createDateTime(weekStart, 3, 15, 0),
+      endTime: createDateTime(weekStart, 3, 16, 30),
+      color: patients[10]!.color,
+    },
+    {
+      id: "demo-thu-block-1",
+      title: "Consultation Call",
+      startTime: createDateTime(weekStart, 3, 17, 0),
+      endTime: createDateTime(weekStart, 3, 17, 30),
+      color: "gray" as const,
+    },
+    {
+      id: "demo-thu-7",
+      title: `${patients[12]!.name} - ${patients[12]!.type}`,
+      startTime: createDateTime(weekStart, 3, 18, 0),
+      endTime: createDateTime(weekStart, 3, 19, 0),
+      color: patients[12]!.color,
+    },
+    {
+      id: "demo-thu-8",
+      title: `${patients[14]!.name} - ${patients[14]!.type}`,
+      startTime: createDateTime(weekStart, 3, 19, 30),
+      endTime: createDateTime(weekStart, 3, 20, 30),
+      color: patients[14]!.color,
+    }
+  );
+
+  // Friday (day 4) - Demo day (Feb 6, 2026)
+  demoEvents.push(
+    {
+      id: "demo-fri-1",
+      title: `${patients[1]!.name} - ${patients[1]!.type}`,
+      startTime: createDateTime(weekStart, 4, 7, 30),
+      endTime: createDateTime(weekStart, 4, 9, 0),
+      color: patients[1]!.color,
+    },
+    {
+      id: "demo-fri-2",
+      title: `${patients[3]!.name} - ${patients[3]!.type}`,
+      startTime: createDateTime(weekStart, 4, 9, 30),
+      endTime: createDateTime(weekStart, 4, 10, 30),
+      color: patients[3]!.color,
+      hasNotification: true,
+    },
+    {
+      id: "demo-fri-3",
+      title: `${patients[5]!.name} - ${patients[5]!.type}`,
+      startTime: createDateTime(weekStart, 4, 11, 0),
+      endTime: createDateTime(weekStart, 4, 11, 30),
+      color: patients[5]!.color,
+    },
+    {
+      id: "demo-fri-block-1",
+      title: "Lunch Break",
+      startTime: createDateTime(weekStart, 4, 12, 0),
+      endTime: createDateTime(weekStart, 4, 13, 0),
+      color: "gray" as const,
+    },
+    {
+      id: "demo-fri-4",
+      title: `${patients[7]!.name} - ${patients[7]!.type}`,
+      startTime: createDateTime(weekStart, 4, 13, 30),
+      endTime: createDateTime(weekStart, 4, 15, 0),
+      color: patients[7]!.color,
+    },
+    {
+      id: "demo-fri-5",
+      title: `${patients[9]!.name} - ${patients[9]!.type}`,
+      startTime: createDateTime(weekStart, 4, 15, 30),
+      endTime: createDateTime(weekStart, 4, 16, 30),
+      color: patients[9]!.color,
+    },
+    {
+      id: "demo-fri-block-2",
+      title: "Case Review Meeting",
+      startTime: createDateTime(weekStart, 4, 17, 0),
+      endTime: createDateTime(weekStart, 4, 18, 0),
+      color: "gray" as const,
+    },
+    {
+      id: "demo-fri-6",
+      title: `${patients[11]!.name} - ${patients[11]!.type}`,
+      startTime: createDateTime(weekStart, 4, 18, 30),
+      endTime: createDateTime(weekStart, 4, 19, 30),
+      color: patients[11]!.color,
+    }
+  );
+
+  // Saturday (day 5) - Lighter weekend hours
+  demoEvents.push(
+    {
+      id: "demo-sat-1",
+      title: `${patients[15]!.name} - ${patients[15]!.type}`,
+      startTime: createDateTime(weekStart, 5, 9, 0),
+      endTime: createDateTime(weekStart, 5, 10, 0),
+      color: patients[15]!.color,
+    },
+    {
+      id: "demo-sat-2",
+      title: `${patients[17]!.name} - ${patients[17]!.type}`,
+      startTime: createDateTime(weekStart, 5, 10, 30),
+      endTime: createDateTime(weekStart, 5, 11, 30),
+      color: patients[17]!.color,
+    },
+    {
+      id: "demo-sat-3",
+      title: `${patients[19]!.name} - ${patients[19]!.type}`,
+      startTime: createDateTime(weekStart, 5, 12, 0),
+      endTime: createDateTime(weekStart, 5, 13, 0),
+      color: patients[19]!.color,
+    }
+  );
+
+  // Sunday (day 6) - Emergency/on-call only
+  demoEvents.push({
+    id: "demo-sun-block-1",
+    title: "On-Call Coverage",
+    startTime: createDateTime(weekStart, 6, 8, 0),
+    endTime: createDateTime(weekStart, 6, 12, 0),
+    color: "gray" as const,
+  });
+
+  return demoEvents;
+}
+
 const filterTabs = [
   { id: "all", label: "All Appointments" },
   { id: "scheduled", label: "Scheduled" },
@@ -77,23 +469,27 @@ export default function SchedulePage() {
   const [completedEvents, setCompletedEvents] = React.useState<Set<string>>(new Set());
   const [appointments, setAppointments] = React.useState<AppointmentWithPatient[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
   // Load appointments from Supabase
-  React.useEffect(() => {
-    async function loadAppointments() {
-      try {
-        setLoading(true);
-        // Fetch 2 weeks of appointments (all statuses for filter tabs to work)
-        const data = await getUpcomingAppointments(undefined, 14, "all");
-        setAppointments(data);
-      } catch (err) {
-        console.error("Failed to load appointments:", err);
-      } finally {
-        setLoading(false);
-      }
+  const loadAppointments = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      // Fetch 2 weeks of appointments (all statuses for filter tabs to work)
+      const data = await getUpcomingAppointments(undefined, 14, "all");
+      setAppointments(data);
+    } catch (err) {
+      console.error("Failed to load appointments:", err);
+      setError("Unable to load schedule. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    loadAppointments();
   }, []);
+
+  React.useEffect(() => {
+    loadAppointments();
+  }, [loadAppointments]);
 
   // Calculate week days
   const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
@@ -106,16 +502,27 @@ export default function SchedulePage() {
     return days;
   }, [weekStart]);
 
-  // Convert appointments to calendar events
+  // Generate demo events for the current week
+  const demoEvents = React.useMemo(() => generateDemoEvents(weekStart), [weekStart]);
+
+  // Convert appointments to calendar events and merge with demo events
   const events: CalendarEvent[] = React.useMemo(() => {
-    return appointments
+    const dbEvents = appointments
       .filter((apt) => {
         if (activeFilter === "scheduled") return apt.status === "Scheduled";
         if (activeFilter === "completed") return apt.status === "Completed";
         return true;
       })
       .map(appointmentToEvent);
-  }, [appointments, activeFilter]);
+
+    // For demo purposes, always include demo events when filter is "all" or "scheduled"
+    if (activeFilter === "completed") {
+      return dbEvents;
+    }
+
+    // Merge DB events with demo events, demo events fill in the gaps
+    return [...dbEvents, ...demoEvents];
+  }, [appointments, activeFilter, demoEvents]);
 
   const dateRange = `${format(weekStart, "MMM d, yyyy")} - ${format(weekEnd, "MMM d, yyyy")}`;
 
@@ -181,17 +588,79 @@ export default function SchedulePage() {
 
               {/* Calendar Card */}
               <CardWrapper className="flex flex-1 flex-col overflow-hidden p-4 sm:p-6">
-                {/* Loading State */}
-                {loading ? (
-                  <div className="flex flex-1 items-center justify-center">
-                    <div className="flex flex-col items-center gap-3">
-                      <Loader2 className="text-primary h-8 w-8 animate-spin" />
-                      <Text size="sm" muted>
-                        Loading schedule...
-                      </Text>
+                {/* Loading State with Skeleton */}
+                {loading && (
+                  <div className="flex h-full flex-col">
+                    {/* Header skeleton */}
+                    <div className="mb-6 flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <Skeleton className="h-9 w-9 rounded-full" />
+                        <Skeleton className="h-6 w-48" />
+                        <Skeleton className="h-9 w-9 rounded-full" />
+                      </div>
+                      <div className="flex gap-2">
+                        <Skeleton className="h-9 w-20 rounded-full" />
+                        <Skeleton className="h-9 w-20 rounded-full" />
+                      </div>
+                    </div>
+                    {/* Calendar grid skeleton */}
+                    <div className="flex-1">
+                      <div className="mb-2 grid grid-cols-7 gap-1">
+                        {Array.from({ length: 7 }).map((_, i) => (
+                          <Skeleton key={i} className="h-8" />
+                        ))}
+                      </div>
+                      <div className="grid grid-cols-7 gap-1">
+                        {Array.from({ length: 21 }).map((_, i) => (
+                          <Skeleton key={i} className="h-16 rounded-lg" />
+                        ))}
+                      </div>
                     </div>
                   </div>
-                ) : (
+                )}
+
+                {/* Error State */}
+                {error && !loading && (
+                  <div className="flex flex-1 flex-col items-center justify-center py-12">
+                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+                      <AlertTriangle className="h-7 w-7 text-red-600" />
+                    </div>
+                    <Heading level={4} className="mb-2 text-lg font-semibold">
+                      Unable to Load Schedule
+                    </Heading>
+                    <Text muted className="mb-4 max-w-sm text-center">
+                      {error}
+                    </Text>
+                    <Button onClick={loadAppointments} variant="outline" className="gap-2">
+                      <RefreshCw className="h-4 w-4" />
+                      Try Again
+                    </Button>
+                  </div>
+                )}
+
+                {/* Empty State - only show if no events at all including demo */}
+                {!loading && !error && events.length === 0 && (
+                  <div className="flex flex-1 flex-col items-center justify-center py-12">
+                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
+                      <CalendarX className="h-7 w-7 text-gray-400" />
+                    </div>
+                    <Heading level={4} className="mb-2 text-lg font-semibold">
+                      No Appointments Found
+                    </Heading>
+                    <Text muted className="mb-4 max-w-sm text-center">
+                      {activeFilter !== "all"
+                        ? `No ${activeFilter} appointments in this time range.`
+                        : "No appointments scheduled for this week."}
+                    </Text>
+                    <Button className="gap-2">
+                      <Plus className="h-4 w-4" />
+                      Schedule Appointment
+                    </Button>
+                  </div>
+                )}
+
+                {/* Content - Only show when loaded and has data */}
+                {!loading && !error && events.length > 0 && (
                   <>
                     {/* Desktop View */}
                     <div className="hidden h-full flex-col lg:flex">
@@ -209,8 +678,8 @@ export default function SchedulePage() {
                       <CalendarWeekView
                         weekDays={weekDays}
                         events={events}
-                        startHour={8}
-                        endHour={18}
+                        startHour={6}
+                        endHour={21}
                         className="min-h-0 flex-1"
                       />
 

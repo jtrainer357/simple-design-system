@@ -50,7 +50,7 @@ export function PatientListCard({
   return (
     <Card
       className={cn(
-        "cursor-pointer p-3 transition-all hover:border-white hover:bg-[#F6F3EB]/70 hover:shadow-md sm:p-4",
+        "hover:bg-card-hover/70 cursor-pointer p-3 transition-all hover:border-white hover:shadow-md sm:p-4",
         selected && "border-selected-border bg-accent/30",
         className
       )}
@@ -70,11 +70,8 @@ export function PatientListCard({
           <div className="flex items-center justify-between gap-2">
             <h4 className="text-card-foreground truncate text-sm font-bold">{name}</h4>
             <Badge
-              variant={status === "ACTIVE" ? "default" : status === "NEW" ? "secondary" : "outline"}
-              className={cn(
-                "shrink-0 rounded-md border-none px-2 py-0.5 text-xs font-bold",
-                status === "INACTIVE" && "bg-muted text-muted-foreground"
-              )}
+              variant={status === "ACTIVE" ? "active" : status === "NEW" ? "new" : "inactive"}
+              className="shrink-0 rounded-md border-none px-2 py-0.5 text-xs font-bold"
             >
               {status}
             </Badge>
@@ -97,7 +94,7 @@ export function PatientListCard({
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-foreground h-7 w-7"
+            className="text-muted-foreground hover:text-foreground h-11 w-11"
             onClick={(e) => {
               e.stopPropagation();
               onMessage?.();
@@ -108,7 +105,7 @@ export function PatientListCard({
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-foreground h-7 w-7"
+            className="text-muted-foreground hover:text-foreground h-11 w-11"
             onClick={(e) => {
               e.stopPropagation();
               onEmail?.();
@@ -119,7 +116,7 @@ export function PatientListCard({
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-foreground h-7 w-7"
+            className="text-muted-foreground hover:text-foreground h-11 w-11"
             onClick={(e) => {
               e.stopPropagation();
               onMore?.();

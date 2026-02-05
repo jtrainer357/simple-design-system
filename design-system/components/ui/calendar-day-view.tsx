@@ -26,23 +26,27 @@ interface CalendarDayViewProps {
 const colorBorderStyles: Record<EventColor, string> = {
   blue: "border-l-teal",
   pink: "border-l-primary",
-  purple: "border-l-[#9B8F85]",
-  green: "border-l-[#6B8B73]",
-  yellow: "border-l-[#D4B896]",
+  neutral: "border-l-event-neutral-border",
+  green: "border-l-event-green-border",
+  yellow: "border-l-event-warm-border",
   gray: "border-l-border",
   red: "border-l-destructive",
   orange: "border-l-primary/80",
+  // purple is an alias for neutral (no actual purple/violet in healthcare app)
+  purple: "border-l-event-neutral-border",
 };
 
 const colorBgStyles: Record<EventColor, string> = {
-  blue: "bg-[#CBDDE0]/60",
+  blue: "bg-event-blue-bg/60",
   pink: "bg-primary/10",
-  purple: "bg-[#E8E4DF]/80",
-  green: "bg-[#C6DCCE]/50",
-  yellow: "bg-[#FEF5D5]/60",
+  neutral: "bg-event-neutral-bg/80",
+  green: "bg-event-green-bg/50",
+  yellow: "bg-event-warm-bg/60",
   gray: "bg-muted/80",
   red: "bg-destructive/10",
   orange: "bg-primary/15",
+  // purple is an alias for neutral (no actual purple/violet in healthcare app)
+  purple: "bg-event-neutral-bg/80",
 };
 
 interface TimeSlot {
@@ -60,7 +64,7 @@ export function CalendarDayView({
 }: CalendarDayViewProps) {
   const timeSlots: TimeSlot[] = React.useMemo(() => {
     const slots: TimeSlot[] = [];
-    for (let hour = 8; hour <= 19; hour++) {
+    for (let hour = 6; hour <= 21; hour++) {
       const isNoon = hour === 12;
       let label: string;
       if (isNoon) {
@@ -86,9 +90,9 @@ export function CalendarDayView({
   const now = new Date();
   const currentHour = now.getHours();
   const currentMinutes = now.getMinutes();
-  const showCurrentTime = isToday(date) && currentHour >= 8 && currentHour <= 19;
+  const showCurrentTime = isToday(date) && currentHour >= 6 && currentHour <= 21;
   const SLOT_HEIGHT = 72;
-  const currentTimeTop = (currentHour - 8) * SLOT_HEIGHT + (currentMinutes / 60) * SLOT_HEIGHT;
+  const currentTimeTop = (currentHour - 6) * SLOT_HEIGHT + (currentMinutes / 60) * SLOT_HEIGHT;
 
   return (
     <div className={cn("relative space-y-0", className)}>

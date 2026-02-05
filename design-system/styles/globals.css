@@ -137,12 +137,42 @@
   --color-avatar-fallback: oklch(0.6824 0.0451 175.1172);
   --color-teal: oklch(0.4345 0.065 206.7827);
   --color-teal-foreground: oklch(1 0 0);
-  --color-selected-border: #b3c6c4;
+  --color-selected-border: oklch(0.8 0.02 175);
   --color-foreground-strong: oklch(0 0 0);
 
+  /* Teal Dark - for nav icons and accents */
+  --color-teal-dark: oklch(0.38 0.06 195);
+  --color-teal-dark-hover: oklch(0.32 0.06 195);
+
+  /* Card hover background */
+  --color-card-hover: oklch(0.96 0.01 85);
+
+  /* Calendar and event colors */
+  --color-event-blue-bg: oklch(0.88 0.03 200);
+  --color-event-neutral-bg: oklch(0.92 0.01 80);
+  --color-event-neutral-border: oklch(0.65 0.02 70);
+  --color-event-green-bg: oklch(0.87 0.04 150);
+  --color-event-green-text: oklch(0.42 0.08 150);
+  --color-event-green-border: oklch(0.55 0.06 150);
+  --color-event-warm-bg: oklch(0.95 0.04 85);
+  --color-event-warm-text: oklch(0.52 0.06 60);
+  --color-event-warm-border: oklch(0.8 0.05 70);
+
+  /* Activity indicator - coral/orange accent */
+  --color-activity-indicator: oklch(0.72 0.15 35);
+
+  /* Card border subtle */
+  --color-card-border-subtle: oklch(0.93 0.01 160);
+
+  /* Message/communication colors */
+  --color-message-icon-bg: oklch(0.55 0.1 195);
+
+  /* Priority action background - coral tint */
+  --color-priority-bg: oklch(0.92 0.06 35);
+
   /* Cool Blue Glow Right */
-  --color-page-background: #ffffff;
-  --color-cool-blue: rgba(70, 130, 180, 0.5);
+  --color-page-background: oklch(1 0 0);
+  --color-cool-blue: oklch(0.6 0.08 230 / 0.5);
 
   /* Shadows */
   --shadow-sm: 0 2px 6px -1px rgb(0 0 0 / 0.06);
@@ -202,6 +232,13 @@
     animation-timing-function: linear;
     animation-iteration-count: infinite;
     filter: blur(80px);
+  }
+
+  /* Respect prefers-reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    .animated-background span {
+      animation: none;
+    }
   }
 
   .animated-background span:nth-child(1) {

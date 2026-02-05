@@ -58,7 +58,7 @@ const Text = React.forwardRef<HTMLParagraphElement, TextProps>(
     <p
       ref={ref}
       className={cn(
-        "text-[#545454]",
+        "text-foreground",
         textSizes[size],
         textWeights[weight],
         muted && "text-muted-foreground",

@@ -8,7 +8,17 @@ import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
 import { PageTransition } from "@/design-system/components/ui/page-transition";
 import { Heading, Text } from "@/design-system/components/ui/typography";
 import { Button } from "@/design-system/components/ui/button";
-import { DollarSign, CreditCard, Clock, Lock, TrendingUp, ArrowRight, Loader2 } from "lucide-react";
+import {
+  DollarSign,
+  CreditCard,
+  Clock,
+  Lock,
+  TrendingUp,
+  ArrowRight,
+  AlertTriangle,
+  RefreshCw,
+} from "lucide-react";
+import { MetricCardSkeleton } from "@/design-system/components/ui/skeleton";
 import { getBillingSummary, type BillingSummary } from "@/src/lib/queries/billing";
 
 interface MetricCardProps {
@@ -45,8 +55,8 @@ function MetricCard({ title, value, subtitle, icon: Icon, trend, trendUp }: Metr
             </div>
           )}
         </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#195B63]/10">
-          <Icon className="h-6 w-6 text-[#195B63]" />
+        <div className="bg-teal-dark/10 flex h-12 w-12 items-center justify-center rounded-full">
+          <Icon className="text-teal-dark h-6 w-6" />
         </div>
       </div>
     </CardWrapper>
@@ -66,22 +76,26 @@ function formatCurrency(value: number): string {
 export default function BillingPage() {
   const [summary, setSummary] = React.useState<BillingSummary | null>(null);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
   // Load billing summary from Supabase
-  React.useEffect(() => {
-    async function loadBilling() {
-      try {
-        setLoading(true);
-        const data = await getBillingSummary();
-        setSummary(data);
-      } catch (err) {
-        console.error("Failed to load billing:", err);
-      } finally {
-        setLoading(false);
-      }
+  const loadBilling = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getBillingSummary();
+      setSummary(data);
+    } catch (err) {
+      console.error("Failed to load billing:", err);
+      setError("Unable to load billing data. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    loadBilling();
   }, []);
+
+  React.useEffect(() => {
+    loadBilling();
+  }, [loadBilling]);
 
   return (
     <div className="min-h-screen pb-24 lg:pb-0">
@@ -105,54 +119,72 @@ export default function BillingPage() {
                 <Text muted>Track your practice revenue and collections (6-month history)</Text>
               </div>
 
-              {/* Loading State */}
-              {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="text-primary h-8 w-8 animate-spin" />
-                    <Text size="sm" muted>
-                      Loading billing data...
-                    </Text>
-                  </div>
+              {/* Loading State with Skeleton */}
+              {loading && (
+                <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <MetricCardSkeleton />
+                  <MetricCardSkeleton />
+                  <MetricCardSkeleton />
                 </div>
-              ) : (
-                <>
-                  {/* Metrics Grid */}
-                  <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-                    <MetricCard
-                      title="Total Charged"
-                      value={formatCurrency(summary?.totalCharged || 0)}
-                      subtitle={`${summary?.invoiceCount || 0} Invoices (6 months)`}
-                      icon={DollarSign}
-                      trend={`${summary?.paidCount || 0} paid, ${summary?.pendingCount || 0} pending`}
-                      trendUp={true}
-                    />
-                    <MetricCard
-                      title="Collections"
-                      value={formatCurrency(summary?.totalCollected || 0)}
-                      subtitle={`${summary?.collectionRate || 0}% Collection Rate`}
-                      icon={CreditCard}
-                      trend={
-                        summary?.collectionRate && summary.collectionRate >= 80
-                          ? "Above industry average"
-                          : "Below target"
-                      }
-                      trendUp={(summary?.collectionRate || 0) >= 80}
-                    />
-                    <MetricCard
-                      title="Outstanding AR"
-                      value={formatCurrency(summary?.outstandingAR || 0)}
-                      subtitle="Balance Due"
-                      icon={Clock}
-                      trend={
-                        summary?.outstandingAR && summary.outstandingAR > 0
-                          ? "Requires follow-up"
-                          : "All collected"
-                      }
-                      trendUp={(summary?.outstandingAR || 0) === 0}
-                    />
+              )}
+
+              {/* Error State */}
+              {error && !loading && (
+                <CardWrapper className="mb-8 p-8">
+                  <div className="flex flex-col items-center justify-center py-6 text-center">
+                    <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+                      <AlertTriangle className="h-7 w-7 text-red-600" />
+                    </div>
+                    <Heading level={4} className="mb-2 text-lg font-semibold">
+                      Unable to Load Billing Data
+                    </Heading>
+                    <Text muted className="mb-4 max-w-sm">
+                      {error}
+                    </Text>
+                    <Button onClick={loadBilling} variant="outline" className="gap-2">
+                      <RefreshCw className="h-4 w-4" />
+                      Try Again
+                    </Button>
                   </div>
-                </>
+                </CardWrapper>
+              )}
+
+              {/* Metrics Grid - shown when loaded successfully */}
+              {!loading && !error && (
+                <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <MetricCard
+                    title="Total Charged"
+                    value={formatCurrency(summary?.totalCharged || 0)}
+                    subtitle={`${(summary?.invoiceCount || 0).toLocaleString()} Invoices (6 months)`}
+                    icon={DollarSign}
+                    trend={`${(summary?.paidCount || 0).toLocaleString()} paid, ${(summary?.pendingCount || 0).toLocaleString()} pending`}
+                    trendUp={true}
+                  />
+                  <MetricCard
+                    title="Collections"
+                    value={formatCurrency(summary?.totalCollected || 0)}
+                    subtitle={`${summary?.collectionRate || 0}% Collection Rate`}
+                    icon={CreditCard}
+                    trend={
+                      summary?.collectionRate && summary.collectionRate >= 80
+                        ? "Above industry average"
+                        : "Below target"
+                    }
+                    trendUp={(summary?.collectionRate || 0) >= 80}
+                  />
+                  <MetricCard
+                    title="Outstanding AR"
+                    value={formatCurrency(summary?.outstandingAR || 0)}
+                    subtitle="Balance Due"
+                    icon={Clock}
+                    trend={
+                      summary?.outstandingAR && summary.outstandingAR > 0
+                        ? "Requires follow-up"
+                        : "All collected"
+                    }
+                    trendUp={(summary?.outstandingAR || 0) === 0}
+                  />
+                </div>
               )}
 
               {/* Coming Soon Card */}
@@ -184,7 +216,7 @@ export default function BillingPage() {
               </CardWrapper>
 
               {/* Upsell Banner */}
-              <div className="mt-6 overflow-hidden rounded-xl bg-gradient-to-r from-[#195B63] to-[#2D8A95] p-6 text-white">
+              <div className="from-teal-dark to-teal mt-6 overflow-hidden rounded-xl bg-gradient-to-r p-6 text-white">
                 <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
                   <div>
                     <Heading level={4} className="mb-1 text-lg font-semibold text-white">
@@ -196,7 +228,7 @@ export default function BillingPage() {
                   </div>
                   <Button
                     variant="secondary"
-                    className="gap-2 bg-white text-[#195B63] hover:bg-white/90"
+                    className="text-teal-dark gap-2 bg-white hover:bg-white/90"
                   >
                     Learn More
                     <ArrowRight className="h-4 w-4" />

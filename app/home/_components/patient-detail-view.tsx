@@ -172,7 +172,7 @@ function parseVoiceMessage(
 ): { isVoice: boolean; duration: string } | null {
   if (!messageBody) return null;
   const match = messageBody.match(/^\[Voice message - (\d+:\d+)\]/);
-  if (match) {
+  if (match && match[1]) {
     return { isVoice: true, duration: match[1] };
   }
   return null;
@@ -228,7 +228,6 @@ function PatientChatThread({ patient }: { patient: PatientDetail }) {
   const handleSend = () => {
     if (messageInput.trim()) {
       // Handle sending message (would integrate with backend)
-      console.log("Sending message:", messageInput);
       setMessageInput("");
     }
   };
@@ -753,7 +752,7 @@ export function PatientDetailView({ patient, className }: PatientDetailViewProps
                 {patient.outcomeMeasures.map((measure) => (
                   <Card
                     key={measure.id}
-                    className="p-3 transition-all hover:border-white hover:bg-[#F6F3EB]/70 hover:shadow-md sm:p-4"
+                    className="hover:bg-card-hover/70 p-3 transition-all hover:border-white hover:shadow-md sm:p-4"
                   >
                     <div className="flex items-start justify-between">
                       <div>
@@ -799,7 +798,7 @@ export function PatientDetailView({ patient, className }: PatientDetailViewProps
                 {patient.invoices.map((invoice) => (
                   <Card
                     key={invoice.id}
-                    className="p-3 transition-all hover:border-white hover:bg-[#F6F3EB]/70 hover:shadow-md sm:p-4"
+                    className="hover:bg-card-hover/70 p-3 transition-all hover:border-white hover:shadow-md sm:p-4"
                   >
                     <div className="flex items-start justify-between">
                       <div>
@@ -858,7 +857,7 @@ export function PatientDetailView({ patient, className }: PatientDetailViewProps
                 {patient.reviews.map((review) => (
                   <Card
                     key={review.id}
-                    className="p-3 transition-all hover:border-white hover:bg-[#F6F3EB]/70 hover:shadow-md sm:p-4"
+                    className="hover:bg-card-hover/70 p-3 transition-all hover:border-white hover:shadow-md sm:p-4"
                   >
                     <div className="flex items-start justify-between">
                       <div className="min-w-0 flex-1">

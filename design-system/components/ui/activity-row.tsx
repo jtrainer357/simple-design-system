@@ -31,7 +31,7 @@ export function ActivityRow({
         <div
           className={cn(
             "relative z-10 mt-4 h-2.5 w-2.5 shrink-0 rounded-full ring-2 ring-white",
-            isRecent ? "bg-[#FF8D6E]" : "bg-stone-300"
+            isRecent ? "bg-activity-indicator" : "bg-stone-300"
           )}
         />
         {/* Vertical dashed line (hidden for last item) */}

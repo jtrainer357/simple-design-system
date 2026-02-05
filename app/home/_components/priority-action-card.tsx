@@ -68,7 +68,7 @@ export function PriorityActionCard({ action, className }: PriorityActionCardProp
               {action.patientAvatar && (
                 <AvatarImage src={action.patientAvatar} alt={action.patientName} />
               )}
-              <AvatarFallback className="bg-[#8CA7A2] text-sm font-semibold text-white sm:text-base">
+              <AvatarFallback className="bg-avatar-fallback text-sm font-semibold text-white sm:text-base">
                 {initials}
               </AvatarFallback>
             </Avatar>

@@ -45,7 +45,7 @@ export function OutstandingCard({
           </Button>
         </div>
         <div className="flex items-center gap-3 sm:gap-4">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-[0.5px] border-[#E9EFEE] sm:h-12 sm:w-12">
+          <div className="border-card-border-subtle flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-[0.5px] sm:h-12 sm:w-12">
             <Icon className="text-muted-foreground h-5 w-5 sm:h-6 sm:w-6" />
           </div>
           <div>

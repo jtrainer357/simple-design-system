@@ -51,7 +51,9 @@ export function ScheduleRowCard({
         <div className="flex min-w-0 flex-1 items-center gap-4">
           <Avatar className="ml-4 h-10 w-10 shrink-0">
             {avatarSrc && <AvatarImage src={avatarSrc} alt={patient} />}
-            <AvatarFallback className="bg-[#8CA7A2] text-xs text-white">{initials}</AvatarFallback>
+            <AvatarFallback className="bg-avatar-fallback text-xs text-white">
+              {initials}
+            </AvatarFallback>
           </Avatar>
           <div className="min-w-0">
             <h4 className="truncate text-sm font-bold">{patient}</h4>

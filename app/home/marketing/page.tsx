@@ -23,7 +23,7 @@ function MetricCard({
   value,
   subtitle,
   icon: Icon,
-  iconColor = "text-[#195B63]",
+  iconColor = "text-teal-dark",
 }: MetricCardProps) {
   return (
     <CardWrapper className="p-6">
@@ -39,7 +39,7 @@ function MetricCard({
             {subtitle}
           </Text>
         </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#195B63]/10">
+        <div className="bg-teal-dark/10 flex h-12 w-12 items-center justify-center rounded-full">
           <Icon className={`h-6 w-6 ${iconColor}`} />
         </div>
       </div>
@@ -133,7 +133,7 @@ export default function MarketingPage() {
               </div>
 
               {/* Upsell Banner - Teal Gradient */}
-              <div className="overflow-hidden rounded-xl bg-gradient-to-r from-[#0D9488] to-[#14B8A6] p-8 text-white">
+              <div className="from-teal to-teal/80 overflow-hidden rounded-xl bg-gradient-to-r p-8 text-white">
                 <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
                   <div className="flex-1">
                     <div className="mb-2 flex items-center gap-2">
@@ -154,7 +154,7 @@ export default function MarketingPage() {
                   <div className="flex flex-col gap-3 sm:flex-row">
                     <Button
                       variant="secondary"
-                      className="gap-2 bg-white text-[#0D9488] hover:bg-white/90"
+                      className="text-teal gap-2 bg-white hover:bg-white/90"
                     >
                       Upgrade Now
                       <ArrowRight className="h-4 w-4" />

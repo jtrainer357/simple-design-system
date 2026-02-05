@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 
 import { cn } from "@/design-system/lib/utils";
 
-const cardVariants = cva("text-card-foreground rounded-lg border border-[#E9EFEE]", {
+const cardVariants = cva("text-card-foreground rounded-lg border border-card-border-subtle", {
   variants: {
     opacity: {
       default: "bg-white/90 backdrop-blur-sm",

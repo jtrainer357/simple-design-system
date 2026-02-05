@@ -1898,7 +1898,7 @@ import { Home, User, Calendar, MessageSquare } from 'lucide-react'`}
                         key={index}
                         variant="ghost"
                         size="icon"
-                        className={`h-12 w-12 rounded-full border-[0.5px] border-[#B3C6C4] ${
+                        className={`border-selected-border h-12 w-12 rounded-full border-[0.5px] ${
                           item.active ? "bg-foreground border-0 text-white" : ""
                         }`}
                       >
@@ -1921,7 +1921,7 @@ import { Home, User, Calendar, MessageSquare } from 'lucide-react'`}
                         key={index}
                         variant="ghost"
                         size="icon"
-                        className={`h-11 w-11 rounded-full border-[0.5px] border-[#B3C6C4] ${
+                        className={`border-selected-border h-11 w-11 rounded-full border-[0.5px] ${
                           item.active ? "bg-foreground border-0 text-white" : ""
                         }`}
                       >

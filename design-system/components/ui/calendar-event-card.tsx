@@ -6,12 +6,13 @@ import { cn } from "@/design-system/lib/utils";
 export type EventColor =
   | "blue"
   | "pink"
-  | "purple"
+  | "neutral"
   | "green"
   | "yellow"
   | "gray"
   | "red"
-  | "orange";
+  | "orange"
+  | "purple";
 
 interface CalendarEventCardProps {
   title: string;
@@ -27,7 +28,7 @@ const colorStyles: Record<
   { bg: string; text: string; borderLeft: string; borderOuter: string }
 > = {
   blue: {
-    bg: "bg-[#CBDDE0]/60",
+    bg: "bg-event-blue-bg/60",
     text: "text-teal",
     borderLeft: "border-l-teal",
     borderOuter: "border-teal/30",
@@ -38,23 +39,23 @@ const colorStyles: Record<
     borderLeft: "border-l-primary",
     borderOuter: "border-primary/20",
   },
-  purple: {
-    bg: "bg-[#E8E4DF]/80",
+  neutral: {
+    bg: "bg-event-neutral-bg/80",
     text: "text-foreground",
-    borderLeft: "border-l-[#9B8F85]",
-    borderOuter: "border-[#9B8F85]/30",
+    borderLeft: "border-l-event-neutral-border",
+    borderOuter: "border-event-neutral-border/30",
   },
   green: {
-    bg: "bg-[#C6DCCE]/50",
-    text: "text-[#3D6B4F]",
-    borderLeft: "border-l-[#6B8B73]",
-    borderOuter: "border-[#6B8B73]/30",
+    bg: "bg-event-green-bg/50",
+    text: "text-event-green-text",
+    borderLeft: "border-l-event-green-border",
+    borderOuter: "border-event-green-border/30",
   },
   yellow: {
-    bg: "bg-[#FEF5D5]/60",
-    text: "text-[#8B7355]",
-    borderLeft: "border-l-[#D4B896]",
-    borderOuter: "border-[#D4B896]/40",
+    bg: "bg-event-warm-bg/60",
+    text: "text-event-warm-text",
+    borderLeft: "border-l-event-warm-border",
+    borderOuter: "border-event-warm-border/40",
   },
   gray: {
     bg: "bg-muted/80",
@@ -73,6 +74,13 @@ const colorStyles: Record<
     text: "text-primary",
     borderLeft: "border-l-primary/80",
     borderOuter: "border-primary/20",
+  },
+  // purple is an alias for neutral (no actual purple colors in healthcare app)
+  purple: {
+    bg: "bg-event-neutral-bg/80",
+    text: "text-foreground",
+    borderLeft: "border-l-event-neutral-border",
+    borderOuter: "border-event-neutral-border/30",
   },
 };
 
