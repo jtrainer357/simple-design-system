@@ -30,6 +30,245 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
 const PRACTICE_ID = '550e8400-e29b-41d4-a716-446655440000';
 const DATA_DIR = join(__dirname, '../AlldataUpdatesSmall');
 
+// ============================================================================
+// DEMOGRAPHIC AVATAR SYSTEM
+// Generates demographically-appropriate avatars based on name, age, and ethnicity
+// ============================================================================
+
+// Avatar database organized by gender > ethnicity > age range
+const AVATAR_DATABASE = {
+  male: {
+    caucasian: {
+      young: [1, 2, 5, 8, 11, 14, 21, 24, 27, 30],
+      middle: [3, 6, 9, 12, 17, 20, 23, 26, 29, 32],
+      senior: [4, 7, 10, 13, 18, 19, 22, 25, 28, 31]
+    },
+    asian: {
+      young: [35, 40, 45, 50, 55, 60],
+      middle: [36, 41, 46, 51, 56, 61],
+      senior: [37, 42, 47, 52, 57, 62]
+    },
+    hispanic: {
+      young: [33, 38, 43, 48, 53, 58],
+      middle: [34, 39, 44, 49, 54, 59],
+      senior: [63, 64, 65, 66, 67, 68]
+    },
+    african_american: {
+      young: [15, 16, 69, 70, 71, 72],
+      middle: [73, 74, 75, 76, 77, 78],
+      senior: [79, 80, 81, 82, 83, 84]
+    },
+    south_asian: {
+      young: [35, 40, 45, 50, 55, 60],
+      middle: [36, 41, 46, 51, 56, 61],
+      senior: [37, 42, 47, 52, 57, 62]
+    },
+    middle_eastern: {
+      young: [33, 38, 43, 48, 53, 58],
+      middle: [34, 39, 44, 49, 54, 59],
+      senior: [63, 64, 65, 66, 67, 68]
+    }
+  },
+  female: {
+    caucasian: {
+      young: [1, 2, 5, 8, 11, 14, 21, 24, 27, 30],
+      middle: [3, 6, 9, 12, 17, 20, 23, 26, 29, 32],
+      senior: [4, 7, 10, 13, 18, 19, 22, 25, 28, 31]
+    },
+    asian: {
+      young: [35, 40, 45, 50, 55, 60],
+      middle: [36, 41, 46, 51, 56, 61],
+      senior: [37, 42, 47, 52, 57, 62]
+    },
+    hispanic: {
+      young: [33, 38, 43, 48, 53, 58],
+      middle: [34, 39, 44, 49, 54, 59],
+      senior: [63, 64, 65, 66, 67, 68]
+    },
+    african_american: {
+      young: [15, 16, 69, 70, 71, 72],
+      middle: [73, 74, 75, 76, 77, 78],
+      senior: [79, 80, 81, 82, 83, 84]
+    },
+    south_asian: {
+      young: [35, 40, 45, 50, 55, 60],
+      middle: [36, 41, 46, 51, 56, 61],
+      senior: [37, 42, 47, 52, 57, 62]
+    },
+    middle_eastern: {
+      young: [33, 38, 43, 48, 53, 58],
+      middle: [34, 39, 44, 49, 54, 59],
+      senior: [63, 64, 65, 66, 67, 68]
+    }
+  }
+};
+
+// Common first names by gender for inference
+const MALE_NAMES = new Set([
+  'james', 'john', 'robert', 'michael', 'david', 'william', 'richard', 'joseph',
+  'thomas', 'charles', 'christopher', 'daniel', 'matthew', 'anthony', 'mark',
+  'donald', 'steven', 'paul', 'andrew', 'joshua', 'kenneth', 'kevin', 'brian',
+  'george', 'timothy', 'ronald', 'edward', 'jason', 'jeffrey', 'ryan', 'jacob',
+  'gary', 'nicholas', 'eric', 'jonathan', 'stephen', 'larry', 'justin', 'scott',
+  'brandon', 'benjamin', 'samuel', 'raymond', 'gregory', 'frank', 'alexander',
+  'marcus', 'adam', 'joe', 'herry', 'kane', 'tahsan', 'raj', 'wei', 'chen',
+  'carlos', 'miguel', 'luis', 'ahmed', 'mohammad', 'ali', 'omar'
+]);
+
+const FEMALE_NAMES = new Set([
+  'mary', 'patricia', 'jennifer', 'linda', 'elizabeth', 'barbara', 'susan',
+  'jessica', 'sarah', 'karen', 'lisa', 'nancy', 'betty', 'margaret', 'sandra',
+  'ashley', 'kimberly', 'emily', 'donna', 'michelle', 'dorothy', 'carol',
+  'amanda', 'melissa', 'deborah', 'stephanie', 'rebecca', 'sharon', 'laura',
+  'cynthia', 'kathleen', 'amy', 'angela', 'shirley', 'anna', 'brenda', 'pamela',
+  'emma', 'nicole', 'helen', 'samantha', 'katherine', 'christine', 'debra',
+  'rachel', 'carolyn', 'janet', 'catherine', 'maria', 'heather', 'diane',
+  'ruth', 'julie', 'olivia', 'joyce', 'virginia', 'victoria', 'kelly', 'lauren',
+  'christina', 'joan', 'evelyn', 'judith', 'megan', 'andrea', 'cheryl', 'hannah',
+  'jacqueline', 'martha', 'gloria', 'teresa', 'ann', 'sara', 'madison', 'frances',
+  'kathryn', 'janice', 'jean', 'abigail', 'alice', 'judy', 'sophia', 'grace',
+  'aisha', 'fatima', 'priya', 'mei', 'yuki', 'rosa', 'carmen', 'elena'
+]);
+
+// Last name to ethnicity mapping
+const ETHNICITY_BY_LAST_NAME = {
+  // Asian surnames
+  chen: 'asian', liu: 'asian', wang: 'asian', zhang: 'asian', li: 'asian',
+  yang: 'asian', huang: 'asian', zhao: 'asian', wu: 'asian', zhou: 'asian',
+  kim: 'asian', park: 'asian', lee: 'asian', choi: 'asian', jung: 'asian',
+  nakamura: 'asian', yamamoto: 'asian', tanaka: 'asian', suzuki: 'asian',
+  nguyen: 'asian', tran: 'asian', pham: 'asian',
+
+  // South Asian surnames
+  patel: 'south_asian', sharma: 'south_asian', singh: 'south_asian',
+  kumar: 'south_asian', gupta: 'south_asian', reddy: 'south_asian',
+  khan: 'south_asian', ali: 'south_asian', rahman: 'south_asian',
+
+  // Hispanic surnames
+  rodriguez: 'hispanic', martinez: 'hispanic', garcia: 'hispanic',
+  hernandez: 'hispanic', lopez: 'hispanic', gonzalez: 'hispanic',
+  perez: 'hispanic', sanchez: 'hispanic', ramirez: 'hispanic',
+  torres: 'hispanic', flores: 'hispanic', rivera: 'hispanic',
+  gomez: 'hispanic', diaz: 'hispanic', cruz: 'hispanic',
+  morales: 'hispanic', ortiz: 'hispanic', reyes: 'hispanic',
+
+  // African American (common surnames)
+  washington: 'african_american', jefferson: 'african_american',
+  brooks: 'african_american', jackson: 'african_american',
+  williams: 'african_american', jones: 'african_american',
+  brown: 'african_american', davis: 'african_american',
+
+  // Middle Eastern surnames
+  hassan: 'middle_eastern', ahmed: 'middle_eastern', mohammad: 'middle_eastern',
+  ali: 'middle_eastern', hussein: 'middle_eastern', ibrahim: 'middle_eastern',
+
+  // Italian surnames (Caucasian)
+  rossi: 'caucasian', russo: 'caucasian', ferrari: 'caucasian',
+  esposito: 'caucasian', bianchi: 'caucasian', romano: 'caucasian',
+  colombo: 'caucasian', ricci: 'caucasian', marino: 'caucasian',
+  greco: 'caucasian', bruno: 'caucasian', gallo: 'caucasian',
+  conti: 'caucasian', benedetti: 'caucasian', antonelli: 'caucasian',
+  campanelli: 'caucasian',
+
+  // Irish surnames (Caucasian)
+  murphy: 'caucasian', kelly: 'caucasian', sullivan: 'caucasian',
+  walsh: 'caucasian', smith: 'caucasian', obrien: 'caucasian',
+  byrne: 'caucasian', ryan: 'caucasian', oconnor: 'caucasian',
+  kennedy: 'caucasian', lynch: 'caucasian', murray: 'caucasian',
+  quinn: 'caucasian', moore: 'caucasian', mccarthy: 'caucasian',
+  donovan: 'caucasian',
+
+  // Polish surnames (Caucasian)
+  kowalski: 'caucasian', nowak: 'caucasian', wojcik: 'caucasian',
+  kowalczyk: 'caucasian', kaminski: 'caucasian', lewandowski: 'caucasian',
+
+  // Jewish surnames (Caucasian)
+  goldstein: 'caucasian', cohen: 'caucasian', levy: 'caucasian',
+  friedman: 'caucasian', schwartz: 'caucasian', shapiro: 'caucasian',
+
+  // German surnames (Caucasian)
+  schmidt: 'caucasian', mueller: 'caucasian', schneider: 'caucasian',
+  fischer: 'caucasian', weber: 'caucasian', meyer: 'caucasian',
+
+  // English/Generic surnames (Caucasian)
+  johnson: 'caucasian', thompson: 'caucasian', white: 'caucasian',
+  harris: 'caucasian', martin: 'caucasian', taylor: 'caucasian',
+  anderson: 'caucasian', thomas: 'caucasian', jackson: 'caucasian',
+  wilson: 'caucasian', mitchell: 'caucasian', clark: 'caucasian'
+};
+
+// Calculate age from date of birth
+function calculateAge(dateOfBirth) {
+  if (!dateOfBirth) return 40; // Default to middle age
+  const dob = new Date(dateOfBirth);
+  const today = new Date('2026-02-06'); // Demo date
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+    age--;
+  }
+  return age;
+}
+
+// Get age range category
+function getAgeRange(age) {
+  if (age < 36) return 'young';
+  if (age < 56) return 'middle';
+  return 'senior';
+}
+
+// Infer gender from first name
+function inferGender(firstName) {
+  const nameLower = firstName.toLowerCase();
+  if (FEMALE_NAMES.has(nameLower)) return 'female';
+  if (MALE_NAMES.has(nameLower)) return 'male';
+  // Default based on common patterns
+  if (nameLower.endsWith('a') || nameLower.endsWith('ie') || nameLower.endsWith('y')) {
+    return 'female';
+  }
+  return 'male';
+}
+
+// Infer ethnicity from last name
+function inferEthnicity(lastName) {
+  const nameLower = lastName.toLowerCase().replace(/['\-\s]/g, '');
+  return ETHNICITY_BY_LAST_NAME[nameLower] || 'caucasian';
+}
+
+// Generate deterministic index from patient data
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash);
+}
+
+// Generate demographic-appropriate avatar URL
+function getDemographicAvatar(firstName, lastName, dateOfBirth, patientId) {
+  const gender = inferGender(firstName);
+  const ethnicity = inferEthnicity(lastName);
+  const age = calculateAge(dateOfBirth);
+  const ageRange = getAgeRange(age);
+
+  const avatarOptions = AVATAR_DATABASE[gender]?.[ethnicity]?.[ageRange]
+    || AVATAR_DATABASE[gender]?.caucasian?.[ageRange]
+    || [1, 2, 3, 4, 5];
+
+  // Use patient ID to get consistent avatar selection
+  const hash = hashString(patientId || `${firstName}${lastName}${dateOfBirth}`);
+  const index = hash % avatarOptions.length;
+  const avatarId = avatarOptions[index];
+
+  return `https://xsgames.co/randomusers/assets/avatars/${gender}/${avatarId}.jpg`;
+}
+
+// ============================================================================
+// END DEMOGRAPHIC AVATAR SYSTEM
+// ============================================================================
+
 // Helper to calculate end time from start time and duration
 function calculateEndTime(startTime, durationMinutes) {
   if (!startTime) return '09:45:00';
@@ -59,6 +298,19 @@ function mapPatient(row) {
   if (row.status === 'inactive') status = 'Inactive';
   else if (row.status === 'discharged') status = 'Discharged';
 
+  // Deterministically set ~27% of patients to have no avatar (just initials)
+  // Use hash of name to get better distribution across patients
+  const nameHash = hashString(`${row.first_name}${row.last_name}`);
+  const noAvatar = (nameHash % 100) < 35; // Target ~27% (adjusted for hash distribution)
+
+  // Generate demographically-appropriate avatar URL (or null for 27%)
+  const avatarUrl = noAvatar ? null : getDemographicAvatar(
+    row.first_name,
+    row.last_name,
+    row.date_of_birth,
+    row.id
+  );
+
   return {
     id: row.id,
     practice_id: row.practice_id,
@@ -75,6 +327,7 @@ function mapPatient(row) {
     insurance_member_id: row.insurance_id,
     status: status,
     preferred_contact: row.preferred_contact,
+    avatar_url: avatarUrl,
     created_at: row.created_at,
     updated_at: row.updated_at
   };
