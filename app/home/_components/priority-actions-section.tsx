@@ -6,7 +6,7 @@ import Link from "next/link";
 import { PriorityAction } from "@/design-system/components/ui/priority-action";
 import { AIActionCard } from "@/design-system/components/ui/ai-action-card";
 import { Heading, Text } from "@/design-system/components/ui/typography";
-import { AlertTriangle, Database, Loader2 } from "lucide-react";
+import { AlertTriangle, Database } from "lucide-react";
 import { PriorityActionCardSkeleton, Skeleton } from "@/design-system/components/ui/skeleton";
 import { Button } from "@/design-system/components/ui/button";
 import { getPriorityActions } from "@/src/lib/queries/priority-actions";

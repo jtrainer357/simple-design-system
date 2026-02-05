@@ -22,21 +22,15 @@ interface AuditLogEntry {
 
 /**
  * Log an auditable action for HIPAA compliance.
- * For hackathon demo, this logs to console.
+ * For hackathon demo, this is a no-op.
  * In production, this would write to a secure audit log table.
  */
-export async function logAudit(entry: AuditLogEntry): Promise<void> {
-  try {
-    // For hackathon demo, just log to console
-    console.log("[Audit]", {
-      timestamp: new Date().toISOString(),
-      action: entry.action,
-      resourceType: entry.resourceType,
-      resourceId: entry.resourceId || null,
-      details: entry.details || {},
-    });
-  } catch (error) {
-    // Audit logging should never break the main request
-    console.error("[Audit] Failed to log:", error);
-  }
+export async function logAudit(_entry: AuditLogEntry): Promise<void> {
+  // No-op for hackathon demo
+  // In production, this would write to a secure audit log table:
+  // - timestamp: new Date().toISOString()
+  // - action: entry.action
+  // - resourceType: entry.resourceType
+  // - resourceId: entry.resourceId
+  // - details: entry.details
 }

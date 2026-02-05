@@ -5,7 +5,8 @@
 
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
-type RelationshipDefinition = {
+// Type for Supabase relationship definitions (unused but kept for documentation)
+type _RelationshipDefinition = {
   foreignKeyName: string;
   columns: string[];
   isOneToOne: boolean;

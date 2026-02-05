@@ -19,7 +19,7 @@ interface PreviewStepProps {
 }
 
 export function PreviewStep({
-  batchId,
+  batchId: _batchId,
   stats = { patientsReady: 5, documentsMatched: 5, issuesCount: 1 },
   onCommit,
   isCommitting = false,
