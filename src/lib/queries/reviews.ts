@@ -9,14 +9,20 @@ import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
 
 /**
  * Get all reviews for a specific patient
+ * @param patientId - The patient's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function getPatientReviews(patientId: string): Promise<Review[]> {
+export async function getPatientReviews(
+  patientId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<Review[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
     .from("reviews")
     .select("*")
     .eq("patient_id", patientId)
+    .eq("practice_id", practiceId)
     .order("review_date", { ascending: false });
 
   if (error) {

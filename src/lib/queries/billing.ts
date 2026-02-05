@@ -182,14 +182,20 @@ export async function getBillingSummary(
 
 /**
  * Get patient invoices
+ * @param patientId - The patient's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function getPatientInvoices(patientId: string): Promise<Invoice[]> {
+export async function getPatientInvoices(
+  patientId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<Invoice[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
     .from("invoices")
     .select("*")
     .eq("patient_id", patientId)
+    .eq("practice_id", practiceId)
     .order("date_of_service", { ascending: false });
 
   if (error) {

@@ -2,7 +2,9 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ChevronDown, Loader2, Database } from "lucide-react";
+import { ChevronDown, Database, Users } from "lucide-react";
+import { PatientCardSkeleton, Skeleton } from "@/design-system/components/ui/skeleton";
+import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
 import { Button } from "@/design-system/components/ui/button";
 import { FilterTabs } from "@/design-system/components/ui/filter-tabs";
 import { PatientListSidebar, Patient } from "./patient-list-sidebar";
@@ -380,19 +382,22 @@ export function PatientsPage({ initialPatientId }: PatientsPageProps) {
         } else if (patientsData.length > 0 && patientsData[0]) {
           setSelectedPatient(dbPatientToListItem(patientsData[0]));
         }
-      } catch (err) {
-        console.error("Failed to load patients:", err);
+      } catch {
+        // Error loading patients
       } finally {
         setLoading(false);
       }
     }
 
-    loadPatients();
+    void loadPatients();
   }, [initialPatientId]);
 
   // Load selected patient details
   React.useEffect(() => {
     if (!selectedPatient || !dbReady) return;
+
+    const patientId = selectedPatient.id;
+    let cancelled = false;
 
     async function loadPatientDetails() {
       try {
@@ -400,10 +405,12 @@ export function PatientsPage({ initialPatientId }: PatientsPageProps) {
 
         // Fetch patient details, priority actions, and visit summaries in parallel
         const [details, priorityActions, visitSummaries] = await Promise.all([
-          getPatientDetailsQuery(selectedPatient!.id),
-          getPatientPriorityActions(selectedPatient!.id),
-          getPatientVisitSummaries(selectedPatient!.id),
+          getPatientDetailsQuery(patientId),
+          getPatientPriorityActions(patientId),
+          getPatientVisitSummaries(patientId),
         ]);
+
+        if (cancelled) return;
 
         if (details) {
           const detailData = createPatientDetail(
@@ -419,15 +426,18 @@ export function PatientsPage({ initialPatientId }: PatientsPageProps) {
           detailData.prioritizedActions = priorityActions.map(dbActionToUiAction);
           setPatientDetails(detailData);
         }
-      } catch (err) {
-        console.error("Failed to load patient details:", err);
+      } catch {
+        // Error loading patient details
       } finally {
-        setDetailLoading(false);
+        if (!cancelled) setDetailLoading(false);
       }
     }
 
-    loadPatientDetails();
-  }, [selectedPatient?.id, dbReady]);
+    void loadPatientDetails();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedPatient, dbReady]);
 
   const handlePatientSelect = (patient: Patient) => {
     setSelectedPatient(patient);
@@ -436,13 +446,98 @@ export function PatientsPage({ initialPatientId }: PatientsPageProps) {
   // Convert patients for list
   const patientListItems = patients.map(dbPatientToListItem);
 
-  // Loading state
+  // Loading state with skeleton
   if (loading) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="text-primary mx-auto h-8 w-8 animate-spin" />
-          <p className="text-muted-foreground mt-3">Loading patients...</p>
+      <div className="flex h-full flex-col">
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-12">
+          {/* Patient List Column Skeleton */}
+          <div className="flex min-h-0 flex-col lg:col-span-5 xl:col-span-4">
+            <div className="mb-4 flex items-center gap-2">
+              <Skeleton className="h-9 w-24 rounded-full" />
+              <Skeleton className="h-9 w-16 rounded-full" />
+              <Skeleton className="h-9 w-14 rounded-full" />
+            </div>
+            <CardWrapper className="flex-1 p-4">
+              <Skeleton className="mb-4 h-10 w-full rounded-lg" />
+              <div className="space-y-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <PatientCardSkeleton key={i} />
+                ))}
+              </div>
+            </CardWrapper>
+          </div>
+          {/* Patient Detail Column Skeleton */}
+          <div className="flex min-h-0 flex-col lg:col-span-7 xl:col-span-8">
+            <div className="mb-4 flex justify-end">
+              <Skeleton className="h-10 w-32 rounded-full" />
+            </div>
+            <CardWrapper className="flex-1 p-6">
+              <div className="mb-6 flex items-center gap-4">
+                <Skeleton className="h-20 w-20 rounded-full" />
+                <div className="flex-1">
+                  <Skeleton className="mb-2 h-7 w-48" />
+                  <Skeleton className="mb-2 h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-20 rounded-lg" />
+                ))}
+              </div>
+              <Skeleton className="mt-6 h-8 w-full" />
+              <div className="mt-4 space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-16 rounded-lg" />
+                ))}
+              </div>
+            </CardWrapper>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Empty state (no patients after loading)
+  if (patientListItems.length === 0 && dbReady) {
+    return (
+      <div className="flex h-full flex-col">
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-12">
+          <div className="flex min-h-0 flex-col lg:col-span-5 xl:col-span-4">
+            <div className="mb-4 flex items-center justify-between">
+              <FilterTabs
+                tabs={patientFilterTabs}
+                activeTab={activeFilter}
+                onTabChange={setActiveFilter}
+              />
+            </div>
+            <CardWrapper className="flex flex-1 flex-col items-center justify-center">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
+                <Users className="h-7 w-7 text-gray-400" />
+              </div>
+              <Text size="sm" className="mb-1 font-semibold">
+                No Patients Found
+              </Text>
+              <Text size="xs" muted className="mb-4 text-center">
+                {activeFilter !== "all"
+                  ? `No ${activeFilter} patients in your practice.`
+                  : "Add your first patient to get started."}
+              </Text>
+              <Button size="sm">Add Patient</Button>
+            </CardWrapper>
+          </div>
+          <div className="flex min-h-0 flex-col lg:col-span-7 xl:col-span-8">
+            <div className="mb-4 flex items-center justify-end">
+              <Button className="gap-1.5 text-sm sm:gap-2 sm:text-base">
+                Add Patient
+                <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              </Button>
+            </div>
+            <CardWrapper className="flex flex-1 items-center justify-center">
+              <Text muted>Select a patient to view details</Text>
+            </CardWrapper>
+          </div>
         </div>
       </div>
     );
@@ -503,9 +598,27 @@ export function PatientsPage({ initialPatientId }: PatientsPageProps) {
             </Button>
           </div>
           {detailLoading ? (
-            <div className="flex min-h-0 flex-1 items-center justify-center">
-              <Loader2 className="text-primary h-8 w-8 animate-spin" />
-            </div>
+            <CardWrapper className="min-h-0 flex-1 p-6">
+              <div className="mb-6 flex items-center gap-4">
+                <Skeleton className="h-20 w-20 rounded-full" />
+                <div className="flex-1">
+                  <Skeleton className="mb-2 h-7 w-48" />
+                  <Skeleton className="mb-2 h-4 w-32" />
+                  <Skeleton className="h-4 w-24" />
+                </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-20 rounded-lg" />
+                ))}
+              </div>
+              <Skeleton className="mt-6 h-10 w-full rounded-lg" />
+              <div className="mt-4 space-y-3">
+                {Array.from({ length: 3 }).map((_, i) => (
+                  <Skeleton key={i} className="h-16 rounded-lg" />
+                ))}
+              </div>
+            </CardWrapper>
           ) : (
             <PatientDetailView patient={patientDetails} className="min-h-0 flex-1" />
           )}

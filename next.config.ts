@@ -1,11 +1,6 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  // Turbopack configuration to resolve root issues
-  experimental: {
-    turbo: {
-      root: ".",
-    },
-  },
+import type { NextConfig } from "next";
+
+const nextConfig: NextConfig = {
   // Disable the Next.js DevTools indicator in the corner
   devIndicators: false,
   // Configure allowed image domains

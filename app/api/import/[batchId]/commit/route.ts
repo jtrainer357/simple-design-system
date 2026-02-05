@@ -62,7 +62,7 @@ export async function POST(
     // Validate input (mappings are optional for synthetic data flow)
     const parsed = importCommitSchema.safeParse(body);
     if (!parsed.success) {
-      console.log("Validation warning:", parsed.error.flatten());
+      console.warn("Validation warning:", parsed.error.flatten());
     }
 
     const supabase = createServiceClient();
@@ -102,7 +102,7 @@ export async function POST(
     await supabase.from("appointments").delete().eq("practice_id", practiceId);
     await supabase.from("patients").delete().eq("practice_id", practiceId);
 
-    console.log(`[Import] Cleared existing data for practice ${practiceId}`);
+    console.warn(`[Import] Cleared existing data for practice ${practiceId}`);
 
     // ========================================
     // STEP 3: Insert Patients
@@ -153,7 +153,7 @@ export async function POST(
       }
     });
 
-    console.log(`[Import] Inserted ${insertedPatients?.length || 0} patients`);
+    console.warn(`[Import] Inserted ${insertedPatients?.length || 0} patients`);
 
     // ========================================
     // STEP 4: Insert Appointments
@@ -193,7 +193,7 @@ export async function POST(
       }
     });
 
-    console.log(`[Import] Inserted ${insertedAppointments?.length || 0} appointments`);
+    console.warn(`[Import] Inserted ${insertedAppointments?.length || 0} appointments`);
 
     // ========================================
     // STEP 5: Insert Outcome Measures
@@ -217,7 +217,7 @@ export async function POST(
       throw new Error("Failed to insert outcome measures");
     }
 
-    console.log(`[Import] Inserted ${measureInserts.length} outcome measures`);
+    console.warn(`[Import] Inserted ${measureInserts.length} outcome measures`);
 
     // ========================================
     // STEP 6: Insert Messages
@@ -241,7 +241,7 @@ export async function POST(
       throw new Error("Failed to insert messages");
     }
 
-    console.log(`[Import] Inserted ${messageInserts.length} messages`);
+    console.warn(`[Import] Inserted ${messageInserts.length} messages`);
 
     // ========================================
     // STEP 7: Insert Invoices
@@ -270,12 +270,12 @@ export async function POST(
       throw new Error("Failed to insert invoices");
     }
 
-    console.log(`[Import] Inserted ${invoiceInserts.length} invoices`);
+    console.warn(`[Import] Inserted ${invoiceInserts.length} invoices`);
 
     // ========================================
     // STEP 8: Run Claude Substrate Analysis
     // ========================================
-    console.log("[Import] Starting Claude substrate analysis...");
+    console.warn("[Import] Starting Claude substrate analysis...");
 
     const claudeActions: Array<{
       patient_id: string;
@@ -291,7 +291,7 @@ export async function POST(
         SYNTHETIC_APPOINTMENTS.some((a) => a.patient_id === p.id && a.date === today)
     ).slice(0, 12); // Limit to 12 for demo speed
 
-    console.log(`[Import] Analyzing ${priorityPatients.length} priority patients with Claude...`);
+    console.warn(`[Import] Analyzing ${priorityPatients.length} priority patients with Claude...`);
 
     for (const patient of priorityPatients) {
       const dbPatientId = patientIdMap.get(patient.id);
@@ -366,7 +366,7 @@ export async function POST(
           patient_name: `${patient.first_name} ${patient.last_name}`,
           actions,
         });
-        console.log(
+        console.warn(
           `[Import] Claude generated ${actions.length} actions for ${patient.first_name} ${patient.last_name}`
         );
       } catch (error) {
@@ -416,7 +416,7 @@ export async function POST(
         // Don't throw - continue without actions
       } else {
         insertedActions = data || [];
-        console.log(`[Import] Inserted ${insertedActions.length} priority actions`);
+        console.warn(`[Import] Inserted ${insertedActions.length} priority actions`);
 
         // Generate clinical tasks from actions
         for (const action of insertedActions) {
@@ -444,7 +444,7 @@ export async function POST(
       if (tasksError) {
         console.error("Failed to insert clinical tasks:", tasksError);
       } else {
-        console.log(`[Import] Inserted ${allTaskInserts.length} clinical tasks`);
+        console.warn(`[Import] Inserted ${allTaskInserts.length} clinical tasks`);
       }
     }
 
@@ -527,11 +527,14 @@ export async function POST(
       })),
     });
   } catch (error) {
+    // Log full error internally for debugging
     console.error("Error in import commit:", error);
+
+    // Return generic error to client - don't leak internal details
     return NextResponse.json(
       {
         error: "Failed to commit import",
-        details: error instanceof Error ? error.message : "Unknown error",
+        message: "An unexpected error occurred. Please try again or contact support.",
       },
       { status: 500 }
     );

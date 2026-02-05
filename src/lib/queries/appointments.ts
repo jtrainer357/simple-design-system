@@ -192,14 +192,22 @@ export async function getAppointmentStats(practiceId: string = DEMO_PRACTICE_ID)
 
 /**
  * Update appointment status
+ * @param appointmentId - The appointment's UUID
+ * @param status - The new status
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
 export async function updateAppointmentStatus(
   appointmentId: string,
-  status: "Scheduled" | "Completed" | "No-Show" | "Cancelled"
+  status: "Scheduled" | "Completed" | "No-Show" | "Cancelled",
+  practiceId: string = DEMO_PRACTICE_ID
 ): Promise<void> {
   const supabase = createClient();
 
-  const { error } = await supabase.from("appointments").update({ status }).eq("id", appointmentId);
+  const { error } = await supabase
+    .from("appointments")
+    .update({ status })
+    .eq("id", appointmentId)
+    .eq("practice_id", practiceId);
 
   if (error) {
     console.error("Failed to update appointment status:", error);

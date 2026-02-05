@@ -95,9 +95,12 @@ export interface PatientPriorityAction {
 
 /**
  * Get priority actions for a specific patient
+ * @param patientId - The patient's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
 export async function getPatientPriorityActions(
-  patientId: string
+  patientId: string,
+  practiceId: string = DEMO_PRACTICE_ID
 ): Promise<PatientPriorityAction[]> {
   const supabase = createClient();
 
@@ -105,6 +108,7 @@ export async function getPatientPriorityActions(
     .from("prioritized_actions")
     .select("*")
     .eq("patient_id", patientId)
+    .eq("practice_id", practiceId)
     .or("status.eq.pending,status.is.null")
     .order("created_at", { ascending: false });
 
@@ -138,8 +142,13 @@ export async function getPatientPriorityActions(
 
 /**
  * Mark a priority action as completed
+ * @param actionId - The action's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function completeAction(actionId: string): Promise<void> {
+export async function completeAction(
+  actionId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<void> {
   const supabase = createClient();
 
   const { error } = await (supabase as SupabaseAny)
@@ -148,7 +157,8 @@ export async function completeAction(actionId: string): Promise<void> {
       status: "completed",
       completed_at: new Date().toISOString(),
     })
-    .eq("id", actionId);
+    .eq("id", actionId)
+    .eq("practice_id", practiceId);
 
   if (error) {
     console.error("Failed to complete action:", error);
@@ -158,8 +168,13 @@ export async function completeAction(actionId: string): Promise<void> {
 
 /**
  * Mark a priority action as dismissed
+ * @param actionId - The action's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function dismissAction(actionId: string): Promise<void> {
+export async function dismissAction(
+  actionId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<void> {
   const supabase = createClient();
 
   const { error } = await (supabase as SupabaseAny)
@@ -168,7 +183,8 @@ export async function dismissAction(actionId: string): Promise<void> {
       status: "dismissed",
       completed_at: new Date().toISOString(),
     })
-    .eq("id", actionId);
+    .eq("id", actionId)
+    .eq("practice_id", practiceId);
 
   if (error) {
     console.error("Failed to dismiss action:", error);
@@ -178,8 +194,13 @@ export async function dismissAction(actionId: string): Promise<void> {
 
 /**
  * Complete all pending actions for a patient
+ * @param patientId - The patient's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function completeAllPatientActions(patientId: string): Promise<void> {
+export async function completeAllPatientActions(
+  patientId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<void> {
   const supabase = createClient();
 
   // Update priority actions
@@ -190,6 +211,7 @@ export async function completeAllPatientActions(patientId: string): Promise<void
       completed_at: new Date().toISOString(),
     })
     .eq("patient_id", patientId)
+    .eq("practice_id", practiceId)
     .or("status.eq.pending,status.is.null");
 
   if (actionsError) {
@@ -205,6 +227,7 @@ export async function completeAllPatientActions(patientId: string): Promise<void
       completed_at: new Date().toISOString(),
     })
     .eq("patient_id", patientId)
+    .eq("practice_id", practiceId)
     .eq("status", "pending");
 
   if (tasksError) {

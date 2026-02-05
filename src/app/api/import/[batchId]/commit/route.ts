@@ -49,7 +49,7 @@ export async function POST(
     const parsed = importCommitSchema.safeParse(body);
     if (!parsed.success) {
       // For demo, we can proceed without strict validation
-      console.log("Validation warning:", parsed.error.flatten());
+      console.warn("Validation warning:", parsed.error.flatten());
     }
 
     const practiceId = "demo-practice-id";
@@ -64,7 +64,9 @@ export async function POST(
     const messages = SYNTHETIC_MESSAGES;
     const invoices = SYNTHETIC_INVOICES;
 
-    console.log(`[Import] Loaded ${patients.length} patients, ${appointments.length} appointments`);
+    console.warn(
+      `[Import] Loaded ${patients.length} patients, ${appointments.length} appointments`
+    );
 
     // ========================================
     // STEP 2: Run Claude Substrate Analysis
@@ -84,7 +86,7 @@ export async function POST(
       )
       .slice(0, 12); // Limit to 12 for demo speed
 
-    console.log(`[Import] Analyzing ${priorityPatients.length} priority patients with Claude...`);
+    console.warn(`[Import] Analyzing ${priorityPatients.length} priority patients with Claude...`);
 
     for (const patient of priorityPatients) {
       const patientMeasures = outcomeMeasures.filter((m) => m.patient_id === patient.id);
@@ -155,7 +157,7 @@ export async function POST(
           patient_name: `${patient.first_name} ${patient.last_name}`,
           actions,
         });
-        console.log(
+        console.warn(
           `[Import] Claude generated ${actions.length} actions for ${patient.first_name} ${patient.last_name}`
         );
       } catch (error) {
@@ -243,11 +245,14 @@ export async function POST(
         })),
     });
   } catch (error) {
+    // Log full error internally for debugging
     console.error("Error in import commit:", error);
+
+    // Return generic error to client - don't leak internal details
     return NextResponse.json(
       {
         error: "Failed to commit import",
-        details: error instanceof Error ? error.message : "Unknown error",
+        message: "An unexpected error occurred. Please try again or contact support.",
       },
       { status: 500 }
     );

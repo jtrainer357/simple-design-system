@@ -99,13 +99,15 @@ export async function getDashboardStats(practiceId: string = DEMO_PRACTICE_ID): 
 
 /**
  * Check if the database has been populated (import has run)
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function isDatabasePopulated(): Promise<boolean> {
+export async function isDatabasePopulated(practiceId: string = DEMO_PRACTICE_ID): Promise<boolean> {
   const supabase = createClient();
 
   const { count, error } = await supabase
     .from("patients")
-    .select("*", { count: "exact", head: true });
+    .select("*", { count: "exact", head: true })
+    .eq("practice_id", practiceId);
 
   if (error) {
     console.error("Failed to check database population:", error);

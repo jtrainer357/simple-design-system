@@ -55,11 +55,21 @@ export async function getPatients(practiceId: string = DEMO_PRACTICE_ID): Promis
 
 /**
  * Get a single patient by ID
+ * @param patientId - The patient's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function getPatientById(patientId: string): Promise<Patient | null> {
+export async function getPatientById(
+  patientId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<Patient | null> {
   const supabase = createClient();
 
-  const { data, error } = await supabase.from("patients").select("*").eq("id", patientId).single();
+  const { data, error } = await supabase
+    .from("patients")
+    .select("*")
+    .eq("id", patientId)
+    .eq("practice_id", practiceId)
+    .single();
 
   if (error) {
     console.error("Failed to fetch patient:", error);
@@ -71,14 +81,20 @@ export async function getPatientById(patientId: string): Promise<Patient | null>
 
 /**
  * Get a patient by external_id (from synthetic data)
+ * @param externalId - The external patient ID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function getPatientByExternalId(externalId: string): Promise<Patient | null> {
+export async function getPatientByExternalId(
+  externalId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<Patient | null> {
   const supabase = createClient();
 
   const { data, error } = await supabase
     .from("patients")
     .select("*")
     .eq("external_id", externalId)
+    .eq("practice_id", practiceId)
     .single();
 
   if (error) {
@@ -91,14 +107,20 @@ export async function getPatientByExternalId(externalId: string): Promise<Patien
 
 /**
  * Get patient appointments
+ * @param patientId - The patient's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function getPatientAppointments(patientId: string): Promise<Appointment[]> {
+export async function getPatientAppointments(
+  patientId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<Appointment[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
     .from("appointments")
     .select("*")
     .eq("patient_id", patientId)
+    .eq("practice_id", practiceId)
     .order("date", { ascending: false })
     .order("start_time", { ascending: false });
 
@@ -112,14 +134,20 @@ export async function getPatientAppointments(patientId: string): Promise<Appoint
 
 /**
  * Get patient outcome measures
+ * @param patientId - The patient's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function getPatientOutcomeMeasures(patientId: string): Promise<OutcomeMeasure[]> {
+export async function getPatientOutcomeMeasures(
+  patientId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<OutcomeMeasure[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
     .from("outcome_measures")
     .select("*")
     .eq("patient_id", patientId)
+    .eq("practice_id", practiceId)
     .order("measurement_date", { ascending: false });
 
   if (error) {
@@ -132,14 +160,20 @@ export async function getPatientOutcomeMeasures(patientId: string): Promise<Outc
 
 /**
  * Get patient communications/messages
+ * @param patientId - The patient's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function getPatientMessages(patientId: string): Promise<Communication[]> {
+export async function getPatientMessages(
+  patientId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<Communication[]> {
   const supabase = createClient();
 
   const { data, error } = await (supabase as SupabaseAny)
     .from("communications")
     .select("*")
     .eq("patient_id", patientId)
+    .eq("practice_id", practiceId)
     .order("sent_at", { ascending: false })
     .limit(50);
 
@@ -153,14 +187,20 @@ export async function getPatientMessages(patientId: string): Promise<Communicati
 
 /**
  * Get patient invoices
+ * @param patientId - The patient's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function getPatientInvoices(patientId: string): Promise<Invoice[]> {
+export async function getPatientInvoices(
+  patientId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<Invoice[]> {
   const supabase = createClient();
 
   const { data, error } = await supabase
     .from("invoices")
     .select("*")
     .eq("patient_id", patientId)
+    .eq("practice_id", practiceId)
     .order("date_of_service", { ascending: false });
 
   if (error) {
@@ -174,8 +214,13 @@ export async function getPatientInvoices(patientId: string): Promise<Invoice[]> 
 /**
  * Get patient reviews
  * Returns empty array if table doesn't exist or query fails (graceful degradation)
+ * @param patientId - The patient's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function getPatientReviews(patientId: string): Promise<Review[]> {
+export async function getPatientReviews(
+  patientId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<Review[]> {
   const supabase = createClient();
 
   try {
@@ -183,6 +228,7 @@ export async function getPatientReviews(patientId: string): Promise<Review[]> {
       .from("reviews")
       .select("*")
       .eq("patient_id", patientId)
+      .eq("practice_id", practiceId)
       .order("review_date", { ascending: false });
 
     if (error) {
@@ -296,14 +342,20 @@ export interface VisitSummary {
 
 /**
  * Get patient visit summaries for recent activity
+ * @param patientId - The patient's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function getPatientVisitSummaries(patientId: string): Promise<VisitSummary[]> {
+export async function getPatientVisitSummaries(
+  patientId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<VisitSummary[]> {
   const supabase = createClient();
 
   const { data, error } = await (supabase as SupabaseAny)
     .from("visit_summaries")
     .select("*")
     .eq("patient_id", patientId)
+    .eq("practice_id", practiceId)
     .order("visit_date", { ascending: false })
     .limit(10);
 

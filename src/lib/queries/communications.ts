@@ -73,14 +73,20 @@ export async function getCommunications(
 
 /**
  * Get communications for a specific patient
+ * @param patientId - The patient's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function getPatientCommunications(patientId: string): Promise<Communication[]> {
+export async function getPatientCommunications(
+  patientId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<Communication[]> {
   const supabase = createClient();
 
   const { data, error } = await (supabase as SupabaseAny)
     .from("communications")
     .select("*")
     .eq("patient_id", patientId)
+    .eq("practice_id", practiceId)
     .order("sent_at", { ascending: false });
 
   if (error) {
@@ -114,14 +120,20 @@ export async function getUnreadCount(practiceId: string = DEMO_PRACTICE_ID): Pro
 
 /**
  * Mark a communication as read
+ * @param communicationId - The communication's UUID
+ * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
-export async function markAsRead(communicationId: string): Promise<void> {
+export async function markAsRead(
+  communicationId: string,
+  practiceId: string = DEMO_PRACTICE_ID
+): Promise<void> {
   const supabase = createClient();
 
   const { error } = await (supabase as SupabaseAny)
     .from("communications")
     .update({ is_read: true })
-    .eq("id", communicationId);
+    .eq("id", communicationId)
+    .eq("practice_id", practiceId);
 
   if (error) {
     console.error("Failed to mark communication as read:", error);
