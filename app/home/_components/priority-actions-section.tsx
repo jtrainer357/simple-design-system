@@ -6,7 +6,8 @@ import Link from "next/link";
 import { PriorityAction } from "@/design-system/components/ui/priority-action";
 import { AIActionCard } from "@/design-system/components/ui/ai-action-card";
 import { Heading, Text } from "@/design-system/components/ui/typography";
-import { Loader2, AlertTriangle, Database } from "lucide-react";
+import { AlertTriangle, Database, Loader2 } from "lucide-react";
+import { PriorityActionCardSkeleton, Skeleton } from "@/design-system/components/ui/skeleton";
 import { Button } from "@/design-system/components/ui/button";
 import { getPriorityActions } from "@/src/lib/queries/priority-actions";
 import { getTodayAppointments } from "@/src/lib/queries/appointments";
@@ -187,26 +188,44 @@ export function PriorityActionsSection({
   // Get the first arriving/scheduled patient
   const arrivingPatient = todayAppts.find((a) => a.status === "Scheduled") || todayAppts[0];
 
-  // Loading state
+  // Loading state with skeleton
   if (loading) {
     return (
       <section className={className}>
-        <div className="mb-10 flex items-center gap-4">
+        <div className="mb-14 flex items-center gap-4">
           <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
-          <div>
+          <div className="flex-1">
             <Heading level={3} className="text-xl sm:text-2xl">
               Today&apos;s Actions
             </Heading>
             <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-              Loading...
+              <Skeleton className="inline-block h-3 w-48" />
             </Text>
           </div>
+          <Skeleton className="h-10 w-36 rounded-full" />
         </div>
-        <div className="flex flex-col items-center justify-center py-12">
-          <Loader2 className="text-primary h-8 w-8 animate-spin" />
-          <Text size="sm" muted className="mt-3">
-            Loading substrate intelligence...
-          </Text>
+        {/* Arriving patient skeleton */}
+        <div className="bg-priority-bg/30 mb-10 rounded-xl p-6 sm:p-8">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-4 sm:gap-5">
+              <Skeleton className="h-16 w-16 shrink-0 rounded-full sm:h-20 sm:w-20" />
+              <div className="min-w-0 flex-1">
+                <Skeleton className="mb-2 h-3 w-24" />
+                <Skeleton className="mb-2 h-7 w-56" />
+                <Skeleton className="h-4 w-40" />
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Skeleton className="h-12 w-40 rounded-full" />
+              <Skeleton className="h-12 w-32 rounded-full" />
+            </div>
+          </div>
+        </div>
+        {/* Action cards skeleton */}
+        <div className="space-y-2">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <PriorityActionCardSkeleton key={i} />
+          ))}
         </div>
       </section>
     );

@@ -8,9 +8,12 @@ import { ChatThread, type Message } from "./chat-thread";
 import { Button } from "@/design-system/components/ui/button";
 import { FilterTabs } from "@/design-system/components/ui/filter-tabs";
 import { Text } from "@/design-system/components/ui/typography";
-import { ArrowLeft, Plus, Loader2 } from "lucide-react";
+import { ArrowLeft, Plus, MessageSquare, AlertTriangle, RefreshCw } from "lucide-react";
+import { ConversationCardSkeleton, Skeleton } from "@/design-system/components/ui/skeleton";
+import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
+import { Heading } from "@/design-system/components/ui/typography";
 import { getCommunicationThreads, type Communication } from "@/src/lib/queries/communications";
-import { formatDemoDate, DEMO_DATE_OBJECT } from "@/src/lib/utils/demo-date";
+import { DEMO_DATE_OBJECT } from "@/src/lib/utils/demo-date";
 
 const messageFilterTabs = [
   { id: "all", label: "All Messages" },
@@ -106,26 +109,29 @@ export function CommunicationsPage({ className }: CommunicationsPageProps) {
   const [activeFilter, setActiveFilter] = React.useState("all");
   const [threads, setThreads] = React.useState<ThreadData[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [error, setError] = React.useState<string | null>(null);
 
   // Load communications from Supabase
-  React.useEffect(() => {
-    async function loadCommunications() {
-      try {
-        setLoading(true);
-        const data = await getCommunicationThreads();
-        setThreads(data);
-        // Select first thread by default
-        if (data.length > 0 && !selectedConversation) {
-          setSelectedConversation(data[0]!.patient.id);
-        }
-      } catch (err) {
-        console.error("Failed to load communications:", err);
-      } finally {
-        setLoading(false);
+  const loadCommunications = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getCommunicationThreads();
+      setThreads(data);
+      // Select first thread by default if none selected
+      if (data.length > 0) {
+        setSelectedConversation((current) => current || data[0]!.patient.id);
       }
+    } catch {
+      setError("Unable to load messages. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    loadCommunications();
   }, []);
+
+  React.useEffect(() => {
+    loadCommunications();
+  }, [loadCommunications]);
 
   const handleSendMessage = (_message: string) => {
     // Message sending will be implemented
@@ -157,16 +163,127 @@ export function CommunicationsPage({ className }: CommunicationsPageProps) {
     return selectedThread.messages.map((m) => commToMessage(m, selectedThread.patient)).reverse(); // Show oldest first
   }, [selectedThread]);
 
-  // Loading state
+  // Loading state with skeleton
   if (loading) {
     return (
-      <div className={cn("flex h-full items-center justify-center", className)}>
-        <div className="flex flex-col items-center gap-3">
-          <Loader2 className="text-primary h-8 w-8 animate-spin" />
-          <Text size="sm" muted>
-            Loading messages...
-          </Text>
+      <div className={cn("flex h-full flex-col overflow-hidden", className)}>
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex gap-2">
+            <Skeleton className="h-9 w-28 rounded-full" />
+            <Skeleton className="h-9 w-20 rounded-full" />
+            <Skeleton className="h-9 w-20 rounded-full" />
+          </div>
+          <Skeleton className="h-10 w-32 rounded-full" />
         </div>
+        <div className="flex min-h-0 flex-1 gap-2">
+          <div className="hidden w-40 shrink-0 lg:block xl:w-44">
+            <CardWrapper className="h-full p-3">
+              <Skeleton className="mb-4 h-5 w-20" />
+              <div className="space-y-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton key={i} className="h-8 w-full rounded-md" />
+                ))}
+              </div>
+            </CardWrapper>
+          </div>
+          <div className="w-full shrink-0 sm:w-72 md:w-80 lg:w-64 xl:w-72">
+            <CardWrapper className="h-full p-3">
+              <div className="space-y-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <ConversationCardSkeleton key={i} />
+                ))}
+              </div>
+            </CardWrapper>
+          </div>
+          <div className="hidden min-w-0 flex-1 sm:block">
+            <CardWrapper className="flex h-full flex-col p-4">
+              <div className="mb-4 flex items-center gap-3 border-b pb-4">
+                <Skeleton className="h-10 w-10 rounded-full" />
+                <div>
+                  <Skeleton className="mb-1 h-5 w-32" />
+                  <Skeleton className="h-3 w-16" />
+                </div>
+              </div>
+              <div className="flex-1 space-y-3">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className={`flex ${i % 2 === 0 ? "justify-start" : "justify-end"}`}>
+                    <Skeleton className={`h-16 ${i % 2 === 0 ? "w-3/4" : "w-1/2"} rounded-xl`} />
+                  </div>
+                ))}
+              </div>
+            </CardWrapper>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <div className={cn("flex h-full flex-col overflow-hidden", className)}>
+        <div className="mb-4 flex items-center justify-between">
+          <FilterTabs
+            tabs={messageFilterTabs}
+            activeTab={activeFilter}
+            onTabChange={setActiveFilter}
+          />
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" />
+            New Message
+          </Button>
+        </div>
+        <CardWrapper className="flex flex-1 flex-col items-center justify-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-100">
+            <AlertTriangle className="h-7 w-7 text-red-600" />
+          </div>
+          <Heading level={4} className="mb-2 text-lg font-semibold">
+            Unable to Load Messages
+          </Heading>
+          <Text muted className="mb-4 max-w-sm text-center">
+            {error}
+          </Text>
+          <Button onClick={loadCommunications} variant="outline" className="gap-2">
+            <RefreshCw className="h-4 w-4" />
+            Try Again
+          </Button>
+        </CardWrapper>
+      </div>
+    );
+  }
+
+  // Empty state
+  if (conversations.length === 0) {
+    return (
+      <div className={cn("flex h-full flex-col overflow-hidden", className)}>
+        <div className="mb-4 flex items-center justify-between">
+          <FilterTabs
+            tabs={messageFilterTabs}
+            activeTab={activeFilter}
+            onTabChange={setActiveFilter}
+          />
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" />
+            New Message
+          </Button>
+        </div>
+        <CardWrapper className="flex flex-1 flex-col items-center justify-center">
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100">
+            <MessageSquare className="h-7 w-7 text-gray-400" />
+          </div>
+          <Heading level={4} className="mb-2 text-lg font-semibold">
+            No Messages Yet
+          </Heading>
+          <Text muted className="mb-4 max-w-sm text-center">
+            {activeFilter === "unread"
+              ? "No unread messages. You're all caught up!"
+              : "Start a conversation with your patients."}
+          </Text>
+          <Button className="gap-2">
+            <Plus className="h-4 w-4" />
+            Send First Message
+          </Button>
+        </CardWrapper>
       </div>
     );
   }
