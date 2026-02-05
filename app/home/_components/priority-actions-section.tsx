@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { PriorityAction } from "@/design-system/components/ui/priority-action";
 import { AIActionCard } from "@/design-system/components/ui/ai-action-card";
 import { Heading, Text } from "@/design-system/components/ui/typography";
@@ -127,13 +128,16 @@ export function PriorityActionsSection({
   if (loading) {
     return (
       <section className={className}>
-        <div className="mb-4">
-          <Heading level={3} className="text-xl sm:text-2xl">
-            Today&apos;s Actions
-          </Heading>
-          <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-            Loading...
-          </Text>
+        <div className="mb-10 flex items-center gap-4">
+          <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
+          <div>
+            <Heading level={3} className="text-xl sm:text-2xl">
+              Today&apos;s Actions
+            </Heading>
+            <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+              Loading...
+            </Text>
+          </div>
         </div>
         <div className="flex flex-col items-center justify-center py-12">
           <Loader2 className="text-primary h-8 w-8 animate-spin" />
@@ -149,13 +153,16 @@ export function PriorityActionsSection({
   if (dbReady === false) {
     return (
       <section className={className}>
-        <div className="mb-4">
-          <Heading level={3} className="text-xl sm:text-2xl">
-            Today&apos;s Actions
-          </Heading>
-          <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-            {formattedDate}
-          </Text>
+        <div className="mb-10 flex items-center gap-4">
+          <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
+          <div>
+            <Heading level={3} className="text-xl sm:text-2xl">
+              Today&apos;s Actions
+            </Heading>
+            <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+              {formattedDate}
+            </Text>
+          </div>
         </div>
         <div className="border-muted-foreground/30 bg-muted/20 flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
           <Database className="text-muted-foreground/50 h-12 w-12" />
@@ -180,13 +187,16 @@ export function PriorityActionsSection({
   if (error) {
     return (
       <section className={className}>
-        <div className="mb-4">
-          <Heading level={3} className="text-xl sm:text-2xl">
-            Today&apos;s Actions
-          </Heading>
-          <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-            {formattedDate}
-          </Text>
+        <div className="mb-10 flex items-center gap-4">
+          <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
+          <div>
+            <Heading level={3} className="text-xl sm:text-2xl">
+              Today&apos;s Actions
+            </Heading>
+            <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+              {formattedDate}
+            </Text>
+          </div>
         </div>
         <div className="border-destructive/30 bg-destructive/10 flex flex-col items-center justify-center rounded-lg border py-12">
           <AlertTriangle className="text-destructive h-8 w-8" />
@@ -210,16 +220,19 @@ export function PriorityActionsSection({
   if (actions.length === 0) {
     return (
       <section className={className}>
-        <div className="mb-4">
-          <Heading level={3} className="text-xl sm:text-2xl">
-            Today&apos;s Actions
-          </Heading>
-          <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-            {formattedDate} •{" "}
-            <span className="text-card-foreground font-semibold">
-              {todayAppts.length} Appointments
-            </span>
-          </Text>
+        <div className="mb-10 flex items-center gap-4">
+          <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
+          <div>
+            <Heading level={3} className="text-xl sm:text-2xl">
+              Today&apos;s Actions
+            </Heading>
+            <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+              {formattedDate} •{" "}
+              <span className="text-card-foreground font-semibold">
+                {todayAppts.length} Appointments
+              </span>
+            </Text>
+          </div>
         </div>
         <div className="border-muted-foreground/30 bg-muted/20 flex flex-col items-center justify-center rounded-lg border border-dashed py-12">
           <Text size="sm" muted className="text-center">
@@ -232,16 +245,22 @@ export function PriorityActionsSection({
 
   return (
     <section className={className}>
-      <div className="mb-4">
-        <Heading level={3} className="text-xl sm:text-2xl">
-          Today&apos;s Actions
-        </Heading>
-        <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-          {formattedDate} •{" "}
-          <span className="text-card-foreground font-semibold">
-            {todayAppts.length} Appointments
-          </span>
-        </Text>
+      <div className="mb-10 flex items-center gap-4">
+        <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
+        <div className="flex-1">
+          <Heading level={3} className="text-xl sm:text-2xl">
+            Today&apos;s Actions
+          </Heading>
+          <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+            {formattedDate} •{" "}
+            <span className="text-card-foreground font-semibold">
+              {todayAppts.length} Appointments
+            </span>
+          </Text>
+        </div>
+        <Button variant="outline" className="shrink-0">
+          Complete All Actions
+        </Button>
       </div>
 
       <div className="space-y-4">
