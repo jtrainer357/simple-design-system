@@ -34,7 +34,7 @@ export function PriorityAction({
   return (
     <Card
       className={cn(
-        "bg-priority-bg/50 cursor-pointer overflow-hidden border-0 shadow-md backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-md",
+        "bg-priority-bg/50 cursor-pointer overflow-hidden border-0 backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0",
         className
       )}
     >

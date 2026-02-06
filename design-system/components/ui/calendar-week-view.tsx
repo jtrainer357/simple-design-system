@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/design-system/lib/utils";
 import { CalendarEventCard, EventColor } from "./calendar-event-card";
 import { format, isSameDay, isToday } from "date-fns";
@@ -12,6 +13,7 @@ export interface CalendarEvent {
   endTime: Date;
   color: EventColor;
   hasNotification?: boolean;
+  justMoved?: boolean;
 }
 
 interface CalendarWeekViewProps {
@@ -20,6 +22,7 @@ interface CalendarWeekViewProps {
   startHour?: number;
   endHour?: number;
   onEventClick?: (event: CalendarEvent) => void;
+  selectedEventId?: string | null;
   className?: string;
 }
 
@@ -31,6 +34,7 @@ export function CalendarWeekView({
   startHour = 9,
   endHour = 17,
   onEventClick,
+  selectedEventId,
   className,
 }: CalendarWeekViewProps) {
   const hours = React.useMemo(() => {
@@ -140,25 +144,65 @@ export function CalendarWeekView({
 
                 {/* Events */}
                 <div className="absolute inset-x-1 top-0">
-                  {getEventsForDay(day).map((event) => {
-                    const { top, height } = getEventPosition(event);
-                    return (
-                      <div
-                        key={event.id}
-                        className="absolute inset-x-0 px-0.5"
-                        style={{ top, height }}
-                      >
-                        <CalendarEventCard
-                          title={event.title}
-                          time={format(event.startTime, "h:mm a")}
-                          color={event.color}
-                          hasNotification={event.hasNotification}
-                          onClick={() => onEventClick?.(event)}
-                          className="h-full"
-                        />
-                      </div>
-                    );
-                  })}
+                  <AnimatePresence mode="popLayout">
+                    {getEventsForDay(day).map((event) => {
+                      const { top, height } = getEventPosition(event);
+                      const isSelected = selectedEventId === event.id;
+
+                      return (
+                        <motion.div
+                          key={event.id}
+                          layoutId={event.id}
+                          className="absolute inset-x-0 px-0.5"
+                          initial={false}
+                          animate={{
+                            top,
+                            height,
+                            scale: isSelected ? 1.02 : 1,
+                            zIndex: isSelected ? 10 : 1,
+                          }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 300,
+                            damping: 30,
+                          }}
+                          style={{ height }}
+                        >
+                          <motion.div
+                            className={cn(
+                              "h-full rounded-md",
+                              isSelected && "ring-teal ring-2 ring-offset-1"
+                            )}
+                            animate={
+                              event.justMoved
+                                ? {
+                                    borderColor: ["transparent", "rgb(16 185 129)", "transparent"],
+                                    boxShadow: [
+                                      "0 0 0 0 rgba(16, 185, 129, 0)",
+                                      "0 0 0 4px rgba(16, 185, 129, 0.3)",
+                                      "0 0 0 0 rgba(16, 185, 129, 0)",
+                                    ],
+                                  }
+                                : {}
+                            }
+                            transition={{
+                              duration: 0.8,
+                              ease: "easeInOut",
+                            }}
+                          >
+                            <CalendarEventCard
+                              title={event.title}
+                              time={format(event.startTime, "h:mm a")}
+                              color={event.color}
+                              hasNotification={event.hasNotification}
+                              onClick={() => onEventClick?.(event)}
+                              className="h-full"
+                            />
+                          </motion.div>
+                        </motion.div>
+                      );
+                    })}
+                  </AnimatePresence>
                 </div>
               </div>
             );

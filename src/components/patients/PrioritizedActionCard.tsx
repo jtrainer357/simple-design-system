@@ -113,7 +113,7 @@ export function PrioritizedActionCard({ action, onClick, className }: Prioritize
   return (
     <div
       className={cn(
-        "flex items-start gap-3 rounded-lg p-3 shadow-[var(--shadow-md)] transition-all hover:shadow-[var(--shadow-lg)] sm:gap-4 sm:p-4",
+        "flex items-start gap-3 rounded-lg p-3 transition-all sm:gap-4 sm:p-4",
         urgencyCardStyles[action.urgency],
         onClick && "cursor-pointer",
         className

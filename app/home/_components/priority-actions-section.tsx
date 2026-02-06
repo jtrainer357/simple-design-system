@@ -199,7 +199,7 @@ export function PriorityActionsSection({
               Today&apos;s Actions
             </Heading>
             <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-              <Skeleton className="inline-block h-3 w-48" />
+              <Skeleton as="span" className="inline-block h-3 w-48" />
             </Text>
           </div>
           <Skeleton className="h-10 w-36 rounded-full" />

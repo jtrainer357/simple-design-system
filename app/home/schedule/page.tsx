@@ -31,6 +31,7 @@ import {
   type AppointmentWithPatient,
 } from "@/src/lib/queries/appointments";
 import { DEMO_DATE_OBJECT } from "@/src/lib/utils/demo-date";
+import { useVoiceStore } from "@/src/lib/voice";
 
 // Color mapping based on appointment type
 function getEventColor(serviceType: string, status: string): CalendarEvent["color"] {
@@ -76,28 +77,28 @@ function createDateTime(baseDate: Date, dayOffset: number, hour: number, minute:
 function generateDemoEvents(weekStart: Date): CalendarEvent[] {
   const demoEvents: CalendarEvent[] = [];
 
-  // Patient names for demo - diverse and realistic
+  // Patient names for demo - diverse and realistic with varied colors
   const patients = [
     { name: "Marcus Johnson", type: "Follow-up Session", color: "blue" as const },
     { name: "Sarah Chen", type: "Initial Assessment", color: "green" as const },
-    { name: "Emily Rodriguez", type: "Therapy Session", color: "blue" as const },
+    { name: "Emily Rodriguez", type: "Therapy Session", color: "yellow" as const },
     { name: "David Kim", type: "Crisis Follow-up", color: "pink" as const },
     { name: "Amanda Foster", type: "CBT Session", color: "blue" as const },
-    { name: "James Wilson", type: "Medication Review", color: "neutral" as const },
-    { name: "Lisa Thompson", type: "Couples Therapy", color: "blue" as const },
+    { name: "James Wilson", type: "Medication Review", color: "yellow" as const },
+    { name: "Lisa Thompson", type: "Couples Therapy", color: "neutral" as const },
     { name: "Michael Brown", type: "Intake Evaluation", color: "green" as const },
     { name: "Jennifer Davis", type: "EMDR Session", color: "blue" as const },
-    { name: "Robert Garcia", type: "Group Prep", color: "neutral" as const },
-    { name: "Michelle Lee", type: "Family Session", color: "blue" as const },
+    { name: "Robert Garcia", type: "Group Prep", color: "yellow" as const },
+    { name: "Michelle Lee", type: "Family Session", color: "neutral" as const },
     { name: "Christopher Martinez", type: "Follow-up Session", color: "blue" as const },
-    { name: "Ashley Williams", type: "DBT Session", color: "blue" as const },
+    { name: "Ashley Williams", type: "DBT Session", color: "yellow" as const },
     { name: "Daniel Anderson", type: "Initial Consult", color: "green" as const },
     { name: "Jessica Taylor", type: "Progress Review", color: "neutral" as const },
     { name: "Matthew Jackson", type: "Therapy Session", color: "blue" as const },
     { name: "Rachel White", type: "Crisis Session", color: "pink" as const, hasNotification: true },
-    { name: "Kevin Harris", type: "Anxiety Treatment", color: "blue" as const },
+    { name: "Kevin Harris", type: "Anxiety Treatment", color: "yellow" as const },
     { name: "Stephanie Clark", type: "Depression Follow-up", color: "blue" as const },
-    { name: "Andrew Lewis", type: "Trauma Processing", color: "blue" as const },
+    { name: "Andrew Lewis", type: "Trauma Processing", color: "green" as const },
   ];
 
   // Monday (day 0) - Full day
@@ -357,65 +358,8 @@ function generateDemoEvents(weekStart: Date): CalendarEvent[] {
   );
 
   // Friday (day 4) - Demo day (Feb 6, 2026)
-  demoEvents.push(
-    {
-      id: "demo-fri-1",
-      title: `${patients[1]!.name} - ${patients[1]!.type}`,
-      startTime: createDateTime(weekStart, 4, 7, 30),
-      endTime: createDateTime(weekStart, 4, 9, 0),
-      color: patients[1]!.color,
-    },
-    {
-      id: "demo-fri-2",
-      title: `${patients[3]!.name} - ${patients[3]!.type}`,
-      startTime: createDateTime(weekStart, 4, 9, 30),
-      endTime: createDateTime(weekStart, 4, 10, 30),
-      color: patients[3]!.color,
-      hasNotification: true,
-    },
-    {
-      id: "demo-fri-3",
-      title: `${patients[5]!.name} - ${patients[5]!.type}`,
-      startTime: createDateTime(weekStart, 4, 11, 0),
-      endTime: createDateTime(weekStart, 4, 11, 30),
-      color: patients[5]!.color,
-    },
-    {
-      id: "demo-fri-block-1",
-      title: "Lunch Break",
-      startTime: createDateTime(weekStart, 4, 12, 0),
-      endTime: createDateTime(weekStart, 4, 13, 0),
-      color: "gray" as const,
-    },
-    {
-      id: "demo-fri-4",
-      title: `${patients[7]!.name} - ${patients[7]!.type}`,
-      startTime: createDateTime(weekStart, 4, 13, 30),
-      endTime: createDateTime(weekStart, 4, 15, 0),
-      color: patients[7]!.color,
-    },
-    {
-      id: "demo-fri-5",
-      title: `${patients[9]!.name} - ${patients[9]!.type}`,
-      startTime: createDateTime(weekStart, 4, 15, 30),
-      endTime: createDateTime(weekStart, 4, 16, 30),
-      color: patients[9]!.color,
-    },
-    {
-      id: "demo-fri-block-2",
-      title: "Case Review Meeting",
-      startTime: createDateTime(weekStart, 4, 17, 0),
-      endTime: createDateTime(weekStart, 4, 18, 0),
-      color: "gray" as const,
-    },
-    {
-      id: "demo-fri-6",
-      title: `${patients[11]!.name} - ${patients[11]!.type}`,
-      startTime: createDateTime(weekStart, 4, 18, 30),
-      endTime: createDateTime(weekStart, 4, 19, 30),
-      color: patients[11]!.color,
-    }
-  );
+  // NOTE: Most Friday appointments come from the database - only add non-patient blocks here
+  // to avoid duplicates with DB data
 
   // Saturday (day 5) - Lighter weekend hours
   demoEvents.push(
@@ -442,14 +386,23 @@ function generateDemoEvents(weekStart: Date): CalendarEvent[] {
     }
   );
 
-  // Sunday (day 6) - Emergency/on-call only
-  demoEvents.push({
-    id: "demo-sun-block-1",
-    title: "On-Call Coverage",
-    startTime: createDateTime(weekStart, 6, 8, 0),
-    endTime: createDateTime(weekStart, 6, 12, 0),
-    color: "gray" as const,
-  });
+  // Sunday (day 6) - Emergency/on-call only with a few appointments
+  demoEvents.push(
+    {
+      id: "demo-sun-block-1",
+      title: "On-Call Coverage",
+      startTime: createDateTime(weekStart, 6, 8, 0),
+      endTime: createDateTime(weekStart, 6, 12, 0),
+      color: "neutral" as const,
+    },
+    {
+      id: "demo-sun-1",
+      title: `${patients[0]!.name} - Individual Session`,
+      startTime: createDateTime(weekStart, 6, 10, 30),
+      endTime: createDateTime(weekStart, 6, 11, 30),
+      color: "yellow" as const,
+    }
+  );
 
   return demoEvents;
 }
@@ -471,6 +424,11 @@ export default function SchedulePage() {
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
 
+  // Voice command integration
+  const [selectedEventId, setSelectedEventId] = React.useState<string | null>(null);
+  const [movedEventId, setMovedEventId] = React.useState<string | null>(null);
+  const [localDemoEvents, setLocalDemoEvents] = React.useState<CalendarEvent[]>([]);
+
   // Load appointments from Supabase
   const loadAppointments = React.useCallback(async () => {
     try {
@@ -491,8 +449,70 @@ export default function SchedulePage() {
     loadAppointments();
   }, [loadAppointments]);
 
-  // Calculate week days
-  const weekStart = startOfWeek(currentDate, { weekStartsOn: 1 });
+  // Sync selected event with voice store
+  React.useEffect(() => {
+    useVoiceStore.getState().setSelectedAppointmentId(selectedEventId);
+  }, [selectedEventId]);
+
+  // Listen for voice commands to move appointments
+  React.useEffect(() => {
+    const handleVoiceMoveAppointment = (event: Event) => {
+      const detail = (event as CustomEvent).detail as {
+        appointmentId: string;
+        newTime: { hours: number; minutes: number };
+      };
+
+      // If no specific appointment ID, use the selected one
+      const targetId = detail.appointmentId || selectedEventId;
+
+      if (!targetId) {
+        console.warn("No appointment selected for voice move command");
+        return;
+      }
+
+      // Update the local demo events to move the appointment
+      setLocalDemoEvents((prev) => {
+        const updatedEvents = prev.map((evt) => {
+          if (evt.id === targetId) {
+            const newStartTime = new Date(evt.startTime);
+            const duration = evt.endTime.getTime() - evt.startTime.getTime();
+            newStartTime.setHours(detail.newTime.hours, detail.newTime.minutes, 0, 0);
+            const newEndTime = new Date(newStartTime.getTime() + duration);
+
+            return {
+              ...evt,
+              startTime: newStartTime,
+              endTime: newEndTime,
+              justMoved: true,
+            };
+          }
+          return evt;
+        });
+        return updatedEvents;
+      });
+
+      // Mark the event as just moved for animation
+      setMovedEventId(targetId);
+
+      // Clear the justMoved flag after animation completes
+      setTimeout(() => {
+        setMovedEventId(null);
+        setLocalDemoEvents((prev) => prev.map((evt) => ({ ...evt, justMoved: false })));
+      }, 1000);
+    };
+
+    window.addEventListener("voice-move-appointment", handleVoiceMoveAppointment);
+    return () => {
+      window.removeEventListener("voice-move-appointment", handleVoiceMoveAppointment);
+    };
+  }, [selectedEventId]);
+
+  // Calculate week days - memoize weekStart to prevent infinite loops
+  const weekStartTime = React.useMemo(
+    () => startOfWeek(currentDate, { weekStartsOn: 1 }).getTime(),
+    [currentDate]
+  );
+  const weekStart = React.useMemo(() => new Date(weekStartTime), [weekStartTime]);
   const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1 });
   const weekDays = React.useMemo(() => {
     const days: Date[] = [];
@@ -503,7 +523,15 @@ export default function SchedulePage() {
   }, [weekStart]);
 
   // Generate demo events for the current week
-  const demoEvents = React.useMemo(() => generateDemoEvents(weekStart), [weekStart]);
+  const baseDemoEvents = React.useMemo(() => generateDemoEvents(weekStart), [weekStart]);
+
+  // Initialize local demo events when base events change
+  React.useEffect(() => {
+    setLocalDemoEvents(baseDemoEvents);
+  }, [weekStartTime]);
+
+  // Use local demo events (which can be modified by voice commands) or fall back to base
+  const demoEvents = localDemoEvents.length > 0 ? localDemoEvents : baseDemoEvents;
 
   // Convert appointments to calendar events and merge with demo events
   const events: CalendarEvent[] = React.useMemo(() => {
@@ -680,6 +708,10 @@ export default function SchedulePage() {
                         events={events}
                         startHour={6}
                         endHour={21}
+                        selectedEventId={selectedEventId}
+                        onEventClick={(event) => {
+                          setSelectedEventId(selectedEventId === event.id ? null : event.id);
+                        }}
                         className="min-h-0 flex-1"
                       />
 

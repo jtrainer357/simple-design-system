@@ -1,7 +1,17 @@
 import { cn } from "@/design-system/lib/utils";
 
-function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("bg-muted animate-pulse rounded-md", className)} {...props} />;
+type SkeletonProps<T extends React.ElementType = "div"> = {
+  as?: T;
+  className?: string;
+} & Omit<React.ComponentPropsWithoutRef<T>, "as" | "className">;
+
+function Skeleton<T extends React.ElementType = "div">({
+  as,
+  className,
+  ...props
+}: SkeletonProps<T>) {
+  const Component = as || "div";
+  return <Component className={cn("bg-muted animate-pulse rounded-md", className)} {...props} />;
 }
 
 // Skeleton for metric cards (3 columns)
