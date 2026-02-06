@@ -64,6 +64,7 @@ class VoiceEngine {
   private callbacks: VoiceEngineCallbacks = {};
   private isListening = false;
   private shouldRestart = false;
+  private isPaused = false; // True when paused for TTS, false otherwise
   private restartTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private initialized = false;
 
@@ -174,10 +175,14 @@ class VoiceEngine {
 
     this.recognition.onend = () => {
       this.isListening = false;
-      this.callbacks.onListeningChange?.(false);
+
+      // Don't notify listeners if we're just paused for TTS
+      if (!this.isPaused) {
+        this.callbacks.onListeningChange?.(false);
+      }
 
       // Auto-restart if we should still be listening
-      if (this.shouldRestart) {
+      if (this.shouldRestart && !this.isPaused) {
         this.scheduleRestart();
       }
     };
@@ -297,6 +302,7 @@ class VoiceEngine {
 
   stop(): void {
     this.shouldRestart = false;
+    this.isPaused = false;
 
     if (this.restartTimeoutId) {
       clearTimeout(this.restartTimeoutId);
@@ -319,8 +325,13 @@ class VoiceEngine {
    * Call resume() to continue
    */
   pause(): void {
+    this.isPaused = true;
     if (this.recognition && this.isListening) {
-      this.recognition.stop();
+      try {
+        this.recognition.stop();
+      } catch {
+        // Ignore
+      }
     }
   }
 
@@ -328,7 +339,10 @@ class VoiceEngine {
    * Resume listening after a pause
    */
   resume(): void {
-    if (this.shouldRestart && !this.isListening) {
+    this.isPaused = false;
+    // Always try to restart after resume
+    if (!this.isListening && this.recognition) {
+      this.shouldRestart = true;
       this.scheduleRestart();
     }
   }

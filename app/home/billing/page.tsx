@@ -14,9 +14,13 @@ import {
   Clock,
   Lock,
   TrendingUp,
-  ArrowRight,
   AlertTriangle,
   RefreshCw,
+  Sparkles,
+  FileCheck,
+  Receipt,
+  Wallet,
+  ShieldCheck,
 } from "lucide-react";
 import { MetricCardSkeleton } from "@/design-system/components/ui/skeleton";
 import { getBillingSummary, type BillingSummary } from "@/src/lib/queries/billing";
@@ -26,40 +30,144 @@ interface MetricCardProps {
   value: string;
   subtitle: string;
   icon: React.ElementType;
+  status: "good" | "needs-improvement" | "critical";
   trend?: string;
   trendUp?: boolean;
 }
 
-function MetricCard({ title, value, subtitle, icon: Icon, trend, trendUp }: MetricCardProps) {
+function MetricCard({
+  title,
+  value,
+  subtitle,
+  icon: Icon,
+  status,
+  trend,
+  trendUp,
+}: MetricCardProps) {
+  const valueColor =
+    status === "good"
+      ? "text-teal-dark"
+      : status === "needs-improvement"
+        ? "text-primary"
+        : "text-destructive";
+
+  const borderColor =
+    status === "good"
+      ? "border-teal-dark/40"
+      : status === "needs-improvement"
+        ? "border-primary/40"
+        : "border-destructive/40";
+
+  const leftBorderColor =
+    status === "good"
+      ? "border-l-teal-dark/60"
+      : status === "needs-improvement"
+        ? "border-l-primary/60"
+        : "border-l-destructive/60";
+
   return (
-    <CardWrapper className="p-6">
-      <div className="flex items-start justify-between">
+    <CardWrapper className={`border border-l-4 bg-white/90 p-6 ${borderColor} ${leftBorderColor}`}>
+      <div className="flex items-start gap-3">
+        <div className="text-teal-dark mt-0.5">
+          <Icon className="h-5 w-5" />
+        </div>
         <div className="flex-1">
-          <Text size="sm" muted className="mb-1">
+          <Text size="sm" className="text-foreground font-medium">
             {title}
           </Text>
-          <Heading level={2} className="mb-1 text-3xl font-bold">
-            {value}
-          </Heading>
-          <Text size="sm" muted>
+          <div className="mt-1 flex items-baseline gap-2">
+            <Heading level={2} className={`text-4xl ${valueColor}`}>
+              {value}
+            </Heading>
+          </div>
+          <Text size="sm" muted className="mt-2">
             {subtitle}
           </Text>
           {trend && (
             <div className="mt-2 flex items-center gap-1">
               <TrendingUp
-                className={`h-4 w-4 ${trendUp ? "text-green-600" : "rotate-180 text-red-500"}`}
+                className={`h-4 w-4 ${trendUp ? "text-success" : "text-destructive rotate-180"}`}
               />
-              <Text size="xs" className={trendUp ? "text-green-600" : "text-red-500"}>
+              <Text size="xs" className={trendUp ? "text-success" : "text-destructive"}>
                 {trend}
               </Text>
             </div>
           )}
         </div>
-        <div className="bg-teal-dark/10 flex h-12 w-12 items-center justify-center rounded-full">
-          <Icon className="text-teal-dark h-6 w-6" />
-        </div>
       </div>
     </CardWrapper>
+  );
+}
+
+// Circular progress component
+function CircularProgress({
+  percentage,
+  color,
+  size = 100,
+}: {
+  percentage: number;
+  color: "teal" | "coral" | "gray";
+  size?: number;
+}) {
+  const strokeWidth = 8;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (percentage / 100) * circumference;
+
+  const strokeColor =
+    color === "teal"
+      ? "stroke-teal-dark"
+      : color === "coral"
+        ? "stroke-primary"
+        : "stroke-gray-300";
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg className="rotate-[-90deg]" width={size} height={size}>
+        {/* Background circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={strokeWidth}
+          className="text-gray-200"
+        />
+        {/* Progress circle */}
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          className={strokeColor}
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          style={{ transition: "stroke-dashoffset 0.5s ease-in-out" }}
+        />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-lg font-semibold">{percentage}%</span>
+      </div>
+    </div>
+  );
+}
+
+// Simple bar chart component
+function BarChart({ data }: { data: number[] }) {
+  const max = Math.max(...data);
+  return (
+    <div className="flex h-32 items-end gap-3">
+      {data.map((value, i) => (
+        <div
+          key={i}
+          className="bg-rating flex-1 rounded-t"
+          style={{ height: `${(value / max) * 100}%` }}
+        />
+      ))}
+    </div>
   );
 }
 
@@ -98,30 +206,63 @@ export default function BillingPage() {
   }, [loadBilling]);
 
   return (
-    <div className="min-h-screen pb-24 lg:pb-0">
+    <div className="flex h-screen flex-col pb-24 lg:pb-0">
       <AnimatedBackground />
 
       {/* Left Nav */}
       <LeftNav activePage="billing" />
 
       {/* Main Content Wrapper */}
-      <div className="lg:pl-36">
+      <div className="flex min-h-0 flex-1 flex-col lg:pl-36">
         <HeaderSearch />
 
-        <main className="px-4 py-4 sm:px-6 sm:py-6 md:py-8">
+        <main className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 md:py-8">
           <PageTransition>
-            <div className="mx-auto max-w-[1600px]">
-              {/* Page Header */}
-              <div className="mb-6">
-                <Heading level={1} className="text-2xl font-bold">
-                  Billing Overview
-                </Heading>
-                <Text muted>Track your practice revenue and collections (6-month history)</Text>
+            <div className="mx-auto max-w-[1600px] pb-10">
+              {/* Upsell Banner - Teal Gradient */}
+              <div className="from-teal to-teal/80 mb-8 overflow-hidden rounded-xl bg-gradient-to-r p-8 text-white">
+                <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
+                  <div className="flex flex-1 items-start gap-6">
+                    <div className="hidden shrink-0 md:block">
+                      <Lock className="h-16 w-16 text-white/90" strokeWidth={1.5} />
+                    </div>
+                    <div className="flex-1">
+                      <div className="mb-2 flex items-center gap-2">
+                        <Sparkles className="h-5 w-5" />
+                        <Text
+                          size="xs"
+                          className="font-bold tracking-wider text-white/90 uppercase"
+                        >
+                          Premium Feature
+                        </Text>
+                      </div>
+                      <Heading level={3} className="mb-2 text-3xl text-white">
+                        Unlock Complete Revenue Cycle Management
+                      </Heading>
+                      <Text className="max-w-xl text-white/80">
+                        Automate claims processing, patient statements, payment plans, and
+                        collections. Get real-time insights into your practice finances with
+                        AI-powered analytics.
+                      </Text>
+                    </div>
+                  </div>
+                  <div className="flex flex-col gap-3 sm:flex-row">
+                    <Button
+                      variant="ghost"
+                      className="border border-white/30 text-white hover:bg-white/10"
+                    >
+                      Learn More
+                    </Button>
+                    <Button variant="secondary" className="text-teal bg-white hover:bg-white/90">
+                      Upgrade Now
+                    </Button>
+                  </div>
+                </div>
               </div>
 
               {/* Loading State with Skeleton */}
               {loading && (
-                <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   <MetricCardSkeleton />
                   <MetricCardSkeleton />
                   <MetricCardSkeleton />
@@ -151,12 +292,13 @@ export default function BillingPage() {
 
               {/* Metrics Grid - shown when loaded successfully */}
               {!loading && !error && (
-                <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+                <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                   <MetricCard
                     title="Total Charged"
                     value={formatCurrency(summary?.totalCharged || 0)}
                     subtitle={`${(summary?.invoiceCount || 0).toLocaleString()} Invoices (6 months)`}
                     icon={DollarSign}
+                    status="good"
                     trend={`${(summary?.paidCount || 0).toLocaleString()} paid, ${(summary?.pendingCount || 0).toLocaleString()} pending`}
                     trendUp={true}
                   />
@@ -165,6 +307,7 @@ export default function BillingPage() {
                     value={formatCurrency(summary?.totalCollected || 0)}
                     subtitle={`${summary?.collectionRate || 0}% Collection Rate`}
                     icon={CreditCard}
+                    status={(summary?.collectionRate || 0) >= 80 ? "good" : "needs-improvement"}
                     trend={
                       summary?.collectionRate && summary.collectionRate >= 80
                         ? "Above industry average"
@@ -177,6 +320,13 @@ export default function BillingPage() {
                     value={formatCurrency(summary?.outstandingAR || 0)}
                     subtitle="Balance Due"
                     icon={Clock}
+                    status={
+                      (summary?.outstandingAR || 0) === 0
+                        ? "good"
+                        : (summary?.outstandingAR || 0) > 10000
+                          ? "critical"
+                          : "needs-improvement"
+                    }
                     trend={
                       summary?.outstandingAR && summary.outstandingAR > 0
                         ? "Requires follow-up"
@@ -187,54 +337,145 @@ export default function BillingPage() {
                 </div>
               )}
 
-              {/* Coming Soon Card */}
-              <CardWrapper className="p-8">
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
-                    <Lock className="h-10 w-10 text-gray-400" />
-                  </div>
-                  <Heading level={3} className="mb-2 text-xl font-semibold">
-                    Full Billing Features Coming Soon
-                  </Heading>
-                  <Text muted className="mb-6 max-w-md">
-                    Advanced billing features including insurance claims processing, patient
-                    statements, payment plans, and automated collections are currently in
-                    development.
-                  </Text>
-                  <div className="flex flex-wrap justify-center gap-3">
-                    <Button variant="outline" disabled>
-                      Claims Management
-                    </Button>
-                    <Button variant="outline" disabled>
-                      Patient Statements
-                    </Button>
-                    <Button variant="outline" disabled>
-                      Payment Plans
-                    </Button>
-                  </div>
-                </div>
-              </CardWrapper>
-
-              {/* Upsell Banner */}
-              <div className="from-teal-dark to-teal mt-6 overflow-hidden rounded-xl bg-gradient-to-r p-6 text-white">
-                <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
+              {/* Advanced Billing Features */}
+              <CardWrapper className="p-6">
+                <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div>
-                    <Heading level={4} className="mb-1 text-lg font-semibold text-white">
-                      Upgrade to Tebra Complete
+                    <Heading level={3} className="text-xl">
+                      Advanced Billing Features
                     </Heading>
-                    <Text className="text-white/80">
-                      Get full billing, claims processing, and revenue cycle management
-                    </Text>
+                    <Text muted>Unlock the full power of Tebra's revenue cycle management</Text>
                   </div>
-                  <Button
-                    variant="secondary"
-                    className="text-teal-dark gap-2 bg-white hover:bg-white/90"
-                  >
-                    Learn More
-                    <ArrowRight className="h-4 w-4" />
+                  <Button className="shrink-0 gap-2">
+                    Unlock Premium AI Features
+                    <Sparkles className="h-4 w-4" />
                   </Button>
                 </div>
-              </div>
+
+                {/* Feature Grid */}
+                <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+                  {[
+                    {
+                      title: "Claims Management",
+                      description:
+                        "Automated insurance claims submission, tracking, and denial management",
+                      icon: FileCheck,
+                    },
+                    {
+                      title: "Patient Statements",
+                      description:
+                        "Automated patient billing with customizable statement templates",
+                      icon: Receipt,
+                    },
+                    {
+                      title: "Payment Plans",
+                      description: "Flexible payment plan options to improve patient collections",
+                      icon: Wallet,
+                    },
+                    {
+                      title: "Denial Prevention",
+                      description: "AI-powered claim scrubbing to catch errors before submission",
+                      icon: ShieldCheck,
+                    },
+                  ].map((feature, i) => (
+                    <CardWrapper key={i} className="border-border bg-white p-4 shadow-sm">
+                      <div className="mb-3 flex items-center gap-3">
+                        <feature.icon className="text-teal-dark h-10 w-10 shrink-0 opacity-50" />
+                        <Text className="font-medium">{feature.title}</Text>
+                      </div>
+                      <Text size="sm" muted className="pl-[3.25rem]">
+                        {feature.description}
+                      </Text>
+                    </CardWrapper>
+                  ))}
+                </div>
+
+                {/* Financial Performance Section */}
+                <CardWrapper className="border-0 bg-white p-6 shadow-sm">
+                  <div className="mb-4 flex items-start justify-between">
+                    <Heading level={4} className="text-lg">
+                      Financial Performance
+                    </Heading>
+                    <Text size="xs" muted className="text-right">
+                      * Data is for display purposes only
+                    </Text>
+                  </div>
+
+                  {/* Revenue Summary */}
+                  <div className="mb-6">
+                    <Heading level={2} className="text-4xl">
+                      $824,500
+                    </Heading>
+                    <Text size="sm" muted>
+                      +12.5% from last month
+                    </Text>
+                  </div>
+
+                  {/* Bar Chart */}
+                  <div className="mb-8">
+                    <BarChart data={[65, 85, 78, 45, 72, 88]} />
+                  </div>
+
+                  {/* Circular Progress Indicators */}
+                  <div className="mb-6 grid grid-cols-3 gap-4">
+                    <div className="flex flex-col items-center">
+                      <CircularProgress percentage={92.4} color="teal" />
+                      <Text size="sm" muted className="mt-2 text-center">
+                        Collections Rate
+                      </Text>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <CircularProgress percentage={2.8} color="gray" />
+                      <Text size="sm" muted className="mt-2 text-center">
+                        Denial Rate
+                      </Text>
+                    </div>
+                    <div className="flex flex-col items-center">
+                      <CircularProgress percentage={91.7} color="coral" />
+                      <Text size="sm" muted className="mt-2 text-center">
+                        Clean Claim Rate
+                      </Text>
+                    </div>
+                  </div>
+
+                  {/* Alert Cards */}
+                  <div className="space-y-3">
+                    <CardWrapper className="border-border flex items-center justify-between bg-white p-4 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
+                          <AlertTriangle className="h-5 w-5 text-red-500" />
+                        </div>
+                        <div>
+                          <Text className="font-medium">Denial Spikes</Text>
+                          <Text size="sm" muted>
+                            Unusual rate for CPT 99213
+                          </Text>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        Learn More
+                      </Button>
+                    </CardWrapper>
+
+                    <CardWrapper className="border-border flex items-center justify-between bg-white p-4 shadow-sm">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-50">
+                          <Clock className="h-5 w-5 text-yellow-600" />
+                        </div>
+                        <div>
+                          <Text className="font-medium">Aging A/R</Text>
+                          <Text size="sm" muted>
+                            $12k outstanding &gt; 90 days
+                          </Text>
+                        </div>
+                      </div>
+                      <Button variant="outline" size="sm">
+                        Learn More
+                      </Button>
+                    </CardWrapper>
+                  </div>
+                </CardWrapper>
+              </CardWrapper>
             </div>
           </PageTransition>
         </main>

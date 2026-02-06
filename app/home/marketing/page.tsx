@@ -295,7 +295,10 @@ export default function MarketingPage() {
                       See how your practice visibility compares to nearby competitors
                     </Text>
                   </div>
-                  <Button className="shrink-0">Unlock Premium AI Features</Button>
+                  <Button className="shrink-0 gap-2">
+                    Unlock Premium AI Features
+                    <Sparkles className="h-4 w-4" />
+                  </Button>
                 </div>
 
                 {/* Warning Banner */}

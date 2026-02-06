@@ -27,3 +27,6 @@ coverage/
 # Build
 dist/
 out/
+
+# POC artifacts
+poc/*/test-results.json

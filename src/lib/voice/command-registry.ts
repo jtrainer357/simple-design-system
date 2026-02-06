@@ -196,17 +196,18 @@ export function createCommandRegistry(deps: CommandDependencies): VoiceCommand[]
       description: "Test voice command",
       patterns: [/^test$/i, /^hello$/i, /^hi$/i],
       handler: async () => {
-        return "Voice commands are working! Try saying: Tebra, calendar";
+        return "Voice commands are working! Try saying: Tebra, take me to the calendar";
       },
     },
 
     // ========================================================================
     // NAVIGATION COMMANDS (must come before patient commands!)
+    // These use broad patterns to catch natural speech variations
     // ========================================================================
     {
       id: "go-calendar",
       description: "Navigate to the calendar/schedule",
-      patterns: [/calendar/i, /schedule/i],
+      patterns: [/calendar/i, /schedule/i, /appointments/i],
       handler: async () => {
         router.push("/home/schedule");
         return "Here's your calendar";
@@ -216,7 +217,7 @@ export function createCommandRegistry(deps: CommandDependencies): VoiceCommand[]
     {
       id: "go-home",
       description: "Navigate to the home page",
-      patterns: [/\bhome\b/i, /\bdashboard\b/i],
+      patterns: [/\bhome\s*page\b/i, /\bhome\b/i, /\bdashboard\b/i, /\bmain\s*page\b/i],
       handler: async () => {
         router.push("/home");
         return "Taking you home";
@@ -224,9 +225,9 @@ export function createCommandRegistry(deps: CommandDependencies): VoiceCommand[]
     },
 
     {
-      id: "go-patients",
+      id: "go-patients-list",
       description: "Navigate to patients list",
-      patterns: [/\bpatients?\b/i],
+      patterns: [/\bpatient\s*list\b/i, /\bmy\s+patients\b/i, /\ball\s+patients\b/i],
       handler: async () => {
         router.push("/home/patients");
         return "Here's your patient list";
@@ -236,7 +237,7 @@ export function createCommandRegistry(deps: CommandDependencies): VoiceCommand[]
     {
       id: "go-billing",
       description: "Navigate to billing",
-      patterns: [/billing/i],
+      patterns: [/billing/i, /payments?/i, /claims?/i],
       handler: async () => {
         router.push("/home/billing");
         return "Opening billing";
@@ -246,7 +247,7 @@ export function createCommandRegistry(deps: CommandDependencies): VoiceCommand[]
     {
       id: "go-marketing",
       description: "Navigate to marketing",
-      patterns: [/marketing/i],
+      patterns: [/marketing/i, /campaigns?/i],
       handler: async () => {
         router.push("/home/marketing");
         return "Here's your marketing dashboard";
@@ -256,7 +257,7 @@ export function createCommandRegistry(deps: CommandDependencies): VoiceCommand[]
     {
       id: "go-messages",
       description: "Navigate to messages",
-      patterns: [/messages?/i, /inbox/i],
+      patterns: [/messages?/i, /inbox/i, /communications?/i],
       handler: async () => {
         router.push("/home/communications");
         return "Here are your messages";
@@ -264,22 +265,37 @@ export function createCommandRegistry(deps: CommandDependencies): VoiceCommand[]
     },
 
     // ========================================================================
-    // PATIENT COMMANDS (must come AFTER navigation to avoid conflicts)
+    // PATIENT COMMANDS - "show me [name]" patterns
+    // Must come AFTER navigation to avoid conflicts
     // ========================================================================
     {
       id: "show-patient",
       description: "Show a patient's chart",
       patterns: [
-        // Specific patterns that require patient-related words
-        /^(?:show\s+(?:me\s+)?|open\s+|find\s+|pull\s+up\s+)(.+?)(?:'s)?\s*(?:chart|record|file)$/i,
-        /^(?:patient\s+)(.+)$/i,
+        // "show me Sarah", "take me to Sarah", "go to Sarah Johnson"
+        /^(?:show\s+me|take\s+me\s+to|open|find|pull\s+up|go\s+to)\s+(.+?)(?:'s)?(?:\s+chart|\s+record|\s+file)?$/i,
+        // "patient Sarah"
+        /^patient\s+(.+)$/i,
+        // "Sarah's chart"
         /^(.+?)(?:'s)\s+chart$/i,
       ],
       handler: async (match) => {
-        const patientName = match[1]?.trim();
-        if (!patientName) {
+        const rawName = match[1]?.trim();
+        if (!rawName) {
           return "I didn't catch the patient name. Could you say it again?";
         }
+
+        // Filter out navigation words - if they said "show me the calendar",
+        // that should have been caught by navigation commands above
+        const navWords =
+          /^(the\s+)?(calendar|schedule|home|homepage|dashboard|billing|marketing|messages?|inbox|patients?|patient\s*list|appointments?)$/i;
+        if (navWords.test(rawName)) {
+          // This shouldn't happen since nav commands come first, but just in case
+          return "I didn't catch the patient name. Try saying: show me Sarah Johnson";
+        }
+
+        // Clean up the name - remove leading "the" if present
+        const patientName = rawName.replace(/^the\s+/i, "").trim();
 
         try {
           const patients = await searchPatients(patientName);

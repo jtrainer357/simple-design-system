@@ -1,0 +1,19 @@
+{
+  "name": "marketing-intelligence-poc",
+  "version": "1.0.0",
+  "description": "Tebra Marketing Intelligence POC - Provider Discovery Score via Gemini 2.0 Flash with Google Search Grounding",
+  "type": "module",
+  "scripts": {
+    "analyze": "tsx analyze.ts",
+    "test": "tsx test-runner.ts"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0",
+    "@types/node": "^22.0.0"
+  }
+}

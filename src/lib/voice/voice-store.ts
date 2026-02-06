@@ -221,12 +221,8 @@ export const useVoiceStore = create<VoiceStore>((set, get) => ({
 
   // Speak response
   speak: async (text: string) => {
-    const { isListening } = get();
-
     // Pause listening while speaking to avoid echo
-    if (isListening) {
-      voiceEngine.pause();
-    }
+    voiceEngine.pause();
 
     set({
       isSpeaking: true,
@@ -239,13 +235,13 @@ export const useVoiceStore = create<VoiceStore>((set, get) => ({
     } finally {
       set({
         isSpeaking: false,
-        state: isListening ? "listening" : "idle",
+        isListening: true,
+        state: "listening",
       });
 
-      // Resume listening
-      if (isListening) {
-        voiceEngine.resume();
-      }
+      // Always resume listening after speaking - this is the expected behavior
+      // for a voice-first interface
+      voiceEngine.resume();
     }
   },
 }));
