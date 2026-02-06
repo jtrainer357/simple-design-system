@@ -21,6 +21,12 @@ import {
   Smile,
   Send,
   Play,
+  ArrowLeft,
+  Clock,
+  User,
+  FileText,
+  Stethoscope,
+  ClipboardList,
 } from "lucide-react";
 import { Card } from "@/design-system/components/ui/card";
 import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
@@ -146,6 +152,14 @@ export interface PatientDetail {
     title: string;
     description: string;
     date: string;
+    // Extended fields for visit summary panel
+    visitSummary?: string;
+    duration?: string;
+    provider?: string;
+    appointmentType?: string;
+    diagnosisCodes?: string[];
+    treatmentNotes?: string;
+    nextSteps?: string;
   }>;
   messages?: PatientMessage[];
   invoices?: PatientInvoice[];
@@ -505,7 +519,503 @@ function PatientChatThread({ patient }: { patient: PatientDetail }) {
   );
 }
 
+// Type for selected activity with full details
+type SelectedActivity = PatientDetail["recentActivity"][number];
+
+// Full Clinical Note Component
+function FullNoteView({
+  activity,
+  patientName,
+  onBack,
+}: {
+  activity: SelectedActivity;
+  patientName: string;
+  onBack: () => void;
+}) {
+  // Generate realistic SOAP note content based on session type
+  const getNoteContent = () => {
+    const isSubstanceUse =
+      activity.title?.toLowerCase().includes("substance") ||
+      activity.diagnosisCodes?.some((c) => c.toLowerCase().includes("substance"));
+
+    if (isSubstanceUse || activity.appointmentType === "Individual Therapy") {
+      return {
+        chiefComplaint:
+          "Follow-up for ongoing individual therapy, mood management, and coping skills development.",
+        subjective: `Patient reports: "I've been doing better this week. The techniques we discussed last session really helped when I felt triggered." Patient describes improved sleep quality (6-7 hours/night vs 4-5 previously). Denies any return to substance use. Reports attending 2 support group meetings this week. Mood described as "mostly stable with some anxiety around work deadlines." No suicidal or homicidal ideation. Appetite normal. Energy levels improving.`,
+        objective: `Patient arrived on time, appropriately dressed with good hygiene. Alert and oriented x4. Speech normal rate/rhythm/volume. Mood: "better." Affect: congruent, full range, appropriate. Thought process: linear, goal-directed. No evidence of psychosis, delusions, or hallucinations. Insight: good. Judgment: intact. Eye contact appropriate throughout session.`,
+        assessment: `${patientName} continues to make progress in treatment. Demonstrates improved coping skills and increased insight into triggers. Sustained recovery maintained. GAD symptoms showing improvement with current interventions. Patient remains engaged and motivated in treatment.`,
+        plan: [
+          "Continue individual therapy weekly x 4 sessions",
+          "Maintain current coping strategies (mindfulness, journaling, sponsor contact)",
+          "Continue support group attendance (minimum 2x/week)",
+          "Practice grounding techniques discussed today",
+          "Review sleep hygiene handout provided",
+          "Next appointment scheduled in 1 week",
+        ],
+        diagnoses: [
+          "F10.20 - Alcohol Use Disorder, Moderate, In Sustained Remission",
+          "F41.1 - Generalized Anxiety Disorder",
+        ],
+        vitals: {
+          bp: "122/78",
+          hr: "72",
+          phq9: "8 (mild)",
+          gad7: "10 (moderate)",
+        },
+      };
+    }
+
+    // Default therapy note
+    return {
+      chiefComplaint: "Scheduled follow-up for ongoing psychotherapy and symptom management.",
+      subjective: `Patient reports overall improvement since last session. Describes practicing coping techniques discussed previously with moderate success. Sleep and appetite within normal limits. Denies suicidal or homicidal ideation. Reports some ongoing stressors related to work/family but feels better equipped to manage them.`,
+      objective: `Patient arrived on time, casually dressed, good hygiene. Alert and oriented x4. Cooperative and engaged throughout session. Mood: "okay." Affect: appropriate, full range. Thought process: linear and goal-directed. No evidence of psychosis. Insight and judgment intact.`,
+      assessment: `Patient demonstrates continued engagement in treatment and progress toward therapeutic goals. Current symptoms are well-managed with existing treatment approach.`,
+      plan: [
+        "Continue current treatment approach",
+        "Practice techniques discussed in session",
+        "Schedule follow-up appointment",
+      ],
+      diagnoses: ["F41.1 - Generalized Anxiety Disorder"],
+      vitals: {
+        phq9: "6 (mild)",
+        gad7: "8 (mild)",
+      },
+    };
+  };
+
+  const note = getNoteContent();
+
+  return (
+    <div className="flex h-full flex-col">
+      {/* Header */}
+      <div className="mb-4 flex items-center justify-between border-b pb-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={onBack}
+            className="hover:bg-muted flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </button>
+          <div>
+            <Heading level={5} className="text-base sm:text-lg">
+              Clinical Note
+            </Heading>
+            <Text size="sm" muted>
+              {activity.title} • {activity.date}
+            </Text>
+          </div>
+        </div>
+        <Badge variant="secondary" className="text-xs">
+          Signed & Locked
+        </Badge>
+      </div>
+
+      {/* Note Content */}
+      <div className="flex-1 space-y-5 overflow-y-auto">
+        {/* Patient & Session Info */}
+        <Card className="bg-muted/30 p-4">
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div>
+              <Text size="xs" muted>
+                Patient
+              </Text>
+              <Text size="sm" className="font-medium">
+                {patientName}
+              </Text>
+            </div>
+            <div>
+              <Text size="xs" muted>
+                Date of Service
+              </Text>
+              <Text size="sm" className="font-medium">
+                {activity.date}
+              </Text>
+            </div>
+            <div>
+              <Text size="xs" muted>
+                Provider
+              </Text>
+              <Text size="sm" className="font-medium">
+                {activity.provider || "Dr. Demo"}
+              </Text>
+            </div>
+            <div>
+              <Text size="xs" muted>
+                Duration
+              </Text>
+              <Text size="sm" className="font-medium">
+                {activity.duration || "60 min"}
+              </Text>
+            </div>
+          </div>
+        </Card>
+
+        {/* Vitals / Assessments */}
+        {note.vitals && (
+          <div>
+            <Text size="sm" className="mb-2 font-semibold text-stone-500">
+              CLINICAL MEASURES
+            </Text>
+            <Card className="p-4">
+              <div className="flex flex-wrap gap-4">
+                {note.vitals.bp && (
+                  <div className="flex items-center gap-2">
+                    <div className="bg-muted flex h-7 w-7 items-center justify-center rounded-full">
+                      <Text size="xs" className="font-medium">
+                        BP
+                      </Text>
+                    </div>
+                    <Text size="sm">{note.vitals.bp} mmHg</Text>
+                  </div>
+                )}
+                {note.vitals.hr && (
+                  <div className="flex items-center gap-2">
+                    <div className="bg-muted flex h-7 w-7 items-center justify-center rounded-full">
+                      <Text size="xs" className="font-medium">
+                        HR
+                      </Text>
+                    </div>
+                    <Text size="sm">{note.vitals.hr} bpm</Text>
+                  </div>
+                )}
+                {note.vitals.phq9 && (
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 items-center justify-center rounded-full bg-blue-100 px-2.5">
+                      <Text size="xs" className="font-medium text-blue-700">
+                        PHQ-9
+                      </Text>
+                    </div>
+                    <Text size="sm">{note.vitals.phq9}</Text>
+                  </div>
+                )}
+                {note.vitals.gad7 && (
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-7 items-center justify-center rounded-full bg-purple-100 px-2.5">
+                      <Text size="xs" className="font-medium text-purple-700">
+                        GAD-7
+                      </Text>
+                    </div>
+                    <Text size="sm">{note.vitals.gad7}</Text>
+                  </div>
+                )}
+              </div>
+            </Card>
+          </div>
+        )}
+
+        {/* Chief Complaint */}
+        <div>
+          <Text size="sm" className="mb-2 font-semibold text-stone-500">
+            CHIEF COMPLAINT
+          </Text>
+          <Text size="sm" className="leading-relaxed">
+            {note.chiefComplaint}
+          </Text>
+        </div>
+
+        {/* Subjective */}
+        <div>
+          <Text size="sm" className="mb-2 font-semibold text-stone-500">
+            SUBJECTIVE
+          </Text>
+          <Card className="p-4">
+            <Text size="sm" className="leading-relaxed whitespace-pre-wrap">
+              {note.subjective}
+            </Text>
+          </Card>
+        </div>
+
+        {/* Objective */}
+        <div>
+          <Text size="sm" className="mb-2 font-semibold text-stone-500">
+            OBJECTIVE
+          </Text>
+          <Card className="p-4">
+            <Text size="sm" className="leading-relaxed">
+              {note.objective}
+            </Text>
+          </Card>
+        </div>
+
+        {/* Assessment */}
+        <div>
+          <Text size="sm" className="mb-2 font-semibold text-stone-500">
+            ASSESSMENT
+          </Text>
+          <Card className="p-4">
+            <Text size="sm" className="mb-3 leading-relaxed">
+              {note.assessment}
+            </Text>
+            <div className="border-t pt-3">
+              <Text size="xs" muted className="mb-2">
+                Diagnoses:
+              </Text>
+              <div className="space-y-1">
+                {note.diagnoses.map((dx, i) => (
+                  <Text key={i} size="sm" className="font-mono text-xs">
+                    {dx}
+                  </Text>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Plan */}
+        <div>
+          <Text size="sm" className="mb-2 font-semibold text-stone-500">
+            PLAN
+          </Text>
+          <Card className="p-4">
+            <ul className="space-y-2">
+              {note.plan.map((item, i) => (
+                <li key={i} className="flex items-start gap-2">
+                  <span className="bg-primary/10 text-primary mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full text-xs font-medium">
+                    {i + 1}
+                  </span>
+                  <Text size="sm">{item}</Text>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </div>
+
+        {/* Signature */}
+        <Card className="bg-muted/30 p-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <Text size="sm" className="font-medium">
+                Electronically signed by {activity.provider || "Dr. Demo"}
+              </Text>
+              <Text size="xs" muted>
+                {activity.date} at 4:32 PM
+              </Text>
+            </div>
+            <Badge className="bg-green-100 text-green-700">✓ Verified</Badge>
+          </div>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
+// Visit Summary Panel Component
+function VisitSummaryPanel({
+  activity,
+  patientName,
+  onBack,
+}: {
+  activity: SelectedActivity;
+  patientName: string;
+  onBack: () => void;
+}) {
+  const [showFullNote, setShowFullNote] = React.useState(false);
+
+  return (
+    <div className="relative h-full overflow-hidden">
+      {/* Sliding container for summary <-> full note transition */}
+      <div
+        className={cn(
+          "flex h-full transition-transform duration-300 ease-in-out",
+          showFullNote ? "-translate-x-1/2" : "translate-x-0"
+        )}
+        style={{ width: "200%" }}
+      >
+        {/* Panel 1: Visit Summary */}
+        <div className="flex h-full w-1/2 shrink-0 flex-col">
+          {/* Header with back button */}
+          <div className="mb-4 flex items-center gap-3">
+            <button
+              onClick={onBack}
+              className="hover:bg-muted flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <div>
+              <Heading level={5} className="text-base sm:text-lg">
+                {activity.title}
+              </Heading>
+              <Text size="sm" muted>
+                {activity.date}
+              </Text>
+            </div>
+          </div>
+
+          {/* Visit details */}
+          <div className="flex-1 space-y-4 overflow-y-auto pr-2">
+            {/* Session Info Card */}
+            <Card className="p-4">
+              <div className="grid grid-cols-4 gap-3">
+                <div>
+                  <Text size="xs" muted className="mb-0.5">
+                    Duration
+                  </Text>
+                  <Text size="sm" className="font-medium">
+                    {activity.duration || "60 min"}
+                  </Text>
+                </div>
+                <div>
+                  <Text size="xs" muted className="mb-0.5">
+                    Provider
+                  </Text>
+                  <Text size="sm" className="font-medium">
+                    {activity.provider || "Dr. Demo"}
+                  </Text>
+                </div>
+                <div>
+                  <Text size="xs" muted className="mb-0.5">
+                    Type
+                  </Text>
+                  <Text size="sm" className="font-medium">
+                    {activity.appointmentType || "Individual"}
+                  </Text>
+                </div>
+                <div>
+                  <Text size="xs" muted className="mb-0.5">
+                    Location
+                  </Text>
+                  <Text size="sm" className="font-medium">
+                    In-office
+                  </Text>
+                </div>
+              </div>
+            </Card>
+
+            {/* Visit Summary */}
+            <div>
+              <div className="mb-2 flex items-center gap-2">
+                <FileText className="text-muted-foreground h-4 w-4" />
+                <Text size="sm" className="font-semibold">
+                  Session Summary
+                </Text>
+              </div>
+              <Card className="p-4">
+                <Text size="sm" className="leading-relaxed">
+                  {activity.visitSummary || activity.description}
+                </Text>
+              </Card>
+            </div>
+
+            {/* Diagnosis/Focus Areas */}
+            {activity.diagnosisCodes && activity.diagnosisCodes.length > 0 && (
+              <div>
+                <div className="mb-2 flex items-center gap-2">
+                  <Stethoscope className="text-muted-foreground h-4 w-4" />
+                  <Text size="sm" className="font-semibold">
+                    Focus Areas
+                  </Text>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {activity.diagnosisCodes.map((code, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs">
+                      {code}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Treatment Notes */}
+            {activity.treatmentNotes && (
+              <div>
+                <div className="mb-2 flex items-center gap-2">
+                  <ClipboardList className="text-muted-foreground h-4 w-4" />
+                  <Text size="sm" className="font-semibold">
+                    Treatment Notes
+                  </Text>
+                </div>
+                <Card className="p-4">
+                  <Text size="sm" className="leading-relaxed">
+                    {activity.treatmentNotes}
+                  </Text>
+                </Card>
+              </div>
+            )}
+
+            {/* Next Steps */}
+            {activity.nextSteps && (
+              <div>
+                <div className="mb-2 flex items-center gap-2">
+                  <Sparkles className="text-primary h-4 w-4" />
+                  <Text size="sm" className="font-semibold">
+                    Next Steps
+                  </Text>
+                </div>
+                <Card className="border-primary/20 bg-primary/5 p-4">
+                  <Text size="sm" className="leading-relaxed">
+                    {activity.nextSteps}
+                  </Text>
+                </Card>
+              </div>
+            )}
+
+            {/* Billing Summary */}
+            <div>
+              <div className="mb-2 flex items-center gap-2">
+                <DollarSign className="text-muted-foreground h-4 w-4" />
+                <Text size="sm" className="font-semibold">
+                  Billing Summary
+                </Text>
+              </div>
+              <Card className="p-4">
+                <div className="grid grid-cols-3 gap-3">
+                  <div>
+                    <Text size="xs" muted className="mb-0.5">
+                      Copay Collected
+                    </Text>
+                    <Text size="sm" className="font-medium text-green-600">
+                      $25.00
+                    </Text>
+                  </div>
+                  <div>
+                    <Text size="xs" muted className="mb-0.5">
+                      Insurance Claim
+                    </Text>
+                    <Text size="sm" className="font-medium">
+                      Submitted
+                    </Text>
+                  </div>
+                  <div>
+                    <Text size="xs" muted className="mb-0.5">
+                      Balance
+                    </Text>
+                    <Text size="sm" className="font-medium">
+                      $0.00
+                    </Text>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          </div>
+
+          {/* Footer with View Note button */}
+          <div className="mt-4 flex justify-end border-t pt-4">
+            <Button variant="outline" className="gap-2" onClick={() => setShowFullNote(true)}>
+              <FileText className="h-4 w-4" />
+              View Full Note
+            </Button>
+          </div>
+        </div>
+
+        {/* Panel 2: Full Clinical Note */}
+        <div className="h-full w-1/2 shrink-0 pl-6">
+          <FullNoteView
+            activity={activity}
+            patientName={patientName}
+            onBack={() => setShowFullNote(false)}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function PatientDetailView({ patient, className }: PatientDetailViewProps) {
+  // State for selected activity (visit summary panel)
+  const [selectedActivity, setSelectedActivity] = React.useState<SelectedActivity | null>(null);
+
   if (!patient) {
     return (
       <CardWrapper className={cn("flex h-full items-center justify-center", className)}>
@@ -625,289 +1135,326 @@ export function PatientDetailView({ patient, className }: PatientDetailViewProps
         </div>
       </CardWrapper>
 
-      {/* Tabs Section */}
-      <CardWrapper className="flex flex-1 flex-col overflow-hidden">
-        <Tabs defaultValue="overview" className="flex h-full w-full flex-col">
-          <TabsList className="border-border/50 mb-4 h-auto w-full justify-start gap-0 overflow-x-auto border-b-2 bg-transparent p-0 sm:mb-6">
-            <TabsTrigger value="overview" className={tabTriggerStyles}>
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="appointments" className={tabTriggerStyles}>
-              Appointments
-            </TabsTrigger>
-            <TabsTrigger value="medical-records" className={tabTriggerStyles}>
-              Medical Records
-            </TabsTrigger>
-            <TabsTrigger value="messages" className={tabTriggerStyles}>
-              Messages
-            </TabsTrigger>
-            <TabsTrigger value="billing" className={tabTriggerStyles}>
-              Billing
-            </TabsTrigger>
-            <TabsTrigger value="reviews" className={tabTriggerStyles}>
-              Reviews
-            </TabsTrigger>
-          </TabsList>
+      {/* Tabs Section with Full-Panel Sliding */}
+      <div className="relative flex-1 overflow-hidden">
+        {/* Sliding container for full panel transition */}
+        <div
+          className={cn(
+            "flex h-full transition-transform duration-300 ease-in-out",
+            selectedActivity ? "-translate-x-1/2" : "translate-x-0"
+          )}
+          style={{ width: "200%" }}
+        >
+          {/* Panel 1: Tabs Content */}
+          <div className="h-full w-1/2 shrink-0">
+            <CardWrapper className="flex h-full flex-col overflow-hidden">
+              <Tabs defaultValue="overview" className="flex h-full w-full flex-col">
+                <TabsList className="border-border/50 mb-4 h-auto w-full justify-start gap-0 overflow-x-auto border-b-2 bg-transparent p-0 sm:mb-6">
+                  <TabsTrigger value="overview" className={tabTriggerStyles}>
+                    Overview
+                  </TabsTrigger>
+                  <TabsTrigger value="appointments" className={tabTriggerStyles}>
+                    Appointments
+                  </TabsTrigger>
+                  <TabsTrigger value="medical-records" className={tabTriggerStyles}>
+                    Medical Records
+                  </TabsTrigger>
+                  <TabsTrigger value="messages" className={tabTriggerStyles}>
+                    Messages
+                  </TabsTrigger>
+                  <TabsTrigger value="billing" className={tabTriggerStyles}>
+                    Billing
+                  </TabsTrigger>
+                  <TabsTrigger value="reviews" className={tabTriggerStyles}>
+                    Reviews
+                  </TabsTrigger>
+                </TabsList>
 
-          {/* Overview Tab Content */}
-          <TabsContent value="overview" className="mt-0 flex-1 overflow-y-auto">
-            {/* Prioritized Actions - AI Surfaced */}
-            <div className="mb-4 sm:mb-6">
-              <div className="mb-3 flex items-center justify-between sm:mb-4">
-                <div className="flex items-center gap-2">
-                  <Heading level={5} className="text-base sm:text-lg">
-                    Prioritized Actions
-                  </Heading>
-                  <span className="text-primary flex items-center gap-1 text-[10px] font-medium sm:text-xs">
-                    <Sparkles className="h-3 w-3" />
-                    AI Surfaced
-                  </span>
-                </div>
-                <Button variant="link" className="h-auto p-0 text-xs sm:text-sm">
-                  View All
-                </Button>
-              </div>
-              <div className="flex flex-col gap-3">
-                {(patient.prioritizedActions || []).slice(0, 4).map((action) => (
-                  <PriorityActionCard
-                    key={action.id}
-                    type={action.type}
-                    title={action.title}
-                    description={action.description}
-                    priority={action.priority}
-                    dueDate={action.dueDate}
-                    aiConfidence={action.aiConfidence}
-                  />
-                ))}
-                {(!patient.prioritizedActions || patient.prioritizedActions.length === 0) && (
-                  <div className="border-muted-foreground/30 rounded-lg border-2 border-dashed py-8">
-                    <Text size="sm" muted className="text-center">
-                      No prioritized actions at this time
-                    </Text>
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Recent Activity */}
-            <div>
-              <Heading level={5} className="mb-3 text-base sm:mb-4 sm:text-lg">
-                Recent Activity
-              </Heading>
-              <div>
-                {patient.recentActivity.map((activity, index) => (
-                  <ActivityRow
-                    key={activity.id}
-                    title={activity.title}
-                    description={activity.description}
-                    date={activity.date}
-                    isRecent={index === 0}
-                    isLast={index === patient.recentActivity.length - 1}
-                  />
-                ))}
-                {patient.recentActivity.length === 0 && (
-                  <Text size="sm" muted className="py-4 text-center">
-                    No recent activity
-                  </Text>
-                )}
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Placeholder content for other tabs */}
-          <TabsContent value="appointments" className="mt-0 flex-1 overflow-y-auto pr-1">
-            <div className="space-y-2">
-              {(patient.allAppointments || patient.upcomingAppointments).map((apt) => (
-                <AppointmentPreviewCard
-                  key={apt.id}
-                  status={
-                    apt.status as
-                      | "Scheduled"
-                      | "Confirmed"
-                      | "Checked In"
-                      | "In Progress"
-                      | "Completed"
-                      | "Cancelled"
-                      | "No-Show"
-                  }
-                  date={apt.date}
-                  time={apt.time}
-                  type={apt.type}
-                  provider={apt.provider}
-                />
-              ))}
-              {(patient.allAppointments || patient.upcomingAppointments).length === 0 && (
-                <div className="border-muted-foreground/30 rounded-lg border-2 border-dashed py-8">
-                  <Text size="sm" muted className="text-center">
-                    No appointments found
-                  </Text>
-                </div>
-              )}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="medical-records" className="mt-0 flex-1 overflow-y-auto pr-1">
-            {patient.outcomeMeasures && patient.outcomeMeasures.length > 0 ? (
-              <div className="space-y-3">
-                {patient.outcomeMeasures.map((measure) => (
-                  <Card
-                    key={measure.id}
-                    className="hover:bg-card-hover/70 p-3 transition-all hover:border-white hover:shadow-md sm:p-4"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <Text className="font-medium">{measure.measureType}</Text>
-                        {measure.score !== null && (
-                          <Text size="sm" muted className="mt-1">
-                            Score: {measure.score}
-                          </Text>
-                        )}
-                        {measure.notes && (
-                          <Text size="sm" muted className="mt-1">
-                            {measure.notes}
-                          </Text>
-                        )}
+                {/* Overview Tab Content */}
+                <TabsContent value="overview" className="mt-0 flex-1 overflow-y-auto">
+                  {/* Prioritized Actions - AI Surfaced */}
+                  <div className="mb-4 sm:mb-6">
+                    <div className="mb-3 flex items-center justify-between sm:mb-4">
+                      <div className="flex items-center gap-2">
+                        <Heading level={5} className="text-base sm:text-lg">
+                          Prioritized Actions
+                        </Heading>
+                        <span className="text-primary flex items-center gap-1 text-[10px] font-medium sm:text-xs">
+                          <Sparkles className="h-3 w-3" />
+                          AI Surfaced
+                        </span>
                       </div>
-                      <Text size="xs" muted>
-                        {new Date(measure.measurementDate).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </Text>
+                      <Button variant="link" className="h-auto p-0 text-xs sm:text-sm">
+                        View All
+                      </Button>
                     </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="border-muted-foreground/30 rounded-lg border-2 border-dashed py-8">
-                <Text size="sm" muted className="text-center">
-                  No medical records found
-                </Text>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="messages" className="-mx-6 mt-0 -mb-6 flex-1 overflow-hidden">
-            <PatientChatThread patient={patient} />
-          </TabsContent>
-
-          <TabsContent value="billing" className="mt-0 flex-1 overflow-y-auto pr-1">
-            {patient.invoices && patient.invoices.length > 0 ? (
-              <div className="space-y-3">
-                {patient.invoices.map((invoice) => (
-                  <Card
-                    key={invoice.id}
-                    className="hover:bg-card-hover/70 p-3 transition-all hover:border-white hover:shadow-md sm:p-4"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <Text className="font-medium">
-                          {invoice.description || "Service Charge"}
-                        </Text>
-                        <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
-                          <Text size="sm" muted>
-                            Charge: ${invoice.chargeAmount.toFixed(2)}
+                    <div className="flex flex-col gap-3">
+                      {(patient.prioritizedActions || []).slice(0, 4).map((action) => (
+                        <PriorityActionCard
+                          key={action.id}
+                          type={action.type}
+                          title={action.title}
+                          description={action.description}
+                          priority={action.priority}
+                          dueDate={action.dueDate}
+                          aiConfidence={action.aiConfidence}
+                        />
+                      ))}
+                      {(!patient.prioritizedActions || patient.prioritizedActions.length === 0) && (
+                        <div className="border-muted-foreground/30 rounded-lg border-2 border-dashed py-8">
+                          <Text size="sm" muted className="text-center">
+                            No prioritized actions at this time
                           </Text>
-                          {invoice.insurancePaid > 0 && (
-                            <Text size="sm" muted>
-                              Insurance: ${invoice.insurancePaid.toFixed(2)}
-                            </Text>
-                          )}
-                          {invoice.patientPaid > 0 && (
-                            <Text size="sm" muted>
-                              Patient Paid: ${invoice.patientPaid.toFixed(2)}
-                            </Text>
-                          )}
                         </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Recent Activity */}
+                  <div>
+                    <Heading level={5} className="mb-3 text-base sm:mb-4 sm:text-lg">
+                      Recent Activity
+                    </Heading>
+                    <div>
+                      {patient.recentActivity.map((activity, index) => (
+                        <ActivityRow
+                          key={activity.id}
+                          title={activity.title}
+                          description={activity.description}
+                          date={activity.date}
+                          isRecent={index === 0}
+                          isLast={index === patient.recentActivity.length - 1}
+                          onClick={() => setSelectedActivity(activity)}
+                        />
+                      ))}
+                      {patient.recentActivity.length === 0 && (
+                        <Text size="sm" muted className="py-4 text-center">
+                          No recent activity
+                        </Text>
+                      )}
+                    </div>
+                  </div>
+                </TabsContent>
+
+                {/* Placeholder content for other tabs */}
+                <TabsContent value="appointments" className="mt-0 flex-1 overflow-y-auto pr-1">
+                  <div className="space-y-2">
+                    {(patient.allAppointments || patient.upcomingAppointments).map((apt) => (
+                      <AppointmentPreviewCard
+                        key={apt.id}
+                        status={
+                          apt.status as
+                            | "Scheduled"
+                            | "Confirmed"
+                            | "Checked In"
+                            | "In Progress"
+                            | "Completed"
+                            | "Cancelled"
+                            | "No-Show"
+                        }
+                        date={apt.date}
+                        time={apt.time}
+                        type={apt.type}
+                        provider={apt.provider}
+                      />
+                    ))}
+                    {(patient.allAppointments || patient.upcomingAppointments).length === 0 && (
+                      <div className="border-muted-foreground/30 rounded-lg border-2 border-dashed py-8">
+                        <Text size="sm" muted className="text-center">
+                          No appointments found
+                        </Text>
                       </div>
-                      <div className="text-right">
-                        <Badge
-                          variant={invoice.balance > 0 ? "destructive" : "default"}
-                          className="text-xs"
+                    )}
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="medical-records" className="mt-0 flex-1 overflow-y-auto pr-1">
+                  {patient.outcomeMeasures && patient.outcomeMeasures.length > 0 ? (
+                    <div className="space-y-3">
+                      {patient.outcomeMeasures.map((measure) => (
+                        <Card
+                          key={measure.id}
+                          className="hover:bg-card-hover/70 p-3 transition-all hover:border-white hover:shadow-md sm:p-4"
                         >
-                          {invoice.balance > 0 ? `Due: $${invoice.balance.toFixed(2)}` : "Paid"}
-                        </Badge>
-                        <Text size="xs" muted className="mt-1 block">
-                          {invoice.dateOfService
-                            ? new Date(invoice.dateOfService).toLocaleDateString("en-US", {
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <Text className="font-medium">{measure.measureType}</Text>
+                              {measure.score !== null && (
+                                <Text size="sm" muted className="mt-1">
+                                  Score: {measure.score}
+                                </Text>
+                              )}
+                              {measure.notes && (
+                                <Text size="sm" muted className="mt-1">
+                                  {measure.notes}
+                                </Text>
+                              )}
+                            </div>
+                            <Text size="xs" muted>
+                              {new Date(measure.measurementDate).toLocaleDateString("en-US", {
                                 month: "short",
                                 day: "numeric",
                                 year: "numeric",
-                              })
-                            : ""}
-                        </Text>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="border-muted-foreground/30 rounded-lg border-2 border-dashed py-8">
-                <Text size="sm" muted className="text-center">
-                  No billing records found
-                </Text>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="reviews" className="mt-0 flex-1 overflow-y-auto pr-1">
-            {patient.reviews && patient.reviews.length > 0 ? (
-              <div className="space-y-3">
-                {patient.reviews.map((review) => (
-                  <Card
-                    key={review.id}
-                    className="hover:bg-card-hover/70 p-3 transition-all hover:border-white hover:shadow-md sm:p-4"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center gap-0.5">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={cn(
-                                  "h-4 w-4",
-                                  star <= review.rating
-                                    ? "fill-yellow-400 text-yellow-400"
-                                    : "fill-muted text-muted"
-                                )}
-                              />
-                            ))}
+                              })}
+                            </Text>
                           </div>
-                          <Badge variant="outline" className="text-xs capitalize">
-                            {review.reviewType.replace(/_/g, " ")}
-                          </Badge>
-                        </div>
-                        <Text className="mt-2 font-medium">{review.title}</Text>
-                        <Text size="sm" muted className="mt-1">
-                          {review.reviewText}
-                        </Text>
-                        <Text size="xs" muted className="mt-2">
-                          By {review.isAnonymous ? "Anonymous" : review.reviewerName || "Anonymous"}
-                        </Text>
-                      </div>
-                      <Text size="xs" muted className="ml-4 shrink-0">
-                        {new Date(review.reviewDate).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border-muted-foreground/30 rounded-lg border-2 border-dashed py-8">
+                      <Text size="sm" muted className="text-center">
+                        No medical records found
                       </Text>
                     </div>
-                  </Card>
-                ))}
-              </div>
-            ) : (
-              <div className="border-muted-foreground/30 rounded-lg border-2 border-dashed py-8">
-                <Text size="sm" muted className="text-center">
-                  No reviews yet
-                </Text>
-              </div>
-            )}
-          </TabsContent>
-        </Tabs>
-      </CardWrapper>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="messages" className="-mx-6 mt-0 -mb-6 flex-1 overflow-hidden">
+                  <PatientChatThread patient={patient} />
+                </TabsContent>
+
+                <TabsContent value="billing" className="mt-0 flex-1 overflow-y-auto pr-1">
+                  {patient.invoices && patient.invoices.length > 0 ? (
+                    <div className="space-y-3">
+                      {patient.invoices.map((invoice) => (
+                        <Card
+                          key={invoice.id}
+                          className="hover:bg-card-hover/70 p-3 transition-all hover:border-white hover:shadow-md sm:p-4"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div>
+                              <Text className="font-medium">
+                                {invoice.description || "Service Charge"}
+                              </Text>
+                              <div className="mt-1 flex flex-wrap items-center gap-x-4 gap-y-1">
+                                <Text size="sm" muted>
+                                  Charge: ${invoice.chargeAmount.toFixed(2)}
+                                </Text>
+                                {invoice.insurancePaid > 0 && (
+                                  <Text size="sm" muted>
+                                    Insurance: ${invoice.insurancePaid.toFixed(2)}
+                                  </Text>
+                                )}
+                                {invoice.patientPaid > 0 && (
+                                  <Text size="sm" muted>
+                                    Patient Paid: ${invoice.patientPaid.toFixed(2)}
+                                  </Text>
+                                )}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <Badge
+                                variant={invoice.balance > 0 ? "destructive" : "default"}
+                                className="text-xs"
+                              >
+                                {invoice.balance > 0
+                                  ? `Due: $${invoice.balance.toFixed(2)}`
+                                  : "Paid"}
+                              </Badge>
+                              <Text size="xs" muted className="mt-1 block">
+                                {invoice.dateOfService
+                                  ? new Date(invoice.dateOfService).toLocaleDateString("en-US", {
+                                      month: "short",
+                                      day: "numeric",
+                                      year: "numeric",
+                                    })
+                                  : ""}
+                              </Text>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border-muted-foreground/30 rounded-lg border-2 border-dashed py-8">
+                      <Text size="sm" muted className="text-center">
+                        No billing records found
+                      </Text>
+                    </div>
+                  )}
+                </TabsContent>
+
+                <TabsContent value="reviews" className="mt-0 flex-1 overflow-y-auto pr-1">
+                  {patient.reviews && patient.reviews.length > 0 ? (
+                    <div className="space-y-3">
+                      {patient.reviews.map((review) => (
+                        <Card
+                          key={review.id}
+                          className="hover:bg-card-hover/70 p-3 transition-all hover:border-white hover:shadow-md sm:p-4"
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <div className="flex items-center gap-0.5">
+                                  {[1, 2, 3, 4, 5].map((star) => (
+                                    <Star
+                                      key={star}
+                                      className={cn(
+                                        "h-4 w-4",
+                                        star <= review.rating
+                                          ? "fill-yellow-400 text-yellow-400"
+                                          : "fill-muted text-muted"
+                                      )}
+                                    />
+                                  ))}
+                                </div>
+                                <Badge variant="outline" className="text-xs capitalize">
+                                  {review.reviewType.replace(/_/g, " ")}
+                                </Badge>
+                              </div>
+                              <Text className="mt-2 font-medium">{review.title}</Text>
+                              <Text size="sm" muted className="mt-1">
+                                {review.reviewText}
+                              </Text>
+                              <Text size="xs" muted className="mt-2">
+                                By{" "}
+                                {review.isAnonymous
+                                  ? "Anonymous"
+                                  : review.reviewerName || "Anonymous"}
+                              </Text>
+                            </div>
+                            <Text size="xs" muted className="ml-4 shrink-0">
+                              {new Date(review.reviewDate).toLocaleDateString("en-US", {
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </Text>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="border-muted-foreground/30 rounded-lg border-2 border-dashed py-8">
+                      <Text size="sm" muted className="text-center">
+                        No reviews yet
+                      </Text>
+                    </div>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </CardWrapper>
+          </div>
+
+          {/* Panel 2: Visit Summary (Full Panel) */}
+          <div className="h-full w-1/2 shrink-0">
+            <CardWrapper className="flex h-full flex-col">
+              {selectedActivity ? (
+                <VisitSummaryPanel
+                  activity={selectedActivity}
+                  patientName={patient.name}
+                  onBack={() => setSelectedActivity(null)}
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center">
+                  <Text muted>Select an activity to view details</Text>
+                </div>
+              )}
+            </CardWrapper>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

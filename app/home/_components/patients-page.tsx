@@ -179,32 +179,99 @@ function createPatientDetail(
     );
   };
 
+  // Generate visit summary details for the sliding panel
+  const getVisitSummaryDetails = (serviceType: string, patientName: string, duration?: number) => {
+    const durationStr = duration ? `${duration} minutes` : "60 minutes";
+    const focusAreas: Record<string, string[]> = {
+      "Individual Therapy": ["Anxiety Management", "Cognitive Restructuring", "Coping Skills"],
+      "Initial Intake": ["Assessment", "History Review", "Treatment Planning"],
+      "Medication Management": ["Medication Review", "Side Effects", "Dosage Adjustment"],
+      "Group Therapy": ["Peer Support", "Social Skills", "Shared Experiences"],
+      "Family Therapy": ["Communication", "Family Dynamics", "Support Systems"],
+      Telehealth: ["Remote Care", "Progress Review", "Goal Setting"],
+      "Follow-up": ["Progress Review", "Treatment Adjustment", "Goal Tracking"],
+    };
+    const treatmentNotes: Record<string, string> = {
+      "Individual Therapy": `Patient engaged well in session. Practiced cognitive restructuring techniques for managing anxious thoughts. Reviewed homework assignments from previous session.`,
+      "Initial Intake": `Completed comprehensive intake assessment. Discussed presenting concerns, history, and treatment goals. Established rapport and outlined treatment approach.`,
+      "Medication Management": `Reviewed current medication regimen. Patient reports improved symptoms with manageable side effects. Continue current dosage and monitor.`,
+      "Group Therapy": `Patient participated actively in group discussion. Showed improvement in sharing experiences and providing peer support.`,
+      "Family Therapy": `Facilitated productive family discussion on communication patterns. Identified areas for improvement and assigned family exercises.`,
+      Telehealth: `Successfully conducted telehealth session. Patient comfortable with virtual format. Addressed ongoing concerns and adjusted treatment plan.`,
+      "Follow-up": `Reviewed progress since last session. Patient meeting treatment goals. Adjusted care plan as needed.`,
+    };
+    const nextSteps: Record<string, string> = {
+      "Individual Therapy": `Continue practicing mindfulness techniques between sessions. Complete thought log for next appointment.`,
+      "Initial Intake": `Schedule follow-up appointment to begin treatment. Review intake documentation and treatment plan.`,
+      "Medication Management": `Continue current medication. Follow up in 4 weeks to assess effectiveness.`,
+      "Group Therapy": `Attend next group session. Practice skills discussed with support network.`,
+      "Family Therapy": `Complete family communication exercises. Schedule follow-up to review progress.`,
+      Telehealth: `Schedule next telehealth appointment. Continue self-care practices discussed.`,
+      "Follow-up": `Maintain current treatment plan. Check in as scheduled or if concerns arise.`,
+    };
+
+    return {
+      duration: durationStr,
+      provider: "Dr. Demo",
+      diagnosisCodes: focusAreas[serviceType] || ["General Treatment"],
+      treatmentNotes:
+        treatmentNotes[serviceType] || `Session with ${patientName} completed successfully.`,
+      nextSteps:
+        nextSteps[serviceType] || `Continue current treatment plan and schedule follow-up.`,
+    };
+  };
+
   // Get recent activity from visit summaries (preferred) or appointments
   const recentActivity =
     visitSummaries.length > 0
-      ? visitSummaries.slice(0, 5).map((vs) => ({
-          id: vs.id,
-          title: getActivityTitle(vs.appointment_type || "Visit"),
-          description: vs.visit_summary || `Session with ${patient.first_name}`,
-          date: new Date(vs.visit_date).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-          }),
-        }))
-      : sortedAppts
-          .filter((a) => a.status === "Completed")
-          .slice(0, 5)
-          .map((a) => ({
-            id: a.id,
-            title: getActivityTitle(a.service_type),
-            description: getActivityDescription(a, patient.first_name),
-            date: new Date(a.date).toLocaleDateString("en-US", {
+      ? visitSummaries.slice(0, 5).map((vs) => {
+          const serviceType = vs.appointment_type || "Visit";
+          const details = getVisitSummaryDetails(serviceType, patient.first_name);
+          return {
+            id: vs.id,
+            title: getActivityTitle(serviceType),
+            description: vs.visit_summary || `Session with ${patient.first_name}`,
+            date: new Date(vs.visit_date).toLocaleDateString("en-US", {
               month: "short",
               day: "numeric",
               year: "numeric",
             }),
-          }));
+            visitSummary: vs.visit_summary || details.treatmentNotes,
+            duration: details.duration,
+            provider: details.provider,
+            appointmentType: serviceType,
+            diagnosisCodes: details.diagnosisCodes,
+            treatmentNotes: details.treatmentNotes,
+            nextSteps: details.nextSteps,
+          };
+        })
+      : sortedAppts
+          .filter((a) => a.status === "Completed")
+          .slice(0, 5)
+          .map((a) => {
+            const details = getVisitSummaryDetails(
+              a.service_type,
+              patient.first_name,
+              a.duration_minutes
+            );
+            return {
+              id: a.id,
+              title: getActivityTitle(a.service_type),
+              description: getActivityDescription(a, patient.first_name),
+              date: new Date(a.date).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              }),
+              visitSummary: a.notes || details.treatmentNotes,
+              duration: details.duration,
+              provider: details.provider,
+              appointmentType: a.service_type,
+              diagnosisCodes: details.diagnosisCodes,
+              treatmentNotes: details.treatmentNotes,
+              nextSteps: details.nextSteps,
+            };
+          });
 
   // Map all appointments for the appointments tab
   const allAppts = sortedAppts.map((a) => ({

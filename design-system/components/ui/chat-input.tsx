@@ -118,7 +118,7 @@ export function ChatInput({
           </div>
         </div>
 
-        <Button onClick={handleSend} disabled={disabled || !currentValue.trim()} className="gap-2">
+        <Button onClick={handleSend} disabled={disabled} className="gap-2">
           Send
           <Send className="h-4 w-4" />
         </Button>

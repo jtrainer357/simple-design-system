@@ -86,15 +86,15 @@ export function PatientListCard({
       </div>
 
       {/* Bottom row - Last Activity and Actions */}
-      <div className="border-border/50 mt-3 flex items-center justify-between border-t pt-3">
+      <div className="border-border/50 mt-2 -mb-1 flex items-center justify-between border-t pt-1">
         <Text size="xs" muted className="font-medium tracking-wide uppercase">
           Last Activity: {lastActivity}
         </Text>
-        <div className="flex items-center gap-0.5 sm:gap-1">
+        <div className="flex items-center gap-0">
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-foreground h-11 w-11"
+            className="text-muted-foreground hover:text-foreground h-8 w-8"
             onClick={(e) => {
               e.stopPropagation();
               onMessage?.();
@@ -105,7 +105,7 @@ export function PatientListCard({
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-foreground h-11 w-11"
+            className="text-muted-foreground hover:text-foreground h-8 w-8"
             onClick={(e) => {
               e.stopPropagation();
               onEmail?.();
@@ -116,7 +116,7 @@ export function PatientListCard({
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-foreground h-11 w-11"
+            className="text-muted-foreground hover:text-foreground h-8 w-8"
             onClick={(e) => {
               e.stopPropagation();
               onMore?.();

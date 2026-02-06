@@ -164,7 +164,10 @@ function BarChart({ data }: { data: number[] }) {
         <div
           key={i}
           className="bg-rating flex-1 rounded-t"
-          style={{ height: `${(value / max) * 100}%` }}
+          style={{
+            height: `${(value / max) * 100}%`,
+            opacity: i % 2 === 0 ? 0.9 : 0.8,
+          }}
         />
       ))}
     </div>
