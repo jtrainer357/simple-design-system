@@ -30,8 +30,8 @@ export function HeaderSearch() {
         </div>
 
         {/* Search bar with voice control inside + mobile header icons */}
-        <div className="flex items-center gap-2">
-          <div className="relative w-full sm:max-w-md md:max-w-xl lg:max-w-4xl xl:max-w-5xl">
+        <div className="flex items-center gap-2 lg:flex-1">
+          <div className="relative w-full">
             <div className="text-muted-foreground absolute top-1/2 left-3 z-10 flex -translate-y-1/2 items-center gap-1">
               {isListening ? (
                 <Mic className="h-4 w-4 text-[var(--color-primary)]" />

@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { LeftNav } from "./_components/left-nav";
 import { HeaderSearch } from "./_components/header-search";
 import { DynamicCanvas } from "./_components/dynamic-canvas";
@@ -9,11 +10,27 @@ import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
 import { BillingUpsellWidget } from "./_components/billing-upsell-widget";
 import { AnimatedBackground } from "@/design-system/components/ui/animated-background";
 import { PageTransition } from "@/design-system/components/ui/page-transition";
+import { WelcomeModal } from "./_components/welcome-modal";
 
 export default function HomePage() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const setupComplete = searchParams.get("setup_complete") === "true";
+  const [showWelcome, setShowWelcome] = React.useState(false);
+
+  // Show welcome modal if setup_complete is in URL
+  React.useEffect(() => {
+    if (setupComplete) {
+      setShowWelcome(true);
+      // Clean up URL by removing the query parameter
+      router.replace("/home", { scroll: false });
+    }
+  }, [setupComplete, router]);
+
   return (
     <div className="min-h-screen pb-24 lg:pb-0">
       <AnimatedBackground />
+      <WelcomeModal open={showWelcome} onOpenChange={setShowWelcome} />
 
       {/* Left Nav */}
       <LeftNav />
