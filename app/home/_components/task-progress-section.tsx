@@ -36,11 +36,11 @@ export function TaskProgressSection({ className }: TaskProgressSectionProps) {
             className={cn(
               "flex items-center gap-3 px-4 py-3",
               index !== taskItems.length - 1 && "border-b border-stone-100",
-              task.completed && "bg-emerald-50/50"
+              task.completed && "bg-[#FFCFBF]/20"
             )}
           >
             {task.completed ? (
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-emerald-500">
+              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#D4856A]">
                 <CheckCircle2 className="h-4 w-4 text-white" />
               </div>
             ) : (
@@ -51,7 +51,7 @@ export function TaskProgressSection({ className }: TaskProgressSectionProps) {
             <span
               className={cn(
                 "text-sm font-medium",
-                task.completed ? "text-emerald-700" : "text-stone-600"
+                task.completed ? "text-[#C4735A]" : "text-stone-600"
               )}
             >
               {task.label}

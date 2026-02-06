@@ -170,6 +170,8 @@ export interface PatientDetail {
 interface PatientDetailViewProps {
   patient: PatientDetail | null;
   className?: string;
+  /** Initial tab to display (overview, appointments, medical-records, messages, billing, reviews) */
+  initialTab?: string;
 }
 
 // Channel tabs for messaging
@@ -1012,9 +1014,22 @@ function VisitSummaryPanel({
   );
 }
 
-export function PatientDetailView({ patient, className }: PatientDetailViewProps) {
+export function PatientDetailView({
+  patient,
+  className,
+  initialTab = "overview",
+}: PatientDetailViewProps) {
   // State for selected activity (visit summary panel)
   const [selectedActivity, setSelectedActivity] = React.useState<SelectedActivity | null>(null);
+  // State for controlled tab
+  const [activeTab, setActiveTab] = React.useState(initialTab);
+
+  // Update activeTab when initialTab changes (e.g., from voice command)
+  React.useEffect(() => {
+    if (initialTab) {
+      setActiveTab(initialTab);
+    }
+  }, [initialTab]);
 
   if (!patient) {
     return (
@@ -1148,7 +1163,11 @@ export function PatientDetailView({ patient, className }: PatientDetailViewProps
           {/* Panel 1: Tabs Content */}
           <div className="h-full w-1/2 shrink-0">
             <CardWrapper className="flex h-full flex-col overflow-hidden">
-              <Tabs defaultValue="overview" className="flex h-full w-full flex-col">
+              <Tabs
+                value={activeTab}
+                onValueChange={setActiveTab}
+                className="flex h-full w-full flex-col"
+              >
                 <TabsList className="border-border/50 mb-4 h-auto w-full justify-start gap-0 overflow-x-auto border-b-2 bg-transparent p-0 sm:mb-6">
                   <TabsTrigger value="overview" className={tabTriggerStyles}>
                     Overview

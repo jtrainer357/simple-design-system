@@ -1,200 +1,143 @@
 "use client";
 
 /**
- * VoiceControl - Mic Button with 4 Visual States
+ * VoiceControl - Mic Button with 2 Visual States
  *
  * States:
- * 1. IDLE - Muted mic icon, no animation
- * 2. LISTENING - Red glow animation, white mic icon
- * 3. PROCESSING - Spinner/loading indicator
- * 4. SPEAKING - Sound wave bars, teal color
+ * 1. OFF (idle) - Transparent bg, primary (coral) mic icon
+ * 2. ON (listening) - Primary (coral) bg with pulse, white mic icon
  *
  * @module VoiceControl
  */
 
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Mic, Loader2 } from "lucide-react";
+import { Mic } from "lucide-react";
 import { cn } from "@/design-system/lib/utils";
-import { useVoiceStore } from "@/src/lib/voice";
-import type { VoiceState } from "@/src/lib/voice";
+import { voiceEngine } from "@/src/lib/voice/voice-engine";
 
 interface VoiceControlProps {
   className?: string;
   size?: "sm" | "md" | "lg";
+  onTranscriptChange?: (transcript: string) => void;
+  onListeningChange?: (isListening: boolean) => void;
 }
 
-// Sound wave animation for speaking state
-function SoundWave({ className }: { className?: string }) {
-  return (
-    <div className={cn("flex h-4 items-center justify-center gap-0.5", className)}>
-      {[0, 1, 2].map((i) => (
-        <motion.div
-          key={i}
-          className="w-0.5 rounded-full bg-white"
-          animate={{
-            height: ["8px", "16px", "8px"],
-          }}
-          transition={{
-            duration: 0.5,
-            repeat: Infinity,
-            delay: i * 0.15,
-            ease: "easeInOut",
-          }}
-        />
-      ))}
-    </div>
-  );
-}
-
-// Size configurations
+// Size configurations - bigger icons with heavier stroke
 const sizeConfig = {
-  sm: { button: "h-8 w-8", icon: "h-4 w-4" },
-  md: { button: "h-10 w-10", icon: "h-5 w-5" },
-  lg: { button: "h-12 w-12", icon: "h-6 w-6" },
+  sm: { button: "h-8 w-8", icon: "h-5 w-5", strokeWidth: 2.5 },
+  md: { button: "h-10 w-10", icon: "h-6 w-6", strokeWidth: 2.5 },
+  lg: { button: "h-12 w-12", icon: "h-7 w-7", strokeWidth: 2.5 },
 };
 
-// Inner component that handles the actual rendering
-function VoiceControlInner({
+export function VoiceControl({
   className,
   size = "md",
-  voiceState,
-  isSupported,
-}: VoiceControlProps & { voiceState: VoiceState; isSupported: boolean }) {
+  onTranscriptChange,
+  onListeningChange: onListeningChangeProp,
+}: VoiceControlProps) {
   const config = sizeConfig[size];
+  const [isListening, setIsListening] = React.useState(false);
+  const [transcript, setTranscript] = React.useState("");
 
-  const isIdle = voiceState === "idle";
-  const isListening = voiceState === "listening";
-  const isProcessing = voiceState === "processing";
-  const isSpeaking = voiceState === "speaking";
-  const isActive = isListening || isProcessing || isSpeaking;
+  // Check if supported (client-side only)
+  const [isSupported, setIsSupported] = React.useState(false);
 
-  const tooltipText = !isSupported
-    ? "Voice commands require Chrome"
-    : isIdle
-      ? "Click to enable voice commands"
-      : isListening
-        ? "Listening... say 'Tebra' followed by a command"
-        : isProcessing
-          ? "Processing..."
-          : isSpeaking
-            ? "Speaking..."
-            : "Voice commands";
+  React.useEffect(() => {
+    setIsSupported(voiceEngine.isSupported());
 
-  const handleClick = () => {
+    // Restore listening state if user had it activated (survives navigation)
+    if (voiceEngine.isUserActivated()) {
+      setIsListening(true);
+    }
+  }, []);
+
+  // Notify parent of transcript changes
+  React.useEffect(() => {
+    onTranscriptChange?.(transcript);
+  }, [transcript, onTranscriptChange]);
+
+  // Notify parent of listening state changes
+  React.useEffect(() => {
+    onListeningChangeProp?.(isListening);
+  }, [isListening, onListeningChangeProp]);
+
+  // Toggle voice listening
+  const handleToggle = React.useCallback(() => {
     if (!isSupported) return;
-    useVoiceStore.getState().toggleListening();
-  };
 
-  return (
-    <button
-      onClick={handleClick}
-      disabled={!isSupported}
-      aria-label={tooltipText}
-      aria-pressed={isActive}
-      title={tooltipText}
-      className={cn(
-        "relative flex items-center justify-center rounded-full transition-all duration-200",
-        "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-        config.button,
-        isIdle && "text-muted-foreground hover:text-foreground hover:bg-muted/50",
-        isListening && "bg-[#DC785D] text-white",
-        isProcessing && "bg-[#DC785D]/80 text-white",
-        isSpeaking && "bg-teal text-white",
-        !isSupported && "cursor-not-allowed opacity-50",
-        className
-      )}
-    >
-      {/* Outer glow ring - only when listening */}
-      <AnimatePresence>
-        {isListening && (
-          <motion.span
-            className="absolute inset-0 rounded-full bg-[#DC785D]/30"
-            initial={{ scale: 1, opacity: 0.6 }}
-            animate={{
-              scale: [1, 1.4, 1],
-              opacity: [0.6, 0, 0.6],
-            }}
-            exit={{ scale: 1, opacity: 0 }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        )}
-      </AnimatePresence>
+    if (isListening) {
+      voiceEngine.stop();
+      setIsListening(false);
+      setTranscript("");
+    } else {
+      const started = voiceEngine.start({
+        onTranscript: (text: string) => {
+          setTranscript(text);
+        },
+      });
+      if (started) {
+        setIsListening(true);
+      }
+    }
+  }, [isListening, isSupported]);
 
-      {/* Inner glow ring - only when listening */}
-      <AnimatePresence>
-        {isListening && (
-          <motion.span
-            className="absolute inset-0 rounded-full bg-[#DC785D]/50"
-            initial={{ scale: 1, opacity: 0.5 }}
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.5, 0.2, 0.5],
-            }}
-            exit={{ scale: 1, opacity: 0 }}
-            transition={{
-              duration: 1.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 0.2,
-            }}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Icon container */}
-      <span className="relative z-10 flex items-center justify-center">
-        {isProcessing ? (
-          <Loader2 className={cn(config.icon, "animate-spin")} />
-        ) : isSpeaking ? (
-          <SoundWave className={config.icon} />
-        ) : (
-          <Mic className={config.icon} />
-        )}
-      </span>
-    </button>
-  );
-}
-
-export function VoiceControl({ className, size = "md" }: VoiceControlProps) {
-  const config = sizeConfig[size];
-
-  // Use useSyncExternalStore for safe subscription
-  const voiceState = React.useSyncExternalStore(
-    (callback) => useVoiceStore.subscribe(callback),
-    () => useVoiceStore.getState().state,
-    () => "idle" as VoiceState // Server snapshot
-  );
-
-  const isSupported = React.useSyncExternalStore(
-    (callback) => useVoiceStore.subscribe(callback),
-    () => useVoiceStore.getState().isSupported,
-    () => false // Server snapshot
-  );
-
-  // Handle escape key
+  // Handle escape key to stop listening
   React.useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      const state = useVoiceStore.getState().state;
-      if (e.key === "Escape" && state !== "idle") {
-        useVoiceStore.getState().toggleListening();
+      if (e.key === "Escape" && isListening) {
+        voiceEngine.stop();
+        setIsListening(false);
+        setTranscript("");
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, []);
+  }, [isListening]);
+
+  // Don't render if not supported
+  if (!isSupported) {
+    return null;
+  }
+
+  const tooltipText = isListening
+    ? "Listening... say 'Tebra' followed by a command"
+    : "Click to enable voice commands";
 
   return (
-    <VoiceControlInner
-      className={className}
-      size={size}
-      voiceState={voiceState}
-      isSupported={isSupported}
-    />
+    <div className={cn("relative", className)}>
+      {/* The button — 2 states only: OFF (idle) and ON (listening) */}
+      <button
+        onClick={handleToggle}
+        aria-label={tooltipText}
+        aria-pressed={isListening}
+        title={tooltipText}
+        className={cn(
+          "relative flex items-center justify-center rounded-full transition-all duration-200",
+          "cursor-pointer border-none outline-none",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+          config.button,
+          isListening ? "bg-[var(--color-primary)] shadow-md" : "bg-transparent hover:bg-black/5"
+        )}
+      >
+        <Mic
+          className={cn(config.icon, isListening ? "text-white" : "text-[var(--color-primary)]")}
+          strokeWidth={config.strokeWidth}
+        />
+      </button>
+
+      {/* Subtle pulse ring — only when listening */}
+      <AnimatePresence>
+        {isListening && (
+          <motion.span
+            className="pointer-events-none absolute inset-0 rounded-full border-2 border-[var(--color-primary)]/40"
+            initial={{ scale: 1, opacity: 0.6 }}
+            animate={{ scale: 1.4, opacity: 0 }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}
+          />
+        )}
+      </AnimatePresence>
+    </div>
   );
 }

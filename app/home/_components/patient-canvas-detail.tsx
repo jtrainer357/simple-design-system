@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/design-system/components/ui/avatar";
-import { Badge } from "@/design-system/components/ui/badge";
 import { Button } from "@/design-system/components/ui/button";
 import { Card, CardContent } from "@/design-system/components/ui/card";
 import { Heading, Text } from "@/design-system/components/ui/typography";
@@ -11,7 +10,9 @@ import { LabResultsSection } from "@/src/components/orchestration/LabResultsSect
 import { SuggestedActionsSection } from "@/src/components/orchestration/SuggestedActionsSection";
 import { CurrentMedicationsSection } from "@/src/components/orchestration/CurrentMedicationsSection";
 import { TaskProgressSection } from "./task-progress-section";
+import { useShallow } from "zustand/react/shallow";
 import { useOrchestrationStore } from "@/src/components/orchestration/hooks/useActionOrchestration";
+import { executeActions } from "@/src/lib/orchestration/executeActions";
 import type {
   OrchestrationContext,
   SuggestedAction,
@@ -35,25 +36,91 @@ const extendedMedications: Medication[] = [
 export function PatientCanvasDetail({
   context,
   onCancel,
-  onComplete: _onComplete,
+  onComplete,
   className,
 }: PatientCanvasDetailProps) {
-  const openModal = useOrchestrationStore((state) => state.openModal);
+  const {
+    showOverlay,
+    startExecution,
+    updateTaskProgress,
+    completeExecution,
+    markPatientCompleted,
+  } = useOrchestrationStore(
+    useShallow((state) => ({
+      showOverlay: state.showOverlay,
+      startExecution: state.startExecution,
+      updateTaskProgress: state.updateTaskProgress,
+      completeExecution: state.completeExecution,
+      markPatientCompleted: state.markPatientCompleted,
+    }))
+  );
+
   const [actions, setActions] = React.useState<SuggestedAction[]>(
     context.suggestedActions.map((a) => ({ ...a }))
   );
+
+  // Create a ref for handleCompleteAll so we can use it in event listener
+  const handleCompleteAllRef = React.useRef<(() => void) | null>(null);
+
+  // Listen for voice command to complete all actions
+  React.useEffect(() => {
+    function handleVoiceCompleteActions() {
+      console.log("[PatientCanvasDetail] Voice complete actions triggered");
+      handleCompleteAllRef.current?.();
+    }
+
+    window.addEventListener("voice-complete-actions", handleVoiceCompleteActions);
+    return () => {
+      window.removeEventListener("voice-complete-actions", handleVoiceCompleteActions);
+    };
+  }, []);
+
+  // Sync actions to store when they change
+  React.useEffect(() => {
+    useOrchestrationStore.setState({
+      actions: actions,
+      context: context,
+    });
+  }, [actions, context]);
 
   const toggleAction = (actionId: string) => {
     setActions((prev) => prev.map((a) => (a.id === actionId ? { ...a, checked: !a.checked } : a)));
   };
 
-  const handleCompleteAll = () => {
-    // Open the orchestration modal with updated actions
-    openModal({
-      ...context,
-      suggestedActions: actions,
-    });
-  };
+  const handleCompleteAll = React.useCallback(async () => {
+    const checkedActions = actions.filter((a) => a.checked);
+    if (checkedActions.length === 0) return;
+
+    // Show the overlay
+    showOverlay();
+
+    // Start execution (this initializes taskProgress in the store)
+    startExecution();
+
+    // Execute actions with progress updates
+    await executeActions(actions, updateTaskProgress);
+
+    // Complete execution
+    completeExecution();
+
+    // Mark this patient as completed
+    markPatientCompleted(context.patient.id);
+
+    // The overlay will auto-close and call onComplete
+  }, [
+    actions,
+    showOverlay,
+    startExecution,
+    updateTaskProgress,
+    completeExecution,
+    markPatientCompleted,
+    context.patient.id,
+  ]);
+
+  // Update ref when handleCompleteAll changes
+  React.useEffect(() => {
+    handleCompleteAllRef.current = handleCompleteAll;
+  }, [handleCompleteAll]);
 
   const initials = context.patient.name
     .split(" ")
@@ -63,27 +130,28 @@ export function PatientCanvasDetail({
   const labResults = context.clinicalData.labResults || [];
 
   return (
-    <Card className={cn("overflow-hidden", className)}>
+    <Card className={cn("overflow-hidden bg-white/50", className)}>
       {/* Light Header */}
       <div className="border-border/50 border-b p-4 sm:p-6">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+        <div className="flex items-start gap-4">
           <Avatar className="border-border h-12 w-12 shrink-0 border-2 sm:h-14 sm:w-14">
             <AvatarImage src={context.patient.avatar} alt={context.patient.name} />
             <AvatarFallback className="bg-avatar-fallback text-white">{initials}</AvatarFallback>
           </Avatar>
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <Heading level={4} className="truncate">
-                {context.patient.name}
-              </Heading>
-              <Badge variant="secondary" className="shrink-0">
-                {context.patient.primaryDiagnosis}
-              </Badge>
-            </div>
+            <Heading level={4}>
+              {context.patient.name}, {context.patient.age}
+            </Heading>
             <Text size="sm" muted className="mt-1">
               MRN: {context.patient.mrn} &bull; DOB: {context.patient.dob} ({context.patient.age}{" "}
               years)
             </Text>
+            {context.patient.primaryDiagnosis &&
+              context.patient.primaryDiagnosis !== "Mental Health" && (
+                <Text size="sm" className="text-muted-foreground mt-2 leading-relaxed">
+                  {context.patient.primaryDiagnosis}
+                </Text>
+              )}
           </div>
         </div>
       </div>

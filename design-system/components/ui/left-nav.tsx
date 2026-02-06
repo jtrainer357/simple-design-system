@@ -152,63 +152,49 @@ export function LeftNav({
         </div>
       </aside>
 
-      {/* Tablet/Mobile Bottom Nav */}
+      {/* Tablet/Mobile Bottom Nav - excludes Communications (moved to header) */}
       <nav className="bg-card/95 safe-area-pb pointer-events-auto fixed right-0 bottom-0 left-0 z-40 flex items-center justify-around border-t px-4 py-3 backdrop-blur-sm lg:hidden">
-        {items.map((item, index) => {
-          const mobileButtonContent = (
-            <>
-              <item.icon className="h-5 w-5" />
-              <span className="sr-only">{item.label}</span>
-            </>
-          );
-          const mobileButtonClassName = cn(
-            "h-11 w-11 rounded-full border-[0.5px] border-selected-border text-teal-dark transition-all hover:bg-white/50",
-            item.active &&
-              "border-0 bg-teal-dark text-white shadow-xl hover:bg-teal-dark hover:text-white"
-          );
+        {items
+          .filter((item) => item.label !== "Communications")
+          .map((item, index) => {
+            const mobileButtonContent = (
+              <>
+                <item.icon className="h-5 w-5" />
+                <span className="sr-only">{item.label}</span>
+              </>
+            );
+            const mobileButtonClassName = cn(
+              "h-11 w-11 rounded-full border-[0.5px] border-selected-border text-teal-dark transition-all hover:bg-white/50",
+              item.active &&
+                "border-0 bg-teal-dark text-white shadow-xl hover:bg-teal-dark hover:text-white"
+            );
 
-          if (item.href) {
+            if (item.href) {
+              return (
+                <Button
+                  key={index}
+                  variant="ghost"
+                  size="icon"
+                  asChild
+                  className={mobileButtonClassName}
+                >
+                  <Link href={item.href}>{mobileButtonContent}</Link>
+                </Button>
+              );
+            }
+
             return (
               <Button
                 key={index}
                 variant="ghost"
                 size="icon"
-                asChild
+                onClick={item.onClick}
                 className={mobileButtonClassName}
               >
-                <Link href={item.href}>{mobileButtonContent}</Link>
+                {mobileButtonContent}
               </Button>
             );
-          }
-
-          return (
-            <Button
-              key={index}
-              variant="ghost"
-              size="icon"
-              onClick={item.onClick}
-              className={mobileButtonClassName}
-            >
-              {mobileButtonContent}
-            </Button>
-          );
-        })}
-        {showNotifications && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onNotificationsClick}
-            className="border-selected-border text-teal-dark relative h-11 w-11 rounded-full border-[0.5px] hover:bg-white/50"
-          >
-            <Bell className="h-5 w-5" />
-            {notificationCount && notificationCount > 0 && (
-              <span className="bg-destructive text-destructive-foreground absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px]">
-                {notificationCount > 9 ? "9+" : notificationCount}
-              </span>
-            )}
-            <span className="sr-only">Notifications</span>
-          </Button>
-        )}
+          })}
       </nav>
     </>
   );

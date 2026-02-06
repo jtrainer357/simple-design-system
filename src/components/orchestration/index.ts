@@ -6,6 +6,9 @@
 // Main modal component
 export { ActionOrchestrationModal } from "./ActionOrchestrationModal";
 
+// Full-page execution overlay
+export { ExecutionOverlay } from "./ExecutionOverlay";
+
 // Section components
 export { LabResultsSection } from "./LabResultsSection";
 export { SuggestedActionsSection } from "./SuggestedActionsSection";
@@ -19,6 +22,8 @@ export {
   useOrchestrationContext,
   useOrchestrationActions,
   useOrchestrationExecution,
+  useExecutionOverlay,
+  useCompletedPatients,
   useCheckedActionsCount,
 } from "./hooks/useActionOrchestration";
 

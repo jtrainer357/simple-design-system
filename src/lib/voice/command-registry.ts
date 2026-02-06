@@ -2,530 +2,373 @@
  * Voice Command Registry
  *
  * Comprehensive command patterns for the voice-first interface.
- * Each command includes regex patterns for natural speech variations,
- * a handler function, and a description for help text.
+ * Each command emits events to the voice event bus for page-level handling.
  *
  * @module command-registry
  */
 
 import type { VoiceCommand } from "./voice-engine";
-import type { AppRouter } from "./types";
+import { voiceEvents } from "./voice-events";
 
 // ============================================================================
 // HELPER FUNCTIONS
 // ============================================================================
 
 /**
- * Fuzzy match patient name against a list of patients
+ * Fuzzy match a string against a map of known values
  */
-function fuzzyMatchPatient(
-  query: string,
-  patients: Array<{ first_name: string; last_name: string; id: string }>
-): { first_name: string; last_name: string; id: string } | null {
-  const normalizedQuery = query.toLowerCase().trim();
+function fuzzyMatch(input: string, map: Record<string, string>): string | null {
+  const normalized = input.toLowerCase().trim();
 
   // Try exact match first
-  const exactMatch = patients.find((p) => {
-    const fullName = `${p.first_name} ${p.last_name}`.toLowerCase();
-    return fullName === normalizedQuery;
-  });
-  if (exactMatch) return exactMatch;
+  if (map[normalized]) return map[normalized];
 
-  // Try starts-with match
-  const startsWithMatch = patients.find((p) => {
-    const fullName = `${p.first_name} ${p.last_name}`.toLowerCase();
-    return fullName.startsWith(normalizedQuery);
-  });
-  if (startsWithMatch) return startsWithMatch;
-
-  // Try partial match (first name or last name)
-  const partialMatch = patients.find((p) => {
-    const firstName = p.first_name.toLowerCase();
-    const lastName = p.last_name.toLowerCase();
-    return firstName.includes(normalizedQuery) || lastName.includes(normalizedQuery);
-  });
-  if (partialMatch) return partialMatch;
-
-  // Try fuzzy match (handle common misspellings)
-  const fuzzyMatch = patients.find((p) => {
-    const firstName = p.first_name.toLowerCase();
-    const lastName = p.last_name.toLowerCase();
-    // Check if query is similar (within 2 character difference)
-    return (
-      levenshteinDistance(firstName, normalizedQuery) <= 2 ||
-      levenshteinDistance(lastName, normalizedQuery) <= 2
-    );
-  });
-
-  return fuzzyMatch ?? null;
-}
-
-/**
- * Simple Levenshtein distance for fuzzy matching
- */
-function levenshteinDistance(a: string, b: string): number {
-  if (a.length === 0) return b.length;
-  if (b.length === 0) return a.length;
-
-  const matrix: number[][] = [];
-
-  for (let i = 0; i <= b.length; i++) {
-    matrix[i] = [i];
-  }
-
-  for (let j = 0; j <= a.length; j++) {
-    matrix[0]![j] = j;
-  }
-
-  for (let i = 1; i <= b.length; i++) {
-    for (let j = 1; j <= a.length; j++) {
-      if (b.charAt(i - 1) === a.charAt(j - 1)) {
-        matrix[i]![j] = matrix[i - 1]![j - 1]!;
-      } else {
-        matrix[i]![j] = Math.min(
-          matrix[i - 1]![j - 1]! + 1,
-          matrix[i]![j - 1]! + 1,
-          matrix[i - 1]![j]! + 1
-        );
-      }
-    }
-  }
-
-  return matrix[b.length]![a.length]!;
-}
-
-/**
- * Parse time from natural language (e.g., "4 pm", "3:30", "14:00")
- */
-function parseTime(timeStr: string): { hours: number; minutes: number } | null {
-  const normalized = timeStr.toLowerCase().replace(/\s+/g, "");
-
-  // Match "4pm", "4 pm", "4:30pm", "16:00"
-  const patterns = [
-    /^(\d{1,2}):?(\d{2})?\s*(am|pm)?$/,
-    /^(\d{1,2})\s*(am|pm)$/,
-    /^(\d{1,2})\s*o'?clock$/,
-  ];
-
-  for (const pattern of patterns) {
-    const match = normalized.match(pattern);
-    if (match) {
-      let hours = parseInt(match[1]!, 10);
-      const minutes = match[2] ? parseInt(match[2], 10) : 0;
-      const meridiem = match[3];
-
-      // Handle 12-hour format
-      if (meridiem === "pm" && hours !== 12) {
-        hours += 12;
-      } else if (meridiem === "am" && hours === 12) {
-        hours = 0;
-      }
-
-      // If no meridiem and hours < 8, assume PM (business hours)
-      if (!meridiem && hours < 8 && hours > 0) {
-        hours += 12;
-      }
-
-      if (hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59) {
-        return { hours, minutes };
-      }
-    }
+  // Try includes match
+  for (const [key, value] of Object.entries(map)) {
+    if (normalized.includes(key) || key.includes(normalized)) return value;
   }
 
   return null;
 }
 
 /**
- * Format time for TTS response
+ * Page route mapping
  */
-function formatTimeForSpeech(hours: number, minutes: number): string {
-  const h = hours % 12 || 12;
-  const m = minutes > 0 ? `:${minutes.toString().padStart(2, "0")}` : "";
-  const ampm = hours >= 12 ? "PM" : "AM";
-  return `${h}${m} ${ampm}`;
-}
+const PAGE_ROUTES: Record<string, string> = {
+  // Home variations
+  home: "/home",
+  homepage: "/home",
+  "home page": "/home",
+  "the home": "/home",
+  "the homepage": "/home",
+  "the home page": "/home",
+  dashboard: "/home",
+  "the dashboard": "/home",
+  main: "/home",
+  "main page": "/home",
+  // Patients variations
+  patients: "/home/patients",
+  "patients page": "/home/patients",
+  "the patients": "/home/patients",
+  "the patients page": "/home/patients",
+  "patient list": "/home/patients",
+  patient: "/home/patients",
+  "my patients": "/home/patients",
+  // Calendar/Schedule variations
+  calendar: "/home/schedule",
+  "calendar page": "/home/schedule",
+  "the calendar": "/home/schedule",
+  "the calendar page": "/home/schedule",
+  schedule: "/home/schedule",
+  "schedule page": "/home/schedule",
+  "the schedule": "/home/schedule",
+  "the schedule page": "/home/schedule",
+  "my calendar": "/home/schedule",
+  "my schedule": "/home/schedule",
+  appointments: "/home/schedule",
+  "appointments page": "/home/schedule",
+  // Communications/Messages variations
+  communications: "/home/communications",
+  "communications page": "/home/communications",
+  "the communications": "/home/communications",
+  messages: "/home/communications",
+  "messages page": "/home/communications",
+  "the messages": "/home/communications",
+  "the messages page": "/home/communications",
+  inbox: "/home/communications",
+  "the inbox": "/home/communications",
+  // Billing variations
+  billing: "/home/billing",
+  "billing page": "/home/billing",
+  "the billing": "/home/billing",
+  "the billing page": "/home/billing",
+  invoices: "/home/billing",
+  "invoices page": "/home/billing",
+  // Marketing variations
+  marketing: "/home/marketing",
+  "marketing page": "/home/marketing",
+  "the marketing": "/home/marketing",
+  "the marketing page": "/home/marketing",
+  reputation: "/home/marketing",
+  "reputation page": "/home/marketing",
+  "the reputation": "/home/marketing",
+  "the reputation page": "/home/marketing",
+  "marketing and reputation": "/home/marketing",
+  "marketing and reputation page": "/home/marketing",
+  "the marketing and reputation": "/home/marketing",
+  "the marketing and reputation page": "/home/marketing",
+};
+
+/**
+ * Tab mapping for patient details
+ */
+const TAB_MAP: Record<string, string> = {
+  notes: "overview",
+  note: "overview",
+  "session notes": "overview",
+  "session note": "overview",
+  overview: "overview",
+  treatment: "medical-records",
+  "treatment plan": "medical-records",
+  outcomes: "medical-records",
+  outcome: "medical-records",
+  "outcome measures": "medical-records",
+  "outcome measure": "medical-records",
+  "medical records": "medical-records",
+  communications: "messages",
+  communication: "messages",
+  messages: "messages",
+  message: "messages",
+  appointments: "appointments",
+  appointment: "appointments",
+  billing: "billing",
+  reviews: "reviews",
+};
+
+/**
+ * Known page names to filter out when matching patient names
+ * This list is auto-generated from PAGE_ROUTES keys
+ */
+const PAGE_NAMES = Object.keys(PAGE_ROUTES);
 
 // ============================================================================
 // COMMAND FACTORY
 // ============================================================================
 
-export interface CommandDependencies {
-  router: AppRouter;
-  searchPatients: (query: string) => Promise<
-    Array<{
-      id: string;
-      first_name: string;
-      last_name: string;
-    }>
-  >;
-  getNextAppointment: () => Promise<{
-    patientName: string;
-    time: string;
-    type: string;
-  } | null>;
-  getTodayPatientCount: () => Promise<number>;
-  getUrgentItems: () => Promise<Array<{ description: string }>>;
-  moveAppointment: (
-    appointmentId: string,
-    newTime: { hours: number; minutes: number }
-  ) => Promise<boolean>;
-  getSelectedAppointmentId: () => string | null;
-  getCurrentPage: () => string;
-}
-
-export function createCommandRegistry(deps: CommandDependencies): VoiceCommand[] {
-  const {
-    router,
-    searchPatients,
-    getNextAppointment,
-    getTodayPatientCount,
-    getUrgentItems,
-    moveAppointment,
-    getSelectedAppointmentId,
-    getCurrentPage,
-  } = deps;
-
-  // IMPORTANT: Order matters! More specific commands must come BEFORE generic ones
-  // Navigation commands come first since they have specific keywords
+/**
+ * Create all voice commands
+ * IMPORTANT: Order matters! More specific commands must have HIGHER priority (lower number)
+ */
+export function createCommands(): VoiceCommand[] {
   return [
     // ========================================================================
-    // TEST COMMAND - verify voice is working
+    // COMPLETE ALL ACTIONS (Priority 1 - Most specific)
     // ========================================================================
     {
-      id: "test",
-      description: "Test voice command",
-      patterns: [/^test$/i, /^hello$/i, /^hi$/i],
-      handler: async () => {
-        return "Voice commands are working! Try saying: Tebra, take me to the calendar";
-      },
-    },
-
-    // ========================================================================
-    // NAVIGATION COMMANDS (must come before patient commands!)
-    // These use broad patterns to catch natural speech variations
-    // ========================================================================
-    {
-      id: "go-calendar",
-      description: "Navigate to the calendar/schedule",
-      patterns: [/calendar/i, /schedule/i, /appointments/i],
-      handler: async () => {
-        router.push("/home/schedule");
-        return "Here's your calendar";
-      },
-    },
-
-    {
-      id: "go-home",
-      description: "Navigate to the home page",
-      patterns: [/\bhome\s*page\b/i, /\bhome\b/i, /\bdashboard\b/i, /\bmain\s*page\b/i],
-      handler: async () => {
-        router.push("/home");
-        return "Taking you home";
-      },
-    },
-
-    {
-      id: "go-patients-list",
-      description: "Navigate to patients list",
-      patterns: [/\bpatient\s*list\b/i, /\bmy\s+patients\b/i, /\ball\s+patients\b/i],
-      handler: async () => {
-        router.push("/home/patients");
-        return "Here's your patient list";
-      },
-    },
-
-    {
-      id: "go-billing",
-      description: "Navigate to billing",
-      patterns: [/billing/i, /payments?/i, /claims?/i],
-      handler: async () => {
-        router.push("/home/billing");
-        return "Opening billing";
-      },
-    },
-
-    {
-      id: "go-marketing",
-      description: "Navigate to marketing",
-      patterns: [/marketing/i, /campaigns?/i],
-      handler: async () => {
-        router.push("/home/marketing");
-        return "Here's your marketing dashboard";
-      },
-    },
-
-    {
-      id: "go-messages",
-      description: "Navigate to messages",
-      patterns: [/messages?/i, /inbox/i, /communications?/i],
-      handler: async () => {
-        router.push("/home/communications");
-        return "Here are your messages";
-      },
-    },
-
-    // ========================================================================
-    // PATIENT COMMANDS - "show me [name]" patterns
-    // Must come AFTER navigation to avoid conflicts
-    // ========================================================================
-    {
-      id: "show-patient",
-      description: "Show a patient's chart",
+      id: "complete-actions",
+      priority: 1,
       patterns: [
-        // "show me Sarah", "take me to Sarah", "go to Sarah Johnson"
-        /^(?:show\s+me|take\s+me\s+to|open|find|pull\s+up|go\s+to)\s+(.+?)(?:'s)?(?:\s+chart|\s+record|\s+file)?$/i,
-        // "patient Sarah"
-        /^patient\s+(.+)$/i,
-        // "Sarah's chart"
-        /^(.+?)(?:'s)\s+chart$/i,
+        /^(?:complete|approve|execute|confirm)\s+(?:all\s+)?(?:actions?|suggested\s+actions?|tasks?)\s*$/i,
+        /^(?:complete|approve)\s+all\s*$/i,
       ],
-      handler: async (match) => {
-        const rawName = match[1]?.trim();
-        if (!rawName) {
-          return "I didn't catch the patient name. Could you say it again?";
-        }
-
-        // Filter out navigation words - if they said "show me the calendar",
-        // that should have been caught by navigation commands above
-        const navWords =
-          /^(the\s+)?(calendar|schedule|home|homepage|dashboard|billing|marketing|messages?|inbox|patients?|patient\s*list|appointments?)$/i;
-        if (navWords.test(rawName)) {
-          // This shouldn't happen since nav commands come first, but just in case
-          return "I didn't catch the patient name. Try saying: show me Sarah Johnson";
-        }
-
-        // Clean up the name - remove leading "the" if present
-        const patientName = rawName.replace(/^the\s+/i, "").trim();
-
-        try {
-          const patients = await searchPatients(patientName);
-          const patient = fuzzyMatchPatient(patientName, patients);
-
-          if (patient) {
-            router.push(`/home/patients?id=${patient.id}`);
-            return `Opening ${patient.first_name} ${patient.last_name}'s chart`;
-          } else {
-            return `I couldn't find a patient named ${patientName}. Could you try again?`;
-          }
-        } catch {
-          return "Sorry, I had trouble searching for that patient.";
-        }
-      },
-    },
-
-    {
-      id: "start-session",
-      description: "Start a session with a patient",
-      patterns: [
-        /^start\s+(?:a\s+)?session\s+(?:with\s+)?(.+)$/i,
-        /^begin\s+(?:a\s+)?session\s+(?:with\s+)?(.+)$/i,
-      ],
-      handler: async (match) => {
-        const patientName = match[1]?.trim();
-        if (!patientName) {
-          return "Which patient would you like to start a session with?";
-        }
-
-        try {
-          const patients = await searchPatients(patientName);
-          const patient = fuzzyMatchPatient(patientName, patients);
-
-          if (patient) {
-            router.push(`/home/patients?id=${patient.id}&session=new`);
-            return `Starting session with ${patient.first_name} ${patient.last_name}`;
-          } else {
-            return `I couldn't find a patient named ${patientName}.`;
-          }
-        } catch {
-          return "Sorry, I had trouble finding that patient.";
-        }
+      action: (_match, transcript) => {
+        voiceEvents.emit({ type: "actions:complete", payload: {}, transcript });
       },
     },
 
     // ========================================================================
-    // APPOINTMENT/SCHEDULE COMMANDS
+    // END SESSION (Priority 1)
     // ========================================================================
-    {
-      id: "move-appointment-to-time",
-      description: "Move an appointment to a new time",
-      patterns: [
-        /^move\s+(?:this\s+)?appointment\s+to\s+(.+)$/i,
-        /^reschedule\s+(?:this\s+)?(?:appointment\s+)?to\s+(.+)$/i,
-        /^move\s+(?:it\s+)?to\s+(.+)$/i,
-      ],
-      handler: async (match) => {
-        const timeStr = match[1]?.trim();
-        if (!timeStr) {
-          return "What time would you like to move it to?";
-        }
-
-        const parsedTime = parseTime(timeStr);
-        if (!parsedTime) {
-          return "I couldn't understand that time. Try saying something like '4 PM' or '3:30'.";
-        }
-
-        // Get the currently selected appointment
-        const appointmentId = getSelectedAppointmentId();
-
-        if (!appointmentId) {
-          // If not on schedule page, navigate there first
-          if (!getCurrentPage().includes("schedule")) {
-            router.push("/home/schedule");
-            return `Let me take you to the schedule. Then tell me which appointment to move.`;
-          }
-          return "Please select an appointment first, then tell me the new time.";
-        }
-
-        try {
-          const success = await moveAppointment(appointmentId, parsedTime);
-          if (success) {
-            return `Done — moved to ${formatTimeForSpeech(parsedTime.hours, parsedTime.minutes)}`;
-          } else {
-            return "Sorry, I couldn't move that appointment.";
-          }
-        } catch {
-          return "Something went wrong. Please try again.";
-        }
-      },
-    },
-
-    {
-      id: "move-time-to-time",
-      description: "Move appointment from one time to another",
-      patterns: [
-        /^move\s+(?:my\s+)?(\d+(?::\d+)?)\s*(?:o'?clock)?\s*(?:to|appointment\s+to)\s+(.+)$/i,
-      ],
-      handler: async (match) => {
-        const fromTime = match[1];
-        const toTimeStr = match[2]?.trim();
-
-        if (!toTimeStr) {
-          return "What time would you like to move it to?";
-        }
-
-        const parsedToTime = parseTime(toTimeStr);
-        if (!parsedToTime) {
-          return "I couldn't understand that time. Try saying something like '4 PM' or '3:30'.";
-        }
-
-        // Navigate to schedule if not there
-        if (!getCurrentPage().includes("schedule")) {
-          router.push("/home/schedule");
-        }
-
-        // In a real implementation, we'd find the appointment at fromTime
-        // For demo, we'll use the moveAppointment with a special flag
-        return `Moved your ${fromTime} o'clock to ${formatTimeForSpeech(parsedToTime.hours, parsedToTime.minutes)}`;
-      },
-    },
-
-    // ========================================================================
-    // CONTEXTUAL COMMANDS
-    // ========================================================================
-    {
-      id: "whats-next",
-      description: "Get next appointment info",
-      patterns: [
-        /^what(?:'s|s)?\s+next$/i,
-        /^what(?:'s|s)?\s+my\s+next\s+appointment$/i,
-        /^next\s+appointment$/i,
-        /^who(?:'s|s)?\s+next$/i,
-      ],
-      handler: async () => {
-        try {
-          const next = await getNextAppointment();
-          if (next) {
-            return `Your next appointment is with ${next.patientName} at ${next.time} for ${next.type}`;
-          } else {
-            return "You don't have any more appointments scheduled for today.";
-          }
-        } catch {
-          return "I couldn't check your schedule right now.";
-        }
-      },
-    },
-
-    {
-      id: "patient-count",
-      description: "Get count of patients today",
-      patterns: [
-        /^how\s+many\s+patients?\s+(?:do\s+i\s+have\s+)?today$/i,
-        /^(?:today(?:'s)?|my)\s+patient\s+count$/i,
-        /^patients?\s+today$/i,
-      ],
-      handler: async () => {
-        try {
-          const count = await getTodayPatientCount();
-          if (count === 0) {
-            return "You have no patients scheduled for today.";
-          } else if (count === 1) {
-            return "You have 1 patient scheduled today.";
-          } else {
-            return `You have ${count} patients scheduled today.`;
-          }
-        } catch {
-          return "I couldn't check your schedule right now.";
-        }
-      },
-    },
-
-    {
-      id: "urgent-items",
-      description: "Check for urgent items",
-      patterns: [
-        /^(?:any\s+)?urgent\s+(?:items?|tasks?|actions?)(?:\?)?$/i,
-        /^what(?:'s|s)?\s+urgent$/i,
-        /^do\s+i\s+have\s+(?:any\s+)?urgent\s+(?:items?|tasks?)$/i,
-      ],
-      handler: async () => {
-        try {
-          const items = await getUrgentItems();
-          if (items.length === 0) {
-            return "You don't have any urgent items right now.";
-          } else if (items.length === 1) {
-            return `You have 1 urgent item: ${items[0]!.description}`;
-          } else {
-            return `You have ${items.length} urgent items. The top priority is ${items[0]!.description}`;
-          }
-        } catch {
-          return "I couldn't check your urgent items right now.";
-        }
-      },
-    },
-
-    // ========================================================================
-    // SESSION COMMANDS
-    // ========================================================================
-    {
-      id: "start-recording",
-      description: "Start session recording",
-      patterns: [/^start\s+recording$/i, /^begin\s+recording$/i, /^record(?:\s+this)?$/i],
-      handler: async () => {
-        // This would trigger a session recording action
-        return "Recording started";
-      },
-    },
-
     {
       id: "end-session",
-      description: "End session and generate notes",
+      priority: 1,
       patterns: [
-        /^(?:that\s+)?ends?\s+(?:our\s+|the\s+)?session$/i,
-        /^end\s+(?:the\s+)?session$/i,
+        /^(?:that\s+)?end(?:s)?\s+(?:our\s+|the\s+)?session$/i,
+        /^end\s+session$/i,
         /^stop\s+recording$/i,
-        /^finish\s+session$/i,
       ],
-      handler: async () => {
-        return "Session ended. Generating your notes now.";
+      action: (_match, transcript) => {
+        voiceEvents.emit({ type: "session:end", payload: {}, transcript });
       },
     },
 
+    // ========================================================================
+    // PRIORITY ACTIONS / TODAY'S ACTIONS FOR PATIENT (Priority 2)
+    // ========================================================================
     {
-      id: "sign-note",
-      description: "Sign and lock the current note",
-      patterns: [/^sign\s+(?:the\s+)?note$/i, /^sign\s+and\s+lock$/i, /^lock\s+(?:the\s+)?note$/i],
-      handler: async () => {
-        return "Note signed and locked.";
+      id: "priority-actions",
+      priority: 2,
+      patterns: [
+        /^(?:show\s+(?:me\s+)?)?(.+?)(?:'s?\s+)?priority\s+actions?\s*$/i,
+        /^(?:show\s+(?:me\s+)?)?priority\s+actions?\s+(?:for\s+)?(.+)\s*$/i,
+        /^(?:show\s+(?:me\s+)?)?today(?:'s)?\s+actions?\s+(?:for\s+)?(.+)\s*$/i,
+        /^(?:show\s+(?:me\s+)?)?(?:the\s+)?actions?\s+(?:for\s+)?(.+)\s*$/i,
+      ],
+      action: (match, transcript) => {
+        const patientName = match[1]?.trim() ?? "";
+        if (patientName) {
+          voiceEvents.emit({
+            type: "patient:actions",
+            payload: { patientName },
+            transcript,
+          });
+        }
+      },
+    },
+
+    // ========================================================================
+    // START SESSION (Priority 2)
+    // ========================================================================
+    {
+      id: "start-session",
+      priority: 2,
+      patterns: [/^(?:start|begin)\s+(?:a\s+)?session\s+(?:with\s+)?(.+)$/i],
+      action: (match, transcript) => {
+        const patientName = match[1]?.trim() ?? "";
+        if (patientName) {
+          voiceEvents.emit({
+            type: "session:start",
+            payload: { patientName },
+            transcript,
+          });
+        }
+      },
+    },
+
+    // ========================================================================
+    // CALENDAR RESCHEDULE (Priority 2)
+    // ========================================================================
+    {
+      id: "reschedule",
+      priority: 2,
+      patterns: [
+        /^(?:move|reschedule|change)\s+(.+?)(?:'s?\s+)?(?:appointment\s+)?(?:to\s+)?(\w+(?:day)?)\s+(?:at\s+)?(\d{1,2}(?::\d{2})?\s*(?:am|pm|a\.m\.|p\.m\.)?)/i,
+        /^(?:move|reschedule)\s+(?:this\s+)?(?:appointment\s+)?(?:to\s+)?(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)/i,
+      ],
+      action: (match, transcript) => {
+        // Handle both patterns - first pattern has patient name, day, time
+        // Second pattern just has time (for currently selected appointment)
+        if (match.length >= 4) {
+          voiceEvents.emit({
+            type: "calendar:reschedule",
+            payload: {
+              patientName: match[1]?.trim() ?? "",
+              day: match[2]?.trim() ?? "",
+              time: match[3]?.trim() ?? "",
+            },
+            transcript,
+          });
+        } else {
+          // Just time - use currently selected appointment
+          voiceEvents.emit({
+            type: "calendar:reschedule",
+            payload: {
+              patientName: "",
+              day: "",
+              time: match[1]?.trim() ?? "",
+            },
+            transcript,
+          });
+        }
+      },
+    },
+
+    // ========================================================================
+    // OPEN PATIENT WITH TAB (Priority 3 - More specific than plain patient)
+    // ========================================================================
+    {
+      id: "open-patient-with-tab",
+      priority: 3,
+      patterns: [
+        /^(?:show\s+me|open|find|take\s+me\s+to)\s+(.+?)(?:'s?\s+)?(notes?|session\s*notes?|treatment\s*plan?|outcomes?|outcome\s*measures?|communications?|messages?|appointments?|billing|reviews?|overview|medical\s*records?)\s*$/i,
+      ],
+      action: (match, transcript) => {
+        const patientName = match[1]?.trim() ?? "";
+        const tabRaw = match[2]?.trim().toLowerCase() ?? "";
+        const tab = TAB_MAP[tabRaw] || fuzzyMatch(tabRaw, TAB_MAP) || "overview";
+
+        // Don't match if patient name is a page name
+        if (!patientName || PAGE_NAMES.includes(patientName.toLowerCase())) {
+          return false;
+        }
+
+        voiceEvents.emit({
+          type: "patient:tab",
+          payload: { patientName, tab },
+          transcript,
+        });
+        return; // Explicitly handled
+      },
+    },
+
+    // ========================================================================
+    // OPEN PATIENT (Priority 4 - After patient+tab)
+    // ========================================================================
+    {
+      id: "open-patient",
+      priority: 4,
+      patterns: [
+        /^(?:show\s+me|open|find|take\s+me\s+to)\s+(?:patient\s+)?(.+?)(?:\s+patient)?\s*$/i,
+      ],
+      action: (match, transcript) => {
+        const patientName = match[1]?.trim() ?? "";
+
+        // Don't match if it's a known page name - return false to let navigate-page handle it
+        if (PAGE_NAMES.includes(patientName.toLowerCase())) {
+          return false;
+        }
+
+        // Don't match if it contains "priority actions"
+        if (patientName.toLowerCase().includes("priority")) {
+          return false;
+        }
+
+        voiceEvents.emit({
+          type: "patient:open",
+          payload: { patientName },
+          transcript,
+        });
+        return; // Handled
+      },
+    },
+
+    // ========================================================================
+    // PAGE NAVIGATION (Priority 5)
+    // ========================================================================
+    {
+      id: "navigate-page",
+      priority: 5,
+      patterns: [/^(?:take\s+me\s+to|show\s+me|go\s+to|open)\s+(?:my\s+)?(?:the\s+)?(.+)$/i],
+      action: (match, transcript) => {
+        const page = match[1]?.trim().toLowerCase() ?? "";
+        const route = PAGE_ROUTES[page] || fuzzyMatch(page, PAGE_ROUTES);
+
+        if (route) {
+          voiceEvents.emit({ type: "navigate", payload: { route }, transcript });
+          return; // Handled
+        }
+        return false; // Not handled - let next command try
+      },
+    },
+
+    // ========================================================================
+    // GO HOME (Priority 6)
+    // ========================================================================
+    {
+      id: "go-home",
+      priority: 6,
+      patterns: [
+        /^(?:go\s+(?:back\s+)?(?:to\s+)?home|go\s+back|back\s+to\s+home|take\s+me\s+home|go\s+to\s+dashboard)\s*$/i,
+      ],
+      action: (_match, transcript) => {
+        voiceEvents.emit({ type: "go:home", payload: {}, transcript });
+      },
+    },
+
+    // ========================================================================
+    // SIMPLE NAVIGATION KEYWORDS (Priority 7 - Catch-all)
+    // ========================================================================
+    {
+      id: "simple-navigation",
+      priority: 7,
+      patterns: [
+        /^calendar$/i,
+        /^schedule$/i,
+        /^patients$/i,
+        /^billing$/i,
+        /^marketing$/i,
+        /^messages$/i,
+        /^communications$/i,
+        /^home$/i,
+        /^dashboard$/i,
+      ],
+      action: (match, transcript) => {
+        const keyword = match[0].toLowerCase();
+        const route = PAGE_ROUTES[keyword];
+
+        if (route) {
+          voiceEvents.emit({ type: "navigate", payload: { route }, transcript });
+        }
       },
     },
   ];

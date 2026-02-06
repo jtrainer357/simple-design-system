@@ -16,6 +16,7 @@ import { formatDemoDate } from "@/src/lib/utils/demo-date";
 import type { PriorityActionWithPatient } from "@/src/lib/supabase/types";
 import type { AppointmentWithPatient } from "@/src/lib/queries/appointments";
 import type { OrchestrationContext } from "@/src/lib/orchestration/types";
+import { useCompletedPatients } from "@/src/components/orchestration";
 
 interface PriorityActionsSectionProps {
   className?: string;
@@ -147,6 +148,7 @@ export function PriorityActionsSection({
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
   const [dbReady, setDbReady] = React.useState<boolean | null>(null);
+  const completedPatientIds = useCompletedPatients();
 
   React.useEffect(() => {
     async function loadData() {
@@ -181,6 +183,51 @@ export function PriorityActionsSection({
 
     loadData();
   }, []);
+
+  // Listen for voice command to open patient actions
+  React.useEffect(() => {
+    function handleVoiceOpenPatient(e: CustomEvent<{ patientName: string }>) {
+      const targetName = e.detail.patientName.toLowerCase();
+      console.log("[PriorityActionsSection] Voice open patient:", targetName);
+
+      // Try to find patient in actions first
+      const matchingAction = actions.find((a) => {
+        const fullName = `${a.patient.first_name} ${a.patient.last_name}`.toLowerCase();
+        return fullName.includes(targetName) || targetName.includes(fullName);
+      });
+
+      if (matchingAction) {
+        console.log(
+          "[PriorityActionsSection] Found in actions:",
+          matchingAction.patient.first_name
+        );
+        onSelectPatient?.(actionToContext(matchingAction));
+        return;
+      }
+
+      // Try appointments
+      const matchingAppt = todayAppts.find((a) => {
+        const fullName = `${a.patient.first_name} ${a.patient.last_name}`.toLowerCase();
+        return fullName.includes(targetName) || targetName.includes(fullName);
+      });
+
+      if (matchingAppt) {
+        console.log(
+          "[PriorityActionsSection] Found in appointments:",
+          matchingAppt.patient.first_name
+        );
+        onSelectPatient?.(appointmentToContext(matchingAppt));
+      }
+    }
+
+    window.addEventListener("voice-open-patient-actions", handleVoiceOpenPatient as EventListener);
+    return () => {
+      window.removeEventListener(
+        "voice-open-patient-actions",
+        handleVoiceOpenPatient as EventListener
+      );
+    };
+  }, [actions, todayAppts, onSelectPatient]);
 
   // Format demo date (Feb 6, 2026)
   const formattedDate = formatDemoDate("long");
@@ -404,6 +451,7 @@ export function PriorityActionsSection({
                   suggestedActions={suggestedCount}
                   badgeText={getBadgeText(action.urgency, action.timeframe)}
                   badgeVariant={getBadgeVariant(action.urgency)}
+                  completed={completedPatientIds.includes(action.patient.id)}
                 />
               </div>
             );

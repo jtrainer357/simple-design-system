@@ -3,38 +3,135 @@
 /**
  * VoiceProvider - Global Voice Command System Provider
  *
- * This component initializes the voice command system, registers commands,
- * and provides the voice control UI. Should be placed near the root of the app.
+ * Initializes the voice command system, registers commands,
+ * and handles event routing. Should be placed near the root of the app.
  *
  * @module VoiceProvider
  */
 
 import * as React from "react";
-import { useRouter, usePathname } from "next/navigation";
-import {
-  voiceEngine,
-  createCommandRegistry,
-  useVoiceStore,
-  FALLBACK_RESPONSE,
-} from "@/src/lib/voice";
-import type { CommandDependencies } from "@/src/lib/voice";
-// VoiceTranscript is now rendered inline in HeaderSearch
+import { useRouter } from "next/navigation";
+import { voiceEngine } from "@/src/lib/voice/voice-engine";
+import { createCommands } from "@/src/lib/voice/command-registry";
+import { voiceEvents } from "@/src/lib/voice/voice-events";
 
-// Demo patients data for voice commands
+// Demo patients data for voice commands - must match actual database patients
+// Using shorter names where possible for better speech recognition
 const DEMO_PATIENTS = [
-  { id: "p-001", first_name: "Michal", last_name: "Chen" },
-  { id: "p-002", first_name: "Tim", last_name: "Anders" },
-  { id: "p-003", first_name: "Sarah", last_name: "Johnson" },
-  { id: "p-004", first_name: "Emily", last_name: "Rodriguez" },
-  { id: "p-005", first_name: "Marcus", last_name: "Thompson" },
-  { id: "p-006", first_name: "David", last_name: "Kim" },
-  { id: "p-007", first_name: "Jennifer", last_name: "Davis" },
-  { id: "p-008", first_name: "Robert", last_name: "Garcia" },
-  { id: "p-009", first_name: "Amanda", last_name: "Foster" },
-  { id: "p-010", first_name: "James", last_name: "Wilson" },
-  { id: "p-011", first_name: "Lisa", last_name: "Thompson" },
-  { id: "p-012", first_name: "Michael", last_name: "Brown" },
+  { id: "1", first_name: "Brian", last_name: "Anton" },
+  { id: "2", first_name: "Anthony", last_name: "Benedetti" },
+  { id: "3", first_name: "Ryan", last_name: "Campanelli" },
+  { id: "4", first_name: "Amanda", last_name: "Chen" },
+  { id: "5", first_name: "Emily", last_name: "Chen" },
+  { id: "6", first_name: "Heather", last_name: "Donovan" },
+  { id: "7", first_name: "Kevin", last_name: "Goldstein" },
+  { id: "8", first_name: "Marcus", last_name: "Johnson" },
+  { id: "9", first_name: "David", last_name: "Rodriguez" },
+  { id: "10", first_name: "Sarah", last_name: "Mitchell" },
+  { id: "11", first_name: "Robert", last_name: "Thompson" },
 ];
+
+/**
+ * Fuzzy match patient name against demo patients
+ * Priority: exact match > both parts match > first name match > last name match
+ */
+function findPatient(query: string): (typeof DEMO_PATIENTS)[0] | null {
+  const normalizedQuery = query.toLowerCase().trim();
+  const queryWords = normalizedQuery.split(/\s+/);
+  console.log("[VoiceProvider] Finding patient for query:", normalizedQuery);
+
+  // Try exact match first
+  const exactMatch = DEMO_PATIENTS.find((p) => {
+    const fullName = `${p.first_name} ${p.last_name}`.toLowerCase();
+    return fullName === normalizedQuery;
+  });
+  if (exactMatch) {
+    console.log("[VoiceProvider] Exact match:", exactMatch.first_name, exactMatch.last_name);
+    return exactMatch;
+  }
+
+  // Try starts-with match on full name
+  const startsWithMatch = DEMO_PATIENTS.find((p) => {
+    const fullName = `${p.first_name} ${p.last_name}`.toLowerCase();
+    return fullName.startsWith(normalizedQuery);
+  });
+  if (startsWithMatch) {
+    console.log(
+      "[VoiceProvider] Starts-with match:",
+      startsWithMatch.first_name,
+      startsWithMatch.last_name
+    );
+    return startsWithMatch;
+  }
+
+  // For multi-word queries, try matching BOTH first and last name
+  if (queryWords.length >= 2) {
+    const bothPartsMatch = DEMO_PATIENTS.find((p) => {
+      const firstName = p.first_name.toLowerCase();
+      const lastName = p.last_name.toLowerCase();
+      // Check if query words match both first AND last name
+      const hasFirstMatch = queryWords.some((w) => firstName.includes(w) || w.includes(firstName));
+      const hasLastMatch = queryWords.some((w) => lastName.includes(w) || w.includes(lastName));
+      return hasFirstMatch && hasLastMatch;
+    });
+    if (bothPartsMatch) {
+      console.log(
+        "[VoiceProvider] Both-parts match:",
+        bothPartsMatch.first_name,
+        bothPartsMatch.last_name
+      );
+      return bothPartsMatch;
+    }
+  }
+
+  // Single word or no multi-match: try first name only
+  const firstNameMatch = DEMO_PATIENTS.find((p) => {
+    const firstName = p.first_name.toLowerCase();
+    return firstName === normalizedQuery || firstName.startsWith(normalizedQuery);
+  });
+  if (firstNameMatch) {
+    console.log(
+      "[VoiceProvider] First-name match:",
+      firstNameMatch.first_name,
+      firstNameMatch.last_name
+    );
+    return firstNameMatch;
+  }
+
+  // Try last name only
+  const lastNameMatch = DEMO_PATIENTS.find((p) => {
+    const lastName = p.last_name.toLowerCase();
+    return lastName === normalizedQuery || lastName.startsWith(normalizedQuery);
+  });
+  if (lastNameMatch) {
+    console.log(
+      "[VoiceProvider] Last-name match:",
+      lastNameMatch.first_name,
+      lastNameMatch.last_name
+    );
+    return lastNameMatch;
+  }
+
+  // Fallback: partial match on either name
+  const partialMatch = DEMO_PATIENTS.find((p) => {
+    const firstName = p.first_name.toLowerCase();
+    const lastName = p.last_name.toLowerCase();
+    return firstName.includes(normalizedQuery) || lastName.includes(normalizedQuery);
+  });
+
+  const result = partialMatch ?? null;
+  if (result) {
+    console.log(
+      "[VoiceProvider] Found patient:",
+      result.first_name,
+      result.last_name,
+      `(${result.id})`
+    );
+  } else {
+    console.log("[VoiceProvider] No patient found for:", normalizedQuery);
+  }
+  return result;
+}
 
 interface VoiceProviderProps {
   children: React.ReactNode;
@@ -42,140 +139,170 @@ interface VoiceProviderProps {
 
 export function VoiceProvider({ children }: VoiceProviderProps) {
   const router = useRouter();
-  const pathname = usePathname();
 
-  // Use refs for values accessed in callbacks to avoid deps changes
-  const selectedAppointmentIdRef = React.useRef<string | null>(null);
-  const pathnameRef = React.useRef(pathname);
-
-  // Update pathname ref when it changes
+  // Initialize voice system and register commands
+  // Run on every mount to handle hot reload properly
   React.useEffect(() => {
-    pathnameRef.current = pathname;
-  }, [pathname]);
-
-  // Initialize voice system and subscribe to store changes - run once on mount
-  const initializedRef = React.useRef(false);
-  React.useEffect(() => {
-    if (initializedRef.current) return;
-    initializedRef.current = true;
-
-    console.log("[VoiceProvider] Initializing voice system...");
-
-    // Initialize the voice store using getState() to avoid selector subscriptions
-    const store = useVoiceStore.getState();
-    store.initialize();
-    console.log("[VoiceProvider] Store initialized, isSupported:", store.isSupported);
-
-    // Subscribe to selectedAppointmentId changes
-    const unsubscribe = useVoiceStore.subscribe((state) => {
-      selectedAppointmentIdRef.current = state.selectedAppointmentId;
-    });
-
-    return unsubscribe;
-  }, []);
-
-  // Register commands only once on mount
-  React.useEffect(() => {
-    const deps: CommandDependencies = {
-      router: {
-        push: router.push,
-        replace: router.replace,
-        back: router.back,
-        forward: router.forward,
-      },
-
-      searchPatients: async (query: string) => {
-        const normalizedQuery = query.toLowerCase();
-        return DEMO_PATIENTS.filter(
-          (p) =>
-            p.first_name.toLowerCase().includes(normalizedQuery) ||
-            p.last_name.toLowerCase().includes(normalizedQuery)
-        );
-      },
-
-      getNextAppointment: async () => {
-        return {
-          patientName: "Sarah Chen",
-          time: "2:30 PM",
-          type: "Follow-up Session",
-        };
-      },
-
-      getTodayPatientCount: async () => {
-        return 8;
-      },
-
-      getUrgentItems: async () => {
-        return [
-          { description: "Review lab results for Marcus Thompson" },
-          { description: "Complete prior authorization for Emily Rodriguez" },
-        ];
-      },
-
-      moveAppointment: async (
-        _appointmentId: string,
-        _newTime: { hours: number; minutes: number }
-      ) => {
-        if (typeof window !== "undefined") {
-          window.dispatchEvent(
-            new CustomEvent("voice-move-appointment", {
-              detail: { appointmentId: _appointmentId, newTime: _newTime },
-            })
-          );
-        }
-        return true;
-      },
-
-      getSelectedAppointmentId: () => selectedAppointmentIdRef.current,
-
-      getCurrentPage: () => pathnameRef.current,
-    };
-
-    const commands = createCommandRegistry(deps);
-    console.log("[VoiceProvider] Created", commands.length, "commands");
+    // Register all commands (registerCommands handles deduplication)
+    const commands = createCommands();
+    console.log("[VoiceProvider] Registering", commands.length, "commands");
     voiceEngine.registerCommands(commands);
-
-    // Set up callbacks - use getState() to avoid selector subscriptions
-    voiceEngine.setCallbacks({
-      onTranscript: (transcript, isFinal) => {
-        useVoiceStore.getState().setTranscript(transcript, isFinal);
-      },
-
-      onCommand: async (_commandId, response) => {
-        console.log("[VoiceProvider] onCommand called:", _commandId, response);
-        useVoiceStore.getState().setProcessing(false);
-        await useVoiceStore.getState().speak(response);
-      },
-
-      onNoMatch: async (transcript) => {
-        console.log("[VoiceProvider] onNoMatch called:", transcript);
-        useVoiceStore.getState().setProcessing(false);
-        if (transcript && transcript.length > 0) {
-          await useVoiceStore.getState().speak(FALLBACK_RESPONSE);
-        }
-      },
-
-      onError: async (error) => {
-        useVoiceStore.getState().setProcessing(false);
-        console.error("Voice error:", error);
-      },
-
-      onListeningChange: (isListening) => {
-        // Sync store state with engine state
-        const store = useVoiceStore.getState();
-        if (!isListening && store.isListening) {
-          // Engine stopped but store thinks we're listening - sync it
-          store.stopListening();
-        }
-      },
-    });
 
     return () => {
       voiceEngine.clearCommands();
     };
-    // Only run once on mount - router methods are stable
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Set up event listeners for routing
+  React.useEffect(() => {
+    const unsubs: (() => void)[] = [];
+
+    // Handle page navigation
+    unsubs.push(
+      voiceEvents.on("navigate", (e) => {
+        const route = e.payload.route;
+        console.log("[VoiceProvider] Navigate event received, route:", route);
+        if (route) {
+          router.push(route);
+        }
+      })
+    );
+
+    // Handle go home
+    unsubs.push(
+      voiceEvents.on("go:home", () => {
+        router.push("/home");
+      })
+    );
+
+    // Handle open patient
+    unsubs.push(
+      voiceEvents.on("patient:open", (e) => {
+        const patientName = e.payload.patientName;
+        if (!patientName) return;
+        const patient = findPatient(patientName);
+        if (patient) {
+          // Use patient name in URL for more reliable matching
+          const encodedName = encodeURIComponent(`${patient.first_name} ${patient.last_name}`);
+          router.push(`/home/patients?patientName=${encodedName}`);
+        }
+      })
+    );
+
+    // Handle open patient with specific tab
+    unsubs.push(
+      voiceEvents.on("patient:tab", (e) => {
+        const patientName = e.payload.patientName;
+        const tab = e.payload.tab;
+        if (!patientName) return;
+        const patient = findPatient(patientName);
+        if (patient) {
+          // Use patient name in URL for more reliable matching
+          const encodedName = encodeURIComponent(`${patient.first_name} ${patient.last_name}`);
+          router.push(`/home/patients?patientName=${encodedName}&tab=${tab || "overview"}`);
+        }
+      })
+    );
+
+    // Handle priority actions - dispatch custom event for homepage to open patient detail
+    unsubs.push(
+      voiceEvents.on("patient:actions", (e) => {
+        const patientName = e.payload.patientName;
+        if (!patientName) return;
+        const patient = findPatient(patientName);
+        if (patient) {
+          // Dispatch custom event for homepage to handle
+          window.dispatchEvent(
+            new CustomEvent("voice-open-patient-actions", {
+              detail: { patientName: `${patient.first_name} ${patient.last_name}` },
+            })
+          );
+        }
+      })
+    );
+
+    // Handle calendar reschedule - dispatch custom event for calendar page to handle
+    unsubs.push(
+      voiceEvents.on("calendar:reschedule", (e) => {
+        const { time } = e.payload;
+        if (time) {
+          // Parse time string to hours/minutes
+          const parsedTime = parseTime(time);
+          if (parsedTime) {
+            // Dispatch custom event for calendar page
+            window.dispatchEvent(
+              new CustomEvent("voice-move-appointment", {
+                detail: { appointmentId: "", newTime: parsedTime },
+              })
+            );
+          }
+        }
+      })
+    );
+
+    // Handle session start
+    unsubs.push(
+      voiceEvents.on("session:start", (e) => {
+        const patientName = e.payload.patientName;
+        if (!patientName) return;
+        const patient = findPatient(patientName);
+        if (patient) {
+          const encodedName = encodeURIComponent(`${patient.first_name} ${patient.last_name}`);
+          router.push(`/home/patients?patientName=${encodedName}&session=new`);
+        }
+      })
+    );
+
+    // Handle complete all actions - dispatch custom event
+    unsubs.push(
+      voiceEvents.on("actions:complete", () => {
+        window.dispatchEvent(new CustomEvent("voice-complete-actions"));
+      })
+    );
+
+    return () => unsubs.forEach((fn) => fn());
+  }, [router]);
+
   return <>{children}</>;
+}
+
+/**
+ * Parse time from natural language (e.g., "4 pm", "3:30", "14:00")
+ */
+function parseTime(timeStr: string): { hours: number; minutes: number } | null {
+  const normalized = timeStr.toLowerCase().replace(/\s+/g, "");
+
+  // Match "4pm", "4 pm", "4:30pm", "16:00"
+  const patterns = [
+    /^(\d{1,2}):?(\d{2})?\s*(am|pm)?$/,
+    /^(\d{1,2})\s*(am|pm)$/,
+    /^(\d{1,2})\s*o'?clock$/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = normalized.match(pattern);
+    if (match) {
+      let hours = parseInt(match[1]!, 10);
+      const minutes = match[2] ? parseInt(match[2], 10) : 0;
+      const meridiem = match[3];
+
+      // Handle 12-hour format
+      if (meridiem === "pm" && hours !== 12) {
+        hours += 12;
+      } else if (meridiem === "am" && hours === 12) {
+        hours = 0;
+      }
+
+      // If no meridiem and hours < 8, assume PM (business hours)
+      if (!meridiem && hours < 8 && hours > 0) {
+        hours += 12;
+      }
+
+      if (hours >= 0 && hours <= 23 && minutes >= 0 && minutes <= 59) {
+        return { hours, minutes };
+      }
+    }
+  }
+
+  return null;
 }

@@ -48,8 +48,8 @@ export function ScheduleRowCard({
         </div>
 
         {/* Patient info */}
-        <div className="flex min-w-0 flex-1 items-center gap-4">
-          <Avatar className="ml-4 h-10 w-10 shrink-0">
+        <div className="flex min-w-0 flex-1 items-center gap-5">
+          <Avatar className="ml-6 h-10 w-10 shrink-0">
             {avatarSrc && <AvatarImage src={avatarSrc} alt={patient} />}
             <AvatarFallback className="bg-avatar-fallback text-xs text-white">
               {initials}
@@ -69,9 +69,10 @@ export function ScheduleRowCard({
             status === "IN PROGRESS" ? "default" : status === "CHECKED IN" ? "secondary" : "outline"
           }
           className={cn(
-            "shrink-0 rounded-md border-none px-2 py-0.5 text-xs font-bold",
-            status === "ENDED" && "bg-muted text-muted-foreground",
-            status === "SCHEDULED" && "border-muted text-muted-foreground border bg-transparent"
+            "shrink-0 rounded-md px-2 py-0.5 text-xs font-bold",
+            status === "ENDED" && "bg-muted text-muted-foreground border-none",
+            status === "SCHEDULED" && "text-muted-foreground border border-gray-300 bg-transparent",
+            (status === "IN PROGRESS" || status === "CHECKED IN") && "border-none"
           )}
         >
           {status}

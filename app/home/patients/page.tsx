@@ -7,11 +7,33 @@ import { HeaderSearch } from "../_components/header-search";
 import { AnimatedBackground } from "@/design-system/components/ui/animated-background";
 import { PageTransition } from "@/design-system/components/ui/page-transition";
 import { PatientsPage } from "../_components/patients-page";
+import { Skeleton } from "@/design-system/components/ui/skeleton";
 
-export default function PatientsRoute() {
+function PatientsContent() {
   const searchParams = useSearchParams();
   const initialPatientId = searchParams.get("patient") || undefined;
+  const initialPatientName = searchParams.get("patientName") || undefined;
+  const initialTab = searchParams.get("tab") || undefined;
 
+  return (
+    <PatientsPage
+      initialPatientId={initialPatientId}
+      initialPatientName={initialPatientName}
+      initialTab={initialTab}
+    />
+  );
+}
+
+function PatientsContentSkeleton() {
+  return (
+    <div className="flex h-full gap-4">
+      <Skeleton className="h-full w-80 rounded-xl" />
+      <Skeleton className="h-full flex-1 rounded-xl" />
+    </div>
+  );
+}
+
+export default function PatientsRoute() {
   return (
     <div className="min-h-screen pb-24 lg:pb-0">
       <AnimatedBackground />
@@ -26,7 +48,9 @@ export default function PatientsRoute() {
         <main className="px-4 py-4 sm:px-6 sm:py-6 md:py-8">
           <PageTransition>
             <div className="mx-auto max-w-[1600px] lg:h-[calc(100vh-8.5rem)]">
-              <PatientsPage initialPatientId={initialPatientId} />
+              <React.Suspense fallback={<PatientsContentSkeleton />}>
+                <PatientsContent />
+              </React.Suspense>
             </div>
           </PageTransition>
         </main>

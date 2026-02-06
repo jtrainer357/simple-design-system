@@ -31,7 +31,7 @@ import {
   type AppointmentWithPatient,
 } from "@/src/lib/queries/appointments";
 import { DEMO_DATE_OBJECT } from "@/src/lib/utils/demo-date";
-import { useVoiceStore } from "@/src/lib/voice";
+// Voice command integration uses custom events instead of store
 
 // Color mapping based on appointment type
 function getEventColor(serviceType: string, status: string): CalendarEvent["color"] {
@@ -449,10 +449,7 @@ export default function SchedulePage() {
     loadAppointments();
   }, [loadAppointments]);
 
-  // Sync selected event with voice store
-  React.useEffect(() => {
-    useVoiceStore.getState().setSelectedAppointmentId(selectedEventId);
-  }, [selectedEventId]);
+  // Note: selectedEventId is used by the voice-move-appointment event listener below
 
   // Listen for voice commands to move appointments
   React.useEffect(() => {

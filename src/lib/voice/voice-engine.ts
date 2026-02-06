@@ -2,11 +2,7 @@
  * Voice Command Engine using Web Speech API
  *
  * Core engine for the "Hey Tebra" voice-first interface. Provides wake-word
- * detection, natural language command parsing, and confidence-based error
- * handling. Designed for hands-free clinical workflows.
- *
- * Architecture:
- *   Microphone -> Web Speech API -> Transcript -> Wake Word Filter -> Command Matcher -> Action
+ * detection, natural language command parsing, and continuous listening.
  *
  * @module voice-engine
  */
@@ -38,35 +34,44 @@ interface SpeechRecognitionInstance {
   abort: () => void;
 }
 
+/**
+ * Voice command with regex patterns and action handler
+ */
 export interface VoiceCommand {
   id: string;
   patterns: RegExp[];
-  handler: (match: RegExpMatchArray, transcript: string) => Promise<string> | string;
-  description: string;
+  /** Action receives the regex match array and original transcript. Return false to pass to next command. */
+  action: (match: RegExpMatchArray, transcript: string) => boolean | void;
+  /** Lower priority = checked first. Default 10. */
+  priority?: number;
+  description?: string;
 }
 
-export interface VoiceEngineCallbacks {
+export interface VoiceEngineOptions {
+  onTranscript?: (text: string, hadWakeWord: boolean) => void;
   onListeningChange?: (isListening: boolean) => void;
-  onTranscript?: (transcript: string, isFinal: boolean) => void;
-  onCommand?: (commandId: string, response: string) => void;
   onError?: (error: string) => void;
-  onNoMatch?: (transcript: string) => void;
 }
 
 // Wake word patterns - matches "Tebra" or "Hey Tebra" at the start
 // Includes common misheard variations: Debra, Zebra, Tetra, etc.
 const WAKE_WORD_PATTERN =
-  /^(?:hey\s+)?(?:tebra|debra|zebra|tetra|tab\s?ra|tabra|teabra|tee?brah?|deb\s?ra)\s*,?\s*(.*)/i;
+  /^(?:hey\s+)?(?:tebra|debra|zebra|tetra|tab\s?ra|tabra|teabra|tee?brah?|deb\s?ra)[,.]?\s*(.*)/i;
 
 class VoiceEngine {
   private recognition: SpeechRecognitionInstance | null = null;
   private commands: VoiceCommand[] = [];
-  private callbacks: VoiceEngineCallbacks = {};
+  private options: VoiceEngineOptions = {};
   private isListening = false;
   private shouldRestart = false;
-  private isPaused = false; // True when paused for TTS, false otherwise
+  private isPaused = false;
   private restartTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private initialized = false;
+  // Track when wake word was last heard (for split phrase detection)
+  private lastWakeWordTime: number = 0;
+  private static WAKE_WORD_WINDOW_MS = 5000; // 5 second window after wake word
+  // Track if user has activated listening (survives component remounts)
+  private userActivated = false;
 
   constructor() {
     // Don't initialize in constructor - wait for explicit init on client
@@ -89,7 +94,7 @@ class VoiceEngine {
       | undefined;
 
     if (!SpeechRecognition) {
-      console.warn("Web Speech API not supported in this browser");
+      console.warn("[Voice] Web Speech API not supported in this browser");
       return;
     }
 
@@ -100,41 +105,63 @@ class VoiceEngine {
   private setupRecognition(): void {
     if (!this.recognition) return;
 
-    // Configure for continuous listening with interim results
+    // Configure for continuous listening - stays on until user toggles off
     this.recognition.continuous = true;
-    this.recognition.interimResults = true;
+    this.recognition.interimResults = false; // Only fire on final results
     this.recognition.lang = "en-US";
     this.recognition.maxAlternatives = 1;
 
     this.recognition.onresult = (event: SpeechRecognitionEvent) => {
-      // Get the latest result
-      const resultIndex = event.resultIndex;
-      const result = event.results[resultIndex];
+      // Get the LATEST final result only
+      const lastResult = event.results[event.results.length - 1];
+      if (!lastResult || !lastResult.isFinal) return;
 
-      if (!result) return;
+      const transcript = lastResult[0]?.transcript.toLowerCase().trim() ?? "";
+      const confidence = lastResult[0]?.confidence ?? 0;
 
-      const transcript = result[0]?.transcript.toLowerCase().trim() ?? "";
-      const isFinal = result.isFinal;
-      const confidence = result[0]?.confidence ?? 0;
+      console.log("[Voice] Transcript:", transcript, "| Confidence:", confidence);
 
-      // Debug logging
+      // Accept anything above 0.5 - Web Speech API on Chrome is conservative
+      if (confidence < 0.5) {
+        console.log("[Voice] Confidence too low, ignoring");
+        return;
+      }
+
+      // Check for wake word
+      const wakeMatch = transcript.match(WAKE_WORD_PATTERN);
+      const commandText = wakeMatch ? (wakeMatch[1]?.trim() ?? "") : "";
+      const now = Date.now();
+      const isWithinWakeWindow = now - this.lastWakeWordTime < VoiceEngine.WAKE_WORD_WINDOW_MS;
+
+      console.log("[Voice] Wake word match:", !!wakeMatch, "| Command text:", commandText);
       console.log(
-        "[Voice] Transcript:",
-        transcript,
-        "| Final:",
-        isFinal,
-        "| Confidence:",
-        confidence
+        "[Voice] Within wake window:",
+        isWithinWakeWindow,
+        "| Registered commands:",
+        this.commands.length
       );
 
-      // Always emit transcript for UI feedback
-      this.callbacks.onTranscript?.(transcript, isFinal);
-
-      // Process final results - lowered confidence threshold for better recognition
-      if (isFinal) {
-        console.log("[Voice] Processing final transcript:", transcript);
-        this.processTranscript(transcript);
+      // Case 1: Wake word + command in same phrase
+      if (wakeMatch && commandText) {
+        this.lastWakeWordTime = 0; // Reset window
+        const matched = this.executeCommand(commandText, transcript);
+        console.log("[Voice] Command executed:", matched);
       }
+      // Case 2: Wake word only (no command) - start listening window
+      else if (wakeMatch && !commandText) {
+        this.lastWakeWordTime = now;
+        console.log("[Voice] Wake word detected, waiting for command...");
+      }
+      // Case 3: No wake word but within window - treat entire transcript as command
+      else if (!wakeMatch && isWithinWakeWindow && transcript) {
+        this.lastWakeWordTime = 0; // Reset window
+        console.log("[Voice] Processing command from wake window:", transcript);
+        const matched = this.executeCommand(transcript, transcript);
+        console.log("[Voice] Command executed:", matched);
+      }
+
+      // Fire transcript callback
+      this.options.onTranscript?.(transcript, !!wakeMatch || isWithinWakeWindow);
     };
 
     this.recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
@@ -143,26 +170,26 @@ class VoiceEngine {
       switch (errorType) {
         case "no-speech":
           // Silent timeout - restart if we should be listening
-          if (this.shouldRestart) {
+          if (this.shouldRestart && !this.isPaused) {
             this.scheduleRestart();
           }
           break;
         case "audio-capture":
-          this.callbacks.onError?.("No microphone available");
+          this.options.onError?.("No microphone available");
           this.isListening = false;
-          this.callbacks.onListeningChange?.(false);
+          this.options.onListeningChange?.(false);
           break;
         case "not-allowed":
-          this.callbacks.onError?.("Microphone permission denied");
+          this.options.onError?.("Microphone permission denied");
           this.isListening = false;
-          this.callbacks.onListeningChange?.(false);
+          this.options.onListeningChange?.(false);
           break;
         case "aborted":
           // Intentional stop - no error
           break;
         default:
-          console.warn("Speech recognition error:", errorType);
-          if (this.shouldRestart) {
+          console.warn("[Voice] Speech recognition error:", errorType);
+          if (this.shouldRestart && !this.isPaused) {
             this.scheduleRestart();
           }
       }
@@ -170,20 +197,22 @@ class VoiceEngine {
 
     this.recognition.onstart = () => {
       this.isListening = true;
-      this.callbacks.onListeningChange?.(true);
+      this.options.onListeningChange?.(true);
     };
 
     this.recognition.onend = () => {
       this.isListening = false;
 
-      // Don't notify listeners if we're just paused for TTS
-      if (!this.isPaused) {
-        this.callbacks.onListeningChange?.(false);
-      }
-
       // Auto-restart if we should still be listening
       if (this.shouldRestart && !this.isPaused) {
         this.scheduleRestart();
+        // Don't notify listeners - we're restarting, not stopping
+        return;
+      }
+
+      // Only notify listeners if we're actually stopping
+      if (!this.isPaused) {
+        this.options.onListeningChange?.(false);
       }
     };
   }
@@ -194,94 +223,88 @@ class VoiceEngine {
     }
 
     this.restartTimeoutId = setTimeout(() => {
-      if (this.shouldRestart && this.recognition && !this.isListening) {
+      if (this.shouldRestart && this.recognition && !this.isListening && !this.isPaused) {
         try {
           this.recognition.start();
-        } catch (e) {
+        } catch {
           // Already started or other error - ignore
-          console.warn("Failed to restart recognition:", e);
         }
       }
     }, 100);
   }
 
-  private async processTranscript(transcript: string): Promise<void> {
-    console.log("[Voice] processTranscript called with:", transcript);
-    console.log("[Voice] Registered commands:", this.commands.length);
+  /**
+   * Execute a command against the registered commands
+   * Commands are sorted by priority (lower = first)
+   */
+  private executeCommand(commandText: string, originalTranscript: string): boolean {
+    // Sort commands by priority (ascending - lower priority value = checked first)
+    const sortedCommands = [...this.commands].sort(
+      (a, b) => (a.priority ?? 10) - (b.priority ?? 10)
+    );
 
-    // Check for wake word
-    const wakeMatch = transcript.match(WAKE_WORD_PATTERN);
-    console.log("[Voice] Wake word match:", wakeMatch);
+    console.log("[Voice] Trying to match command:", commandText);
 
-    if (!wakeMatch) {
-      // No wake word - ignore
-      console.log("[Voice] No wake word found, ignoring");
-      return;
-    }
-
-    // Extract the command part after the wake word
-    const commandText = wakeMatch[1]?.trim() ?? "";
-    console.log("[Voice] Command text after wake word:", commandText);
-
-    if (!commandText) {
-      // Wake word detected but no command
-      console.log("[Voice] Wake word detected but no command");
-      this.callbacks.onNoMatch?.("Listening... what would you like me to do?");
-      return;
-    }
-
-    // Try to match against registered commands
-    for (const command of this.commands) {
+    for (const command of sortedCommands) {
       for (const pattern of command.patterns) {
         const match = commandText.match(pattern);
         if (match) {
-          console.log("[Voice] MATCHED command:", command.id, "with pattern:", pattern);
+          console.log("[Voice] MATCHED command:", command.id, "| Pattern:", pattern.toString());
           try {
-            const response = await command.handler(match, commandText);
-            console.log("[Voice] Command response:", response);
-            this.callbacks.onCommand?.(command.id, response);
-            return;
+            // Pass the full match array and original transcript to the action
+            // If action returns false, continue to next command (not handled)
+            const result = command.action(match, originalTranscript);
+            if (result === false) {
+              console.log("[Voice] Command", command.id, "declined to handle, trying next...");
+              break; // Break inner loop, continue to next command
+            }
+            return true;
           } catch (error) {
             console.error("[Voice] Command handler error:", error);
-            this.callbacks.onError?.("Sorry, something went wrong. Please try again.");
-            return;
+            return false;
           }
         }
       }
     }
 
-    // No command matched
     console.log("[Voice] No command matched for:", commandText);
-    this.callbacks.onNoMatch?.(commandText);
+    // No match found - that's okay, user might just be talking
+    return false;
   }
 
   // Public API
+
+  /**
+   * Register a voice command
+   */
   registerCommand(command: VoiceCommand): void {
     // Remove existing command with same ID
     this.commands = this.commands.filter((c) => c.id !== command.id);
     this.commands.push(command);
   }
 
+  /**
+   * Register multiple voice commands
+   */
   registerCommands(commands: VoiceCommand[]): void {
-    console.log("[Voice] Registering", commands.length, "commands");
     commands.forEach((cmd) => this.registerCommand(cmd));
-    console.log("[Voice] Total commands now:", this.commands.length);
   }
 
+  /**
+   * Clear all registered commands
+   */
   clearCommands(): void {
     this.commands = [];
   }
 
-  setCallbacks(callbacks: VoiceEngineCallbacks): void {
-    this.callbacks = { ...this.callbacks, ...callbacks };
-  }
-
-  start(): boolean {
-    // Ensure initialized before checking recognition
+  /**
+   * Start listening for voice commands
+   */
+  start(options?: VoiceEngineOptions): boolean {
     this.ensureInitialized();
 
     if (!this.recognition) {
-      this.callbacks.onError?.("Voice commands require Chrome browser");
+      options?.onError?.("Voice commands require Chrome browser");
       return false;
     }
 
@@ -289,20 +312,30 @@ class VoiceEngine {
       return true; // Already listening
     }
 
+    // Store options for callbacks
+    if (options) {
+      this.options = { ...this.options, ...options };
+    }
+
     this.shouldRestart = true;
+    this.isPaused = false;
+    this.userActivated = true; // Track that user turned on listening
 
     try {
       this.recognition.start();
       return true;
-    } catch (error) {
-      console.error("Failed to start recognition:", error);
+    } catch {
       return false;
     }
   }
 
+  /**
+   * Stop listening for voice commands
+   */
   stop(): void {
     this.shouldRestart = false;
     this.isPaused = false;
+    this.userActivated = false; // Track that user turned off listening
 
     if (this.restartTimeoutId) {
       clearTimeout(this.restartTimeoutId);
@@ -311,18 +344,31 @@ class VoiceEngine {
 
     if (this.recognition) {
       try {
-        // Use abort() for immediate stop, more reliable than stop()
         this.recognition.abort();
       } catch {
         // Ignore errors if already stopped
       }
       this.isListening = false;
+      this.options.onListeningChange?.(false);
+    }
+  }
+
+  /**
+   * Toggle listening on/off
+   * @returns The new isListening state
+   */
+  toggle(options?: VoiceEngineOptions): boolean {
+    if (this.isListening || this.shouldRestart) {
+      this.stop();
+      return false;
+    } else {
+      this.start(options);
+      return true;
     }
   }
 
   /**
    * Temporarily pause listening (e.g., while TTS is playing)
-   * Call resume() to continue
    */
   pause(): void {
     this.isPaused = true;
@@ -340,20 +386,31 @@ class VoiceEngine {
    */
   resume(): void {
     this.isPaused = false;
-    // Always try to restart after resume
-    if (!this.isListening && this.recognition) {
-      this.shouldRestart = true;
+    if (!this.isListening && this.recognition && this.shouldRestart) {
       this.scheduleRestart();
     }
   }
 
+  /**
+   * Check if Web Speech API is supported
+   */
   isSupported(): boolean {
     this.ensureInitialized();
     return this.recognition !== null;
   }
 
+  /**
+   * Get current listening state
+   */
   getIsListening(): boolean {
     return this.isListening;
+  }
+
+  /**
+   * Check if user has activated listening (survives component remounts)
+   */
+  isUserActivated(): boolean {
+    return this.userActivated;
   }
 }
 

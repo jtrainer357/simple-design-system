@@ -7,5 +7,4 @@
  */
 
 export { VoiceControl } from "./VoiceControl";
-export { VoiceTranscript } from "./VoiceTranscript";
 export { VoiceProvider } from "./VoiceProvider";

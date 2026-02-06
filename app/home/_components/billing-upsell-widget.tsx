@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { DollarSign } from "lucide-react";
 import { OutstandingCard } from "@/design-system/components/ui/outstanding-card";
 import { cn } from "@/design-system/lib/utils";
@@ -10,6 +11,8 @@ interface BillingUpsellWidgetProps {
 }
 
 export function BillingUpsellWidget({ className }: BillingUpsellWidgetProps) {
+  const router = useRouter();
+
   return (
     <OutstandingCard
       title="Try Our Billing Solution"
@@ -17,6 +20,7 @@ export function BillingUpsellWidget({ className }: BillingUpsellWidgetProps) {
       suffix="%"
       subtitle="Increase collections"
       buttonText="Learn More"
+      onButtonClick={() => router.push("/home/billing")}
       icon={DollarSign}
       className={cn(className)}
     />

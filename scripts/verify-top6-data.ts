@@ -9,7 +9,7 @@ const practiceId = "550e8400-e29b-41d4-a716-446655440000";
 
 // Top 6 patient IDs (alphabetically sorted)
 const top6PatientIds = [
-  "550e8400-e29b-41d4-a716-446655440020", // Brian Antonelli
+  "550e8400-e29b-41d4-a716-446655440020", // Brian Anton
   "550e8400-e29b-41d4-a716-446655440024", // Anthony Benedetti
   "550e8400-e29b-41d4-a716-446655440025", // Heather Donovan
   "550e8400-e29b-41d4-a716-446655440018", // Kevin Goldstein

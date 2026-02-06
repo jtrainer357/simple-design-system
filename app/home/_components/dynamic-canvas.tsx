@@ -6,6 +6,8 @@ import { PriorityActionsSection, TodaysActionsHeader } from "./priority-actions-
 import { TodaysPatientsList } from "./todays-patients-list";
 import { PatientCanvasDetail } from "./patient-canvas-detail";
 import { getTodayAppointments } from "@/src/lib/queries/appointments";
+import { useShallow } from "zustand/react/shallow";
+import { ExecutionOverlay, useOrchestrationStore } from "@/src/components/orchestration";
 import type { OrchestrationContext } from "@/src/lib/orchestration/types";
 
 type CanvasView = "actions" | "patient-detail";
@@ -32,6 +34,18 @@ export function DynamicCanvas({ className }: DynamicCanvasProps) {
   const [appointmentCount, setAppointmentCount] = React.useState(0);
   const [isLoading, setIsLoading] = React.useState(true);
 
+  // Get overlay state from the store
+  const { showExecutionOverlay, hideOverlay, taskProgress, actions, context } =
+    useOrchestrationStore(
+      useShallow((state) => ({
+        showExecutionOverlay: state.showExecutionOverlay,
+        hideOverlay: state.hideOverlay,
+        taskProgress: state.taskProgress,
+        actions: state.actions,
+        context: state.context,
+      }))
+    );
+
   React.useEffect(() => {
     async function loadAppointmentCount() {
       try {
@@ -56,6 +70,12 @@ export function DynamicCanvas({ className }: DynamicCanvasProps) {
   };
 
   const handleComplete = () => {
+    setView("actions");
+  };
+
+  // Handle overlay completion - go back to actions view
+  const handleOverlayComplete = () => {
+    hideOverlay();
     setView("actions");
   };
 
@@ -120,6 +140,15 @@ export function DynamicCanvas({ className }: DynamicCanvasProps) {
           <TodaysPatientsList onSelectPatient={handleSelectPatient} />
         </div>
       </div>
+
+      {/* Full-page Execution Overlay */}
+      <ExecutionOverlay
+        isVisible={showExecutionOverlay}
+        taskProgress={taskProgress}
+        actions={actions}
+        patientName={context?.patient.name}
+        onComplete={handleOverlayComplete}
+      />
     </div>
   );
 }

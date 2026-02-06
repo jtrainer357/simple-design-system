@@ -408,9 +408,15 @@ function dbActionToUiAction(action: PatientPriorityAction): PriorityAction {
 
 interface PatientsPageProps {
   initialPatientId?: string;
+  initialPatientName?: string;
+  initialTab?: string;
 }
 
-export function PatientsPage({ initialPatientId }: PatientsPageProps) {
+export function PatientsPage({
+  initialPatientId,
+  initialPatientName,
+  initialTab,
+}: PatientsPageProps) {
   const [loading, setLoading] = React.useState(true);
   const [dbReady, setDbReady] = React.useState<boolean | null>(null);
   const [patients, setPatients] = React.useState<DbPatient[]>([]);
@@ -418,6 +424,10 @@ export function PatientsPage({ initialPatientId }: PatientsPageProps) {
   const [patientDetails, setPatientDetails] = React.useState<PatientDetail | null>(null);
   const [detailLoading, setDetailLoading] = React.useState(false);
   const [activeFilter, setActiveFilter] = React.useState("all");
+
+  // Stabilize props for useEffect dependencies
+  const patientIdKey = initialPatientId ?? "";
+  const patientNameKey = initialPatientName ?? "";
 
   // Load initial patients list
   React.useEffect(() => {
@@ -438,14 +448,48 @@ export function PatientsPage({ initialPatientId }: PatientsPageProps) {
         const patientsData = await getPatients();
         setPatients(patientsData);
 
-        // Select patient from URL param, or default to first patient
-        if (initialPatientId) {
-          const targetPatient = patientsData.find((p) => p.id === initialPatientId);
-          if (targetPatient) {
-            setSelectedPatient(dbPatientToListItem(targetPatient));
-          } else if (patientsData.length > 0 && patientsData[0]) {
-            setSelectedPatient(dbPatientToListItem(patientsData[0]));
+        // Select patient from URL param (by ID or name), or default to first patient
+        let targetPatient: DbPatient | undefined;
+
+        if (patientNameKey) {
+          // Search by name (case-insensitive, fuzzy)
+          const searchName = patientNameKey.toLowerCase();
+          // Try exact match first
+          targetPatient = patientsData.find((p) => {
+            const fullName = `${p.first_name} ${p.last_name}`.toLowerCase();
+            return fullName === searchName;
+          });
+          // Try starts-with match for partial names
+          if (!targetPatient) {
+            targetPatient = patientsData.find((p) => {
+              const fullName = `${p.first_name} ${p.last_name}`.toLowerCase();
+              return fullName.startsWith(searchName);
+            });
           }
+          // Try first name only match
+          if (!targetPatient) {
+            targetPatient = patientsData.find((p) => {
+              return p.first_name.toLowerCase() === searchName;
+            });
+          }
+          console.log(
+            "[PatientsPage] Searching for patient by name:",
+            patientNameKey,
+            "Found:",
+            targetPatient?.id
+          );
+        } else if (patientIdKey) {
+          targetPatient = patientsData.find((p) => p.id === patientIdKey);
+          console.log(
+            "[PatientsPage] Searching for patient by ID:",
+            patientIdKey,
+            "Found:",
+            targetPatient?.id
+          );
+        }
+
+        if (targetPatient) {
+          setSelectedPatient(dbPatientToListItem(targetPatient));
         } else if (patientsData.length > 0 && patientsData[0]) {
           setSelectedPatient(dbPatientToListItem(patientsData[0]));
         }
@@ -457,7 +501,7 @@ export function PatientsPage({ initialPatientId }: PatientsPageProps) {
     }
 
     void loadPatients();
-  }, [initialPatientId]);
+  }, [patientIdKey, patientNameKey]);
 
   // Load selected patient details
   React.useEffect(() => {
@@ -687,7 +731,11 @@ export function PatientsPage({ initialPatientId }: PatientsPageProps) {
               </div>
             </CardWrapper>
           ) : (
-            <PatientDetailView patient={patientDetails} className="min-h-0 flex-1" />
+            <PatientDetailView
+              patient={patientDetails}
+              className="min-h-0 flex-1"
+              initialTab={initialTab}
+            />
           )}
         </div>
       </div>

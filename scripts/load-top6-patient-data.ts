@@ -14,20 +14,20 @@ const newPriorityActions = [
   {
     id: "850e8400-e29b-41d4-a716-446655440006",
     practice_id: PRACTICE_ID,
-    patient_id: "550e8400-e29b-41d4-a716-446655440020", // Brian Antonelli
+    patient_id: "550e8400-e29b-41d4-a716-446655440020", // Brian Anton
     title: "Recovery Milestone - 9 Year Sobriety Check-in",
     urgency: "MEDIUM",
     time_window: "This week",
     ai_confidence: 91,
     clinical_context:
-      "Brian Antonelli, 61M. Substance Use Disorder in sustained remission (9 years sober). Annual sobriety milestone approaching. Strong recovery foundation but recent work stress noted. Maintenance support indicated.",
+      "Brian Anton, 61M. Substance Use Disorder in sustained remission (9 years sober). Annual sobriety milestone approaching. Strong recovery foundation but recent work stress noted. Maintenance support indicated.",
     suggested_actions: [
       "Acknowledge 9-year sobriety milestone in session",
       "Review relapse prevention plan",
       "Assess current stress coping strategies",
       "Connect with sponsor/support network",
     ],
-    patient_name: "Brian Antonelli",
+    patient_name: "Brian Anton",
     patient_age: 61,
     status: "pending",
   },
@@ -115,13 +115,13 @@ const newPriorityActions = [
 
 // New visit summaries for top 6 alphabetical patients
 const newVisitSummaries = [
-  // Brian Antonelli
+  // Brian Anton
   {
     id: "b1a1f30e-08e8-446f-8e3b-b945db4f4520",
     practice_id: PRACTICE_ID,
     patient_id: "550e8400-e29b-41d4-a716-446655440020",
     visit_date: "2025-12-16",
-    patient_name: "Brian Antonelli",
+    patient_name: "Brian Anton",
     appointment_type: "Individual Therapy",
     visit_summary: `Individual Therapy - 2025-12-16
 
@@ -139,7 +139,7 @@ Continue monthly maintenance therapy. Review HALT (Hungry, Angry, Lonely, Tired)
     practice_id: PRACTICE_ID,
     patient_id: "550e8400-e29b-41d4-a716-446655440020",
     visit_date: "2026-01-17",
-    patient_name: "Brian Antonelli",
+    patient_name: "Brian Anton",
     appointment_type: "Individual Therapy",
     visit_summary: `Individual Therapy - 2026-01-17
 

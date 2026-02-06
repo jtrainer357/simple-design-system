@@ -23,6 +23,12 @@ interface OrchestrationState {
   isExecuting: boolean;
   taskProgress: TaskProgress[];
 
+  // Full-page execution overlay
+  showExecutionOverlay: boolean;
+
+  // Track completed patient IDs
+  completedPatientIds: string[];
+
   // Modal controls
   openModal: (context: OrchestrationContext) => void;
   closeModal: () => void;
@@ -36,6 +42,11 @@ interface OrchestrationState {
   updateTaskProgress: (actionId: string, status: TaskStatus) => void;
   completeExecution: () => void;
   resetExecution: () => void;
+
+  // Overlay controls
+  showOverlay: () => void;
+  hideOverlay: () => void;
+  markPatientCompleted: (patientId: string) => void;
 }
 
 export const useOrchestrationStore = create<OrchestrationState>((set, get) => ({
@@ -45,6 +56,8 @@ export const useOrchestrationStore = create<OrchestrationState>((set, get) => ({
   actions: [],
   isExecuting: false,
   taskProgress: [],
+  showExecutionOverlay: false,
+  completedPatientIds: [],
 
   // Open modal with context
   openModal: (context: OrchestrationContext) =>
@@ -131,6 +144,28 @@ export const useOrchestrationStore = create<OrchestrationState>((set, get) => ({
       taskProgress: [],
     });
   },
+
+  // Show full-page execution overlay
+  showOverlay: () => {
+    set({ showExecutionOverlay: true });
+  },
+
+  // Hide full-page execution overlay
+  hideOverlay: () => {
+    set({
+      showExecutionOverlay: false,
+      isExecuting: false,
+      taskProgress: [],
+    });
+  },
+
+  // Mark a patient as having completed actions
+  markPatientCompleted: (patientId: string) => {
+    const { completedPatientIds } = get();
+    if (!completedPatientIds.includes(patientId)) {
+      set({ completedPatientIds: [...completedPatientIds, patientId] });
+    }
+  },
 }));
 
 // Selector hooks for optimized re-renders
@@ -159,6 +194,24 @@ export const useOrchestrationExecution = () =>
     completeExecution: state.completeExecution,
     resetExecution: state.resetExecution,
   }));
+
+export const useExecutionOverlay = () =>
+  useOrchestrationStore((state) => ({
+    showExecutionOverlay: state.showExecutionOverlay,
+    showOverlay: state.showOverlay,
+    hideOverlay: state.hideOverlay,
+    taskProgress: state.taskProgress,
+    actions: state.actions,
+    context: state.context,
+    isExecuting: state.isExecuting,
+    startExecution: state.startExecution,
+    updateTaskProgress: state.updateTaskProgress,
+    completeExecution: state.completeExecution,
+    markPatientCompleted: state.markPatientCompleted,
+  }));
+
+export const useCompletedPatients = () =>
+  useOrchestrationStore((state) => state.completedPatientIds);
 
 export const useCheckedActionsCount = () =>
   useOrchestrationStore((state) => state.actions.filter((a) => a.checked).length);

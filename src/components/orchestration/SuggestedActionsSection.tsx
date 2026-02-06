@@ -23,11 +23,11 @@ const actionIcons: Record<ActionType, React.ComponentType<{ className?: string }
 };
 
 const actionColors: Record<ActionType, string> = {
-  message: "text-blue-600 bg-blue-50",
-  order: "text-teal-600 bg-teal-50",
-  medication: "text-emerald-600 bg-emerald-50",
-  task: "text-amber-600 bg-amber-50",
-  document: "text-stone-600 bg-stone-50",
+  message: "text-[#6B8A85] bg-[#8CA7A2]/20",
+  order: "text-[#6B8A85] bg-[#8CA7A2]/20",
+  medication: "text-[#6B8A85] bg-[#8CA7A2]/20",
+  task: "text-[#6B8A85] bg-[#8CA7A2]/20",
+  document: "text-[#6B8A85] bg-[#8CA7A2]/20",
 };
 
 export function SuggestedActionsSection({
@@ -39,13 +39,13 @@ export function SuggestedActionsSection({
   return (
     <div className={cn("space-y-3", className)}>
       <div className="flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-teal-600" />
+        <Sparkles className="h-4 w-4 text-[#8CA7A2]" />
         <h4 className="text-sm font-semibold tracking-wide text-stone-500 uppercase">
           AI Suggested Actions
         </h4>
       </div>
 
-      <div className="rounded-lg border-2 border-dashed border-teal-200 bg-teal-50/30 p-3">
+      <div className="rounded-lg border-2 border-dashed border-[#8CA7A2]/40 bg-[#8CA7A2]/10 p-3">
         <div className="space-y-2">
           {actions.map((action, index) => {
             const Icon = actionIcons[action.type];
@@ -61,16 +61,16 @@ export function SuggestedActionsSection({
                 <label
                   className={cn(
                     "flex cursor-pointer items-center gap-3 rounded-lg border border-stone-200 bg-white p-3",
-                    "transition-all hover:border-teal-300 hover:shadow-sm",
+                    "transition-all hover:border-[#8CA7A2]/60 hover:shadow-sm",
                     disabled && "cursor-not-allowed opacity-60",
-                    action.checked && !disabled && "border-teal-400 bg-teal-50/50"
+                    action.checked && !disabled && "border-[#8CA7A2] bg-[#8CA7A2]/10"
                   )}
                 >
                   <Checkbox
                     checked={action.checked}
                     onCheckedChange={() => onToggle(action.id)}
                     disabled={disabled}
-                    className="h-5 w-5 border-2 data-[state=checked]:border-teal-600 data-[state=checked]:bg-teal-600"
+                    className="h-5 w-5 border-2 data-[state=checked]:border-[#8CA7A2] data-[state=checked]:bg-[#8CA7A2]"
                   />
                   <div
                     className={cn(
