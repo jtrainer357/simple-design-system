@@ -9,9 +9,6 @@
 import { createClient } from "@/src/lib/supabase/client";
 import { DEMO_PRACTICE_ID, getDemoToday, getDemoDaysAgo } from "@/src/lib/utils/demo-date";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SupabaseAny = any;
-
 export interface Invoice {
   id: string;
   practice_id: string;
@@ -147,27 +144,17 @@ export async function getBillingSummary(
     };
   }
 
-  const invoices = (data || []) as SupabaseAny[];
+  const invoices = (data || []) as unknown as Invoice[];
 
-  const totalCharged = invoices.reduce(
-    (sum: number, inv: SupabaseAny) => sum + (inv.charge_amount || 0),
-    0
-  );
+  const totalCharged = invoices.reduce((sum, inv) => sum + (inv.charge_amount || 0), 0);
   const totalCollected = invoices.reduce(
-    (sum: number, inv: SupabaseAny) => sum + (inv.insurance_paid || 0) + (inv.patient_paid || 0),
+    (sum, inv) => sum + (inv.insurance_paid || 0) + (inv.patient_paid || 0),
     0
   );
-  const outstandingAR = invoices.reduce(
-    (sum: number, inv: SupabaseAny) => sum + (inv.balance || 0),
-    0
-  );
+  const outstandingAR = invoices.reduce((sum, inv) => sum + (inv.balance || 0), 0);
   const collectionRate = totalCharged > 0 ? (totalCollected / totalCharged) * 100 : 0;
-  const paidCount = invoices.filter(
-    (inv: SupabaseAny) => inv.status?.toLowerCase() === "paid"
-  ).length;
-  const pendingCount = invoices.filter(
-    (inv: SupabaseAny) => inv.status?.toLowerCase() === "pending"
-  ).length;
+  const paidCount = invoices.filter((inv) => inv.status?.toLowerCase() === "paid").length;
+  const pendingCount = invoices.filter((inv) => inv.status?.toLowerCase() === "pending").length;
 
   return {
     totalCharged,
@@ -266,9 +253,15 @@ export async function getMonthlyBillingTotals(practiceId: string = DEMO_PRACTICE
   }
 
   // Group by month
+  type MonthlyInvoice = {
+    date_of_service: string | null;
+    charge_amount: number;
+    insurance_paid: number;
+    patient_paid: number;
+  };
   const monthMap = new Map<string, { charged: number; collected: number }>();
 
-  ((data || []) as SupabaseAny[]).forEach((inv: SupabaseAny) => {
+  ((data || []) as MonthlyInvoice[]).forEach((inv) => {
     if (!inv.date_of_service) return;
     const month = inv.date_of_service.substring(0, 7); // YYYY-MM
     if (!monthMap.has(month)) {

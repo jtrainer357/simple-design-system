@@ -644,6 +644,187 @@ export type Database = {
           },
         ];
       };
+      // Demo-specific tables (created by demo migration, not in base schema)
+      prioritized_actions: {
+        Row: {
+          id: string;
+          practice_id: string;
+          patient_id: string;
+          title: string;
+          urgency: string;
+          time_window: string | null;
+          ai_confidence: number | null;
+          clinical_context: string | null;
+          suggested_actions: string[] | null;
+          status: string | null;
+          completed_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          practice_id: string;
+          patient_id: string;
+          title: string;
+          urgency: string;
+          time_window?: string | null;
+          ai_confidence?: number | null;
+          clinical_context?: string | null;
+          suggested_actions?: string[] | null;
+          status?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          practice_id?: string;
+          patient_id?: string;
+          title?: string;
+          urgency?: string;
+          time_window?: string | null;
+          ai_confidence?: number | null;
+          clinical_context?: string | null;
+          suggested_actions?: string[] | null;
+          status?: string | null;
+          completed_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "prioritized_actions_practice_id_fkey";
+            columns: ["practice_id"];
+            isOneToOne: false;
+            referencedRelation: "practices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "prioritized_actions_patient_id_fkey";
+            columns: ["patient_id"];
+            isOneToOne: false;
+            referencedRelation: "patients";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      communications: {
+        Row: {
+          id: string;
+          practice_id: string;
+          patient_id: string;
+          channel: string;
+          direction: string;
+          sender: string | null;
+          recipient: string | null;
+          sender_email: string | null;
+          recipient_email: string | null;
+          sender_phone: string | null;
+          recipient_phone: string | null;
+          message_body: string | null;
+          is_read: boolean;
+          sent_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          practice_id: string;
+          patient_id: string;
+          channel: string;
+          direction: string;
+          sender?: string | null;
+          recipient?: string | null;
+          sender_email?: string | null;
+          recipient_email?: string | null;
+          sender_phone?: string | null;
+          recipient_phone?: string | null;
+          message_body?: string | null;
+          is_read?: boolean;
+          sent_at?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          practice_id?: string;
+          patient_id?: string;
+          channel?: string;
+          direction?: string;
+          sender?: string | null;
+          recipient?: string | null;
+          sender_email?: string | null;
+          recipient_email?: string | null;
+          sender_phone?: string | null;
+          recipient_phone?: string | null;
+          message_body?: string | null;
+          is_read?: boolean;
+          sent_at?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "communications_practice_id_fkey";
+            columns: ["practice_id"];
+            isOneToOne: false;
+            referencedRelation: "practices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "communications_patient_id_fkey";
+            columns: ["patient_id"];
+            isOneToOne: false;
+            referencedRelation: "patients";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
+      visit_summaries: {
+        Row: {
+          id: string;
+          practice_id: string;
+          patient_id: string;
+          clinical_note_id: string | null;
+          visit_date: string;
+          patient_name: string | null;
+          appointment_type: string | null;
+          visit_summary: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          practice_id: string;
+          patient_id: string;
+          clinical_note_id?: string | null;
+          visit_date: string;
+          patient_name?: string | null;
+          appointment_type?: string | null;
+          visit_summary?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          practice_id?: string;
+          patient_id?: string;
+          clinical_note_id?: string | null;
+          visit_date?: string;
+          patient_name?: string | null;
+          appointment_type?: string | null;
+          visit_summary?: string | null;
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "visit_summaries_practice_id_fkey";
+            columns: ["practice_id"];
+            isOneToOne: false;
+            referencedRelation: "practices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "visit_summaries_patient_id_fkey";
+            columns: ["patient_id"];
+            isOneToOne: false;
+            referencedRelation: "patients";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
     };
     Views: {
       [_ in never]: never;
@@ -672,6 +853,11 @@ export type ClinicalTask = Database["public"]["Tables"]["clinical_tasks"]["Row"]
 export type AIAnalysisRun = Database["public"]["Tables"]["ai_analysis_runs"]["Row"];
 export type Review = Database["public"]["Tables"]["reviews"]["Row"];
 
+// Demo-specific types
+export type PrioritizedAction = Database["public"]["Tables"]["prioritized_actions"]["Row"];
+export type Communication = Database["public"]["Tables"]["communications"]["Row"];
+export type VisitSummary = Database["public"]["Tables"]["visit_summaries"]["Row"];
+
 // Insert types
 export type PatientInsert = Database["public"]["Tables"]["patients"]["Insert"];
 export type AppointmentInsert = Database["public"]["Tables"]["appointments"]["Insert"];
@@ -688,4 +874,17 @@ export type PriorityActionWithPatient = PriorityAction & {
     Patient,
     "id" | "first_name" | "last_name" | "date_of_birth" | "risk_level" | "avatar_url"
   >;
+};
+
+// Prioritized action with patient relation (for demo table)
+export type PrioritizedActionWithPatient = PrioritizedAction & {
+  patient: Pick<
+    Patient,
+    "id" | "first_name" | "last_name" | "date_of_birth" | "risk_level" | "avatar_url"
+  >;
+  // Mapped fields for UI compatibility
+  urgency: "urgent" | "high" | "medium" | "low";
+  confidence_score: number;
+  timeframe: string;
+  status: string;
 };

@@ -1,43 +1,18 @@
 /**
  * Communications Queries
  * Fetches patient messages from Supabase
- *
- * Note: The communications table is created by demo migration and
- * not in the generated TypeScript types, so we use explicit typing.
  */
 
 import { createClient } from "@/src/lib/supabase/client";
+import type { Communication as CommunicationRow, Patient } from "@/src/lib/supabase/types";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SupabaseAny = any;
+// Re-export the Communication type for backwards compatibility
+export type Communication = CommunicationRow;
 
-export interface Communication {
-  id: string;
-  practice_id: string;
-  patient_id: string;
-  channel: string;
-  direction: string;
-  sender: string | null;
-  recipient: string | null;
-  sender_email: string | null;
-  recipient_email: string | null;
-  sender_phone: string | null;
-  recipient_phone: string | null;
-  message_body: string | null;
-  is_read: boolean;
-  sent_at: string | null;
-  created_at: string;
-}
-
-export interface CommunicationWithPatient extends Communication {
-  patient: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    avatar_url: string | null;
-  };
-}
+export type CommunicationWithPatient = Communication & {
+  patient: Pick<Patient, "id" | "first_name" | "last_name" | "avatar_url">;
+};
 
 /**
  * Get all communications for a practice
@@ -47,7 +22,7 @@ export async function getCommunications(
 ): Promise<CommunicationWithPatient[]> {
   const supabase = createClient();
 
-  const { data, error } = await (supabase as SupabaseAny)
+  const { data, error } = await supabase
     .from("communications")
     .select(
       `
@@ -68,7 +43,7 @@ export async function getCommunications(
     throw error;
   }
 
-  return (data || []) as CommunicationWithPatient[];
+  return (data || []) as unknown as CommunicationWithPatient[];
 }
 
 /**
@@ -82,7 +57,7 @@ export async function getPatientCommunications(
 ): Promise<Communication[]> {
   const supabase = createClient();
 
-  const { data, error } = await (supabase as SupabaseAny)
+  const { data, error } = await supabase
     .from("communications")
     .select("*")
     .eq("patient_id", patientId)
@@ -94,7 +69,7 @@ export async function getPatientCommunications(
     throw error;
   }
 
-  return data || [];
+  return (data || []) as Communication[];
 }
 
 /**
@@ -103,7 +78,7 @@ export async function getPatientCommunications(
 export async function getUnreadCount(practiceId: string = DEMO_PRACTICE_ID): Promise<number> {
   const supabase = createClient();
 
-  const { count, error } = await (supabase as SupabaseAny)
+  const { count, error } = await supabase
     .from("communications")
     .select("*", { count: "exact", head: true })
     .eq("practice_id", practiceId)
@@ -129,7 +104,7 @@ export async function markAsRead(
 ): Promise<void> {
   const supabase = createClient();
 
-  const { error } = await (supabase as SupabaseAny)
+  const { error } = await supabase
     .from("communications")
     .update({ is_read: true })
     .eq("id", communicationId)
@@ -146,12 +121,7 @@ export async function markAsRead(
  */
 export async function getCommunicationThreads(practiceId: string = DEMO_PRACTICE_ID): Promise<
   Array<{
-    patient: {
-      id: string;
-      first_name: string;
-      last_name: string;
-      avatar_url: string | null;
-    };
+    patient: Pick<Patient, "id" | "first_name" | "last_name" | "avatar_url">;
     messages: Communication[];
     unreadCount: number;
     lastMessage: Communication | null;
@@ -160,7 +130,7 @@ export async function getCommunicationThreads(practiceId: string = DEMO_PRACTICE
   const supabase = createClient();
 
   // Get all communications with patient info
-  const { data, error } = await (supabase as SupabaseAny)
+  const { data, error } = await supabase
     .from("communications")
     .select(
       `
@@ -185,34 +155,25 @@ export async function getCommunicationThreads(practiceId: string = DEMO_PRACTICE
   const patientMap = new Map<
     string,
     {
-      patient: {
-        id: string;
-        first_name: string;
-        last_name: string;
-        avatar_url: string | null;
-      };
+      patient: Pick<Patient, "id" | "first_name" | "last_name" | "avatar_url">;
       messages: Communication[];
       unreadCount: number;
     }
   >();
 
-  ((data || []) as SupabaseAny[]).forEach((comm: SupabaseAny) => {
+  const communications = (data || []) as unknown as CommunicationWithPatient[];
+  communications.forEach((comm) => {
     const patientId = comm.patient_id;
     if (!patientMap.has(patientId)) {
       patientMap.set(patientId, {
-        patient: comm.patient as {
-          id: string;
-          first_name: string;
-          last_name: string;
-          avatar_url: string | null;
-        },
+        patient: comm.patient,
         messages: [],
         unreadCount: 0,
       });
     }
 
     const thread = patientMap.get(patientId)!;
-    thread.messages.push(comm as Communication);
+    thread.messages.push(comm);
     if (!comm.is_read && comm.direction === "inbound") {
       thread.unreadCount++;
     }

@@ -10,26 +10,13 @@ import type {
   OutcomeMeasure,
   Invoice,
   Review,
+  Communication,
+  VisitSummary,
 } from "@/src/lib/supabase/types";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SupabaseAny = any;
-
-// Communication type for messages
-export interface Communication {
-  id: string;
-  practice_id: string;
-  patient_id: string;
-  channel: string;
-  direction: string;
-  sender: string | null;
-  recipient: string | null;
-  message_body: string | null;
-  is_read: boolean;
-  sent_at: string | null;
-  created_at: string;
-}
+// Re-export Communication type for backwards compatibility
+export type { Communication };
 
 /**
  * Get all patients for a practice
@@ -169,7 +156,7 @@ export async function getPatientMessages(
 ): Promise<Communication[]> {
   const supabase = createClient();
 
-  const { data, error } = await (supabase as SupabaseAny)
+  const { data, error } = await supabase
     .from("communications")
     .select("*")
     .eq("patient_id", patientId)
@@ -182,7 +169,7 @@ export async function getPatientMessages(
     throw error;
   }
 
-  return data || [];
+  return (data || []) as Communication[];
 }
 
 /**
@@ -327,18 +314,8 @@ export async function getHighRiskPatients(
   return data || [];
 }
 
-// Visit Summary type
-export interface VisitSummary {
-  id: string;
-  practice_id: string;
-  patient_id: string;
-  clinical_note_id: string | null;
-  visit_date: string;
-  patient_name: string | null;
-  appointment_type: string | null;
-  visit_summary: string | null;
-  created_at: string;
-}
+// Re-export VisitSummary type for backwards compatibility
+export type { VisitSummary };
 
 /**
  * Get patient visit summaries for recent activity
@@ -351,7 +328,7 @@ export async function getPatientVisitSummaries(
 ): Promise<VisitSummary[]> {
   const supabase = createClient();
 
-  const { data, error } = await (supabase as SupabaseAny)
+  const { data, error } = await supabase
     .from("visit_summaries")
     .select("*")
     .eq("patient_id", patientId)
@@ -364,5 +341,5 @@ export async function getPatientVisitSummaries(
     return [];
   }
 
-  return data || [];
+  return (data || []) as VisitSummary[];
 }

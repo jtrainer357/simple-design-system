@@ -6,9 +6,11 @@
 import { createBrowserClient } from "@supabase/ssr";
 import type { Database } from "./types";
 
-let client: ReturnType<typeof createBrowserClient<Database>> | null = null;
+type BrowserClient = ReturnType<typeof createBrowserClient<Database>>;
 
-export function createClient() {
+let client: BrowserClient | null = null;
+
+export function createClient(): BrowserClient {
   if (client) return client;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

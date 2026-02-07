@@ -13,7 +13,7 @@ import { getPriorityActions } from "@/src/lib/queries/priority-actions";
 import { getTodayAppointments } from "@/src/lib/queries/appointments";
 import { isDatabasePopulated } from "@/src/lib/queries/practice";
 import { formatDemoDate } from "@/src/lib/utils/demo-date";
-import type { PriorityActionWithPatient } from "@/src/lib/supabase/types";
+import type { PrioritizedActionWithPatient } from "@/src/lib/supabase/types";
 import type { AppointmentWithPatient } from "@/src/lib/queries/appointments";
 import type { OrchestrationContext } from "@/src/lib/orchestration/types";
 import { useCompletedPatients } from "@/src/components/orchestration";
@@ -85,7 +85,7 @@ function getBadgeText(urgency: string, timeframe: string | null): string {
 }
 
 // Convert database action to OrchestrationContext for the detail view
-function actionToContext(action: PriorityActionWithPatient): OrchestrationContext {
+function actionToContext(action: PrioritizedActionWithPatient): OrchestrationContext {
   const patient = action.patient;
   return {
     patient: {
@@ -145,7 +145,7 @@ export function PriorityActionsSection({
   onSelectPatient,
   hideHeader = false,
 }: PriorityActionsSectionProps) {
-  const [actions, setActions] = React.useState<PriorityActionWithPatient[]>([]);
+  const [actions, setActions] = React.useState<PrioritizedActionWithPatient[]>([]);
   const [todayAppts, setTodayAppts] = React.useState<AppointmentWithPatient[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
@@ -303,7 +303,7 @@ export function PriorityActionsSection({
             Run the import wizard to populate the database with patient data and generate AI-powered
             priority actions.
           </Text>
-          <Link href="/import" className="mt-4">
+          <Link href="/import" prefetch={true} className="mt-4">
             <Button variant="default" size="sm">
               Start Import
             </Button>
@@ -455,7 +455,7 @@ export function PriorityActionsSection({
                   patientName={patientName}
                   avatarSrc={action.patient.avatar_url || undefined}
                   mainAction={action.title}
-                  statusIndicators={action.description || action.clinical_context || ""}
+                  statusIndicators={action.clinical_context || ""}
                   readyStatus={`Confidence: ${action.confidence_score || 85}%`}
                   suggestedActions={suggestedCount}
                   badgeText={getBadgeText(action.urgency, action.timeframe)}

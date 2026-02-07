@@ -1,16 +1,23 @@
 /**
  * Priority Actions Queries
  * Fetches Claude-generated priority actions from Supabase
- *
- * Note: Demo uses "prioritized_actions" table which is not in generated types.
  */
 
 import { createClient } from "@/src/lib/supabase/client";
-import type { PriorityActionWithPatient } from "@/src/lib/supabase/types";
+import type {
+  PrioritizedActionWithPatient,
+  PrioritizedAction,
+  Patient,
+} from "@/src/lib/supabase/types";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SupabaseAny = any;
+// Type for prioritized action with patient relation from DB (raw form before mapping)
+type PrioritizedActionWithPatientRow = PrioritizedAction & {
+  patient: Pick<
+    Patient,
+    "id" | "first_name" | "last_name" | "date_of_birth" | "risk_level" | "avatar_url"
+  >;
+};
 
 // Map urgency from uppercase (DB) to lowercase (types)
 function normalizeUrgency(urgency: string): "urgent" | "high" | "medium" | "low" {
@@ -26,10 +33,10 @@ function normalizeUrgency(urgency: string): "urgent" | "high" | "medium" | "low"
  */
 export async function getPriorityActions(
   practiceId: string = DEMO_PRACTICE_ID
-): Promise<PriorityActionWithPatient[]> {
+): Promise<PrioritizedActionWithPatient[]> {
   const supabase = createClient();
 
-  const { data, error } = await (supabase as SupabaseAny)
+  const { data, error } = await supabase
     .from("prioritized_actions")
     .select(
       `
@@ -55,8 +62,9 @@ export async function getPriorityActions(
 
   // Map DB fields to expected types and sort by urgency
   const urgencyOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
-  return ((data || []) as SupabaseAny[])
-    .filter((action: SupabaseAny) => {
+  const actions = (data || []) as unknown as PrioritizedActionWithPatientRow[];
+  return actions
+    .filter((action) => {
       // Filter out Emily Chen's card
       const patient = action.patient;
       if (patient?.first_name === "Emily" && patient?.last_name === "Chen") {
@@ -64,18 +72,18 @@ export async function getPriorityActions(
       }
       return true;
     })
-    .map((action: SupabaseAny) => ({
+    .map((action) => ({
       ...action,
       urgency: normalizeUrgency(action.urgency || "medium"),
       confidence_score: action.ai_confidence || 85,
       timeframe: action.time_window || "This week",
       status: action.status || "pending",
     }))
-    .sort((a: SupabaseAny, b: SupabaseAny) => {
+    .sort((a, b) => {
       const aOrder = urgencyOrder[a.urgency as keyof typeof urgencyOrder] ?? 4;
       const bOrder = urgencyOrder[b.urgency as keyof typeof urgencyOrder] ?? 4;
       return aOrder - bOrder;
-    }) as PriorityActionWithPatient[];
+    }) as PrioritizedActionWithPatient[];
 }
 
 // PriorityAction type for patient-specific queries
@@ -104,7 +112,7 @@ export async function getPatientPriorityActions(
 ): Promise<PatientPriorityAction[]> {
   const supabase = createClient();
 
-  const { data, error } = await (supabase as SupabaseAny)
+  const { data, error } = await supabase
     .from("prioritized_actions")
     .select("*")
     .eq("patient_id", patientId)
@@ -119,8 +127,9 @@ export async function getPatientPriorityActions(
 
   // Map DB fields and sort by urgency priority
   const urgencyOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
-  return ((data || []) as SupabaseAny[])
-    .map((action: SupabaseAny) => ({
+  const actions = (data || []) as unknown as PrioritizedAction[];
+  return actions
+    .map((action) => ({
       id: action.id,
       practice_id: action.practice_id,
       patient_id: action.patient_id,
@@ -129,7 +138,7 @@ export async function getPatientPriorityActions(
       timeframe: action.time_window || "This week",
       confidence_score: action.ai_confidence || 85,
       clinical_context: action.clinical_context,
-      suggested_actions: action.suggested_actions as string[] | null,
+      suggested_actions: action.suggested_actions,
       status: action.status || "pending",
       created_at: action.created_at,
     }))
@@ -151,7 +160,7 @@ export async function completeAction(
 ): Promise<void> {
   const supabase = createClient();
 
-  const { error } = await (supabase as SupabaseAny)
+  const { error } = await supabase
     .from("prioritized_actions")
     .update({
       status: "completed",
@@ -177,7 +186,7 @@ export async function dismissAction(
 ): Promise<void> {
   const supabase = createClient();
 
-  const { error } = await (supabase as SupabaseAny)
+  const { error } = await supabase
     .from("prioritized_actions")
     .update({
       status: "dismissed",
@@ -204,7 +213,7 @@ export async function completeAllPatientActions(
   const supabase = createClient();
 
   // Update priority actions
-  const { error: actionsError } = await (supabase as SupabaseAny)
+  const { error: actionsError } = await supabase
     .from("prioritized_actions")
     .update({
       status: "completed",
@@ -248,7 +257,7 @@ export async function getActionCounts(practiceId: string = DEMO_PRACTICE_ID): Pr
 }> {
   const supabase = createClient();
 
-  const { data, error } = await (supabase as SupabaseAny)
+  const { data, error } = await supabase
     .from("prioritized_actions")
     .select("urgency")
     .eq("practice_id", practiceId)
@@ -259,15 +268,16 @@ export async function getActionCounts(practiceId: string = DEMO_PRACTICE_ID): Pr
     return { urgent: 0, high: 0, medium: 0, low: 0, total: 0 };
   }
 
+  const actions = (data || []) as Array<{ urgency: string }>;
   const counts = {
     urgent: 0,
     high: 0,
     medium: 0,
     low: 0,
-    total: (data as SupabaseAny[])?.length || 0,
+    total: actions.length,
   };
 
-  ((data || []) as SupabaseAny[]).forEach((action: SupabaseAny) => {
+  actions.forEach((action) => {
     const normalized = normalizeUrgency(action.urgency || "medium");
     counts[normalized]++;
   });

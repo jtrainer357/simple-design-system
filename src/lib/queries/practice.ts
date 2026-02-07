@@ -7,9 +7,6 @@ import { createClient } from "@/src/lib/supabase/client";
 import type { Practice } from "@/src/lib/supabase/types";
 import { getDemoToday, DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type SupabaseAny = any;
-
 /**
  * Get the demo practice (first practice in the database)
  */
@@ -62,7 +59,7 @@ export async function getDashboardStats(practiceId: string = DEMO_PRACTICE_ID): 
       supabase.from("appointments").select("id").eq("practice_id", practiceId).eq("date", today),
 
       // Unread messages (try communications table which is what demo uses)
-      (supabase as SupabaseAny)
+      supabase
         .from("communications")
         .select("id")
         .eq("practice_id", practiceId)
@@ -70,7 +67,7 @@ export async function getDashboardStats(practiceId: string = DEMO_PRACTICE_ID): 
         .eq("is_read", false),
 
       // Pending actions (use prioritized_actions table)
-      (supabase as SupabaseAny)
+      supabase
         .from("prioritized_actions")
         .select("id")
         .eq("practice_id", practiceId)
@@ -80,20 +77,26 @@ export async function getDashboardStats(practiceId: string = DEMO_PRACTICE_ID): 
       supabase.from("invoices").select("balance").eq("practice_id", practiceId).gt("balance", 0),
     ]);
 
-  const patients = patientsResult.data || [];
+  type PatientStatus = { status: string | null; risk_level: string | null };
+  type InvoiceBalance = { balance: number | null };
+
+  const patients = (patientsResult.data || []) as PatientStatus[];
   const todayAppts = todayApptsResult.data || [];
   const messages = messagesResult.data || [];
   const actions = actionsResult.data || [];
-  const invoices = invoicesResult.data || [];
+  const invoices = (invoicesResult.data || []) as InvoiceBalance[];
 
   return {
     patientCount: patients.length,
-    activePatientCount: patients.filter((p) => p.status === "Active").length,
-    highRiskCount: patients.filter((p) => p.risk_level === "high").length,
+    activePatientCount: patients.filter((p: PatientStatus) => p.status === "Active").length,
+    highRiskCount: patients.filter((p: PatientStatus) => p.risk_level === "high").length,
     todayAppointmentCount: todayAppts.length,
     unreadMessageCount: messages.length,
     pendingActionCount: actions.length,
-    outstandingBalance: invoices.reduce((sum, inv) => sum + (inv.balance || 0), 0),
+    outstandingBalance: invoices.reduce(
+      (sum: number, inv: InvoiceBalance) => sum + (inv.balance || 0),
+      0
+    ),
   };
 }
 
