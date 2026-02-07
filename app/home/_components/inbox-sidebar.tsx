@@ -121,7 +121,12 @@ export function InboxSidebar({
             Inbox
             <ChevronDown className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-8 w-8">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-11 w-11"
+            aria-label="View layout options"
+          >
             <LayoutGrid className="h-4 w-4" />
           </Button>
         </div>
@@ -132,6 +137,7 @@ export function InboxSidebar({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
+            aria-label="Search inbox"
           />
         </div>
       </div>
@@ -153,7 +159,7 @@ export function InboxSidebar({
                 type="button"
                 onClick={() => handleSectionChange(item.id)}
                 className={cn(
-                  "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                  "flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors",
                   activeSection === item.id
                     ? "bg-primary/10 text-primary font-medium"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -175,8 +181,8 @@ export function InboxSidebar({
             >
               Connect
             </Heading>
-            <Button variant="ghost" size="icon" className="h-5 w-5">
-              <Plus className="h-3.5 w-3.5" />
+            <Button variant="ghost" size="icon" className="h-11 w-11" aria-label="Add connection">
+              <Plus className="h-4 w-4" />
             </Button>
           </div>
           <nav className="space-y-1">
@@ -186,7 +192,7 @@ export function InboxSidebar({
                 type="button"
                 onClick={() => handleSectionChange(item.id)}
                 className={cn(
-                  "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                  "flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors",
                   activeSection === item.id
                     ? "bg-primary/10 text-primary font-medium"
                     : "text-muted-foreground hover:bg-muted hover:text-foreground"
@@ -217,7 +223,7 @@ export function InboxSidebar({
                 type="button"
                 onClick={() => handleContactSelect(contact.id)}
                 className={cn(
-                  "flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors",
+                  "flex min-h-[44px] w-full items-center gap-2 rounded-lg px-3 py-2.5 text-sm transition-colors",
                   activeContact === contact.id
                     ? "bg-primary/10 text-primary font-medium"
                     : "text-foreground hover:bg-muted"
@@ -235,7 +241,7 @@ export function InboxSidebar({
           </nav>
           <Button
             variant="ghost"
-            className="text-muted-foreground hover:text-foreground mt-2 w-full justify-start px-3"
+            className="text-muted-foreground hover:text-foreground mt-2 min-h-[44px] w-full justify-start px-3"
           >
             Add New Teammates
           </Button>

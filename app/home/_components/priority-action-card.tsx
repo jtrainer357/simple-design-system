@@ -102,9 +102,9 @@ export function PriorityActionCard({ action, className }: PriorityActionCardProp
               <p className="text-card-foreground mt-2 text-sm font-medium">{action.description}</p>
 
               {/* Metadata + CTA */}
-              <div className="mt-3 flex items-center justify-between gap-3">
+              <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full border border-stone-300 bg-white">
+                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-stone-300 bg-white">
                     <Check className="h-3 w-3 text-stone-500" />
                   </div>
                   <span className="text-muted-foreground text-xs sm:text-sm">
@@ -114,7 +114,7 @@ export function PriorityActionCard({ action, className }: PriorityActionCardProp
 
                 <Button
                   size="sm"
-                  className="h-8 bg-orange-500 px-4 text-xs font-bold text-white hover:bg-orange-600"
+                  className="h-8 w-full bg-orange-500 px-4 text-xs font-bold text-white hover:bg-orange-600 sm:w-auto"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {action.ctaLabel}

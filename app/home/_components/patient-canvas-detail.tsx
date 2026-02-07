@@ -36,7 +36,7 @@ const extendedMedications: Medication[] = [
 export function PatientCanvasDetail({
   context,
   onCancel,
-  onComplete,
+  onComplete: _onComplete,
   className,
 }: PatientCanvasDetailProps) {
   const {
@@ -65,7 +65,6 @@ export function PatientCanvasDetail({
   // Listen for voice command to complete all actions
   React.useEffect(() => {
     function handleVoiceCompleteActions() {
-      console.log("[PatientCanvasDetail] Voice complete actions triggered");
       handleCompleteAllRef.current?.();
     }
 

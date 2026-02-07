@@ -44,6 +44,7 @@ export function HeaderSearch() {
               placeholder={placeholder}
               value={displayText}
               readOnly
+              aria-label="Ask about your practice or patients"
             />
             {/* Voice Control Button - inside search field */}
             <div className="absolute top-1/2 right-1 z-10 -translate-y-1/2">

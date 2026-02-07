@@ -34,26 +34,28 @@ export function TodaysActionsHeader({ appointmentCount, isLoading }: TodaysActio
   const formattedDate = formatDemoDate("long");
 
   return (
-    <div className="flex items-center gap-4">
-      <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
-      <div className="flex-1">
-        <Heading level={3} className="text-xl sm:text-2xl">
-          Today&apos;s Actions
-        </Heading>
-        <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-          {isLoading ? (
-            "Loading..."
-          ) : (
-            <>
-              {formattedDate} •{" "}
-              <span className="text-card-foreground font-semibold">
-                {appointmentCount} Appointments
-              </span>
-            </>
-          )}
-        </Text>
+    <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+      <div className="flex items-center gap-4">
+        <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
+        <div className="min-w-0 flex-1">
+          <Heading level={3} className="text-xl sm:text-2xl">
+            Today&apos;s Actions
+          </Heading>
+          <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+            {isLoading ? (
+              "Loading..."
+            ) : (
+              <>
+                {formattedDate} •{" "}
+                <span className="text-card-foreground font-semibold">
+                  {appointmentCount} Appointments
+                </span>
+              </>
+            )}
+          </Text>
+        </div>
       </div>
-      <Button variant="outline" className="shrink-0">
+      <Button variant="outline" className="w-full shrink-0 sm:ml-auto sm:w-auto">
         Complete All Actions
       </Button>
     </div>
@@ -188,7 +190,6 @@ export function PriorityActionsSection({
   React.useEffect(() => {
     function handleVoiceOpenPatient(e: CustomEvent<{ patientName: string }>) {
       const targetName = e.detail.patientName.toLowerCase();
-      console.log("[PriorityActionsSection] Voice open patient:", targetName);
 
       // Try to find patient in actions first
       const matchingAction = actions.find((a) => {
@@ -197,10 +198,6 @@ export function PriorityActionsSection({
       });
 
       if (matchingAction) {
-        console.log(
-          "[PriorityActionsSection] Found in actions:",
-          matchingAction.patient.first_name
-        );
         onSelectPatient?.(actionToContext(matchingAction));
         return;
       }
@@ -212,10 +209,6 @@ export function PriorityActionsSection({
       });
 
       if (matchingAppt) {
-        console.log(
-          "[PriorityActionsSection] Found in appointments:",
-          matchingAppt.patient.first_name
-        );
         onSelectPatient?.(appointmentToContext(matchingAppt));
       }
     }
@@ -239,32 +232,40 @@ export function PriorityActionsSection({
   if (loading) {
     return (
       <section className={className}>
-        <div className="mb-14 flex items-center gap-4">
-          <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
-          <div className="flex-1">
-            <Heading level={3} className="text-xl sm:text-2xl">
-              Today&apos;s Actions
-            </Heading>
-            <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-              <Skeleton as="span" className="inline-block h-3 w-48" />
-            </Text>
+        <div className="mb-14 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="flex items-center gap-4">
+            <Image
+              src="/icons/caring-hands.png"
+              alt=""
+              width={56}
+              height={56}
+              className="shrink-0"
+            />
+            <div className="flex-1">
+              <Heading level={3} className="text-xl sm:text-2xl">
+                Today&apos;s Actions
+              </Heading>
+              <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+                <Skeleton as="span" className="inline-block h-3 w-48" />
+              </Text>
+            </div>
           </div>
-          <Skeleton className="h-10 w-36 rounded-full" />
+          <Skeleton className="h-10 w-full rounded-full sm:ml-auto sm:w-36" />
         </div>
         {/* Arriving patient skeleton */}
-        <div className="bg-priority-bg/30 mb-10 rounded-xl p-6 sm:p-8">
+        <div className="bg-priority-bg/30 mb-10 rounded-xl p-4 sm:p-6 md:p-8">
           <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex items-center gap-4 sm:gap-5">
               <Skeleton className="h-16 w-16 shrink-0 rounded-full sm:h-20 sm:w-20" />
               <div className="min-w-0 flex-1">
                 <Skeleton className="mb-2 h-3 w-24" />
-                <Skeleton className="mb-2 h-7 w-56" />
+                <Skeleton className="mb-2 h-7 w-full max-w-[14rem]" />
                 <Skeleton className="h-4 w-40" />
               </div>
             </div>
-            <div className="flex gap-2">
-              <Skeleton className="h-12 w-40 rounded-full" />
-              <Skeleton className="h-12 w-32 rounded-full" />
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <Skeleton className="h-12 w-full rounded-full sm:w-40" />
+              <Skeleton className="h-12 w-full rounded-full sm:w-32" />
             </div>
           </div>
         </div>
@@ -375,20 +376,28 @@ export function PriorityActionsSection({
   return (
     <section className={className}>
       {!hideHeader && (
-        <div className="mb-14 flex items-center gap-4">
-          <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
-          <div className="flex-1">
-            <Heading level={3} className="text-xl sm:text-2xl">
-              Today&apos;s Actions
-            </Heading>
-            <Text size="xs" muted className="mt-1 tracking-widest uppercase">
-              {formattedDate} •{" "}
-              <span className="text-card-foreground font-semibold">
-                {todayAppts.length} Appointments
-              </span>
-            </Text>
+        <div className="mb-14 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
+          <div className="flex items-center gap-4">
+            <Image
+              src="/icons/caring-hands.png"
+              alt=""
+              width={56}
+              height={56}
+              className="shrink-0"
+            />
+            <div className="flex-1">
+              <Heading level={3} className="text-xl sm:text-2xl">
+                Today&apos;s Actions
+              </Heading>
+              <Text size="xs" muted className="mt-1 tracking-widest uppercase">
+                {formattedDate} •{" "}
+                <span className="text-card-foreground font-semibold">
+                  {todayAppts.length} Appointments
+                </span>
+              </Text>
+            </div>
           </div>
-          <Button variant="outline" className="shrink-0">
+          <Button variant="outline" className="w-full shrink-0 sm:ml-auto sm:w-auto">
             Complete All Actions
           </Button>
         </div>

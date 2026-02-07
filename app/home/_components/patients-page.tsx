@@ -472,20 +472,8 @@ export function PatientsPage({
               return p.first_name.toLowerCase() === searchName;
             });
           }
-          console.log(
-            "[PatientsPage] Searching for patient by name:",
-            patientNameKey,
-            "Found:",
-            targetPatient?.id
-          );
         } else if (patientIdKey) {
           targetPatient = patientsData.find((p) => p.id === patientIdKey);
-          console.log(
-            "[PatientsPage] Searching for patient by ID:",
-            patientIdKey,
-            "Found:",
-            targetPatient?.id
-          );
         }
 
         if (targetPatient) {
@@ -592,7 +580,7 @@ export function PatientsPage({
                   <Skeleton className="h-4 w-24" />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <Skeleton key={i} className="h-20 rounded-lg" />
                 ))}
@@ -718,7 +706,7 @@ export function PatientsPage({
                   <Skeleton className="h-4 w-24" />
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <Skeleton key={i} className="h-20 rounded-lg" />
                 ))}

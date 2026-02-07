@@ -32,8 +32,8 @@ export function CurrentMedicationsSection({
               index !== medications.length - 1 && "border-b border-stone-100"
             )}
           >
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#FFCFBF]/30">
-              <Pill className="h-5 w-5 text-[#D4856A]" />
+            <div className="bg-primary/20 flex h-10 w-10 items-center justify-center rounded-full">
+              <Pill className="text-primary h-5 w-5" />
             </div>
             <div className="flex-1">
               <div className="font-medium text-stone-900">{medication.name}</div>

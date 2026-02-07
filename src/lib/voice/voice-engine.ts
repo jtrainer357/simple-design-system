@@ -119,11 +119,8 @@ class VoiceEngine {
       const transcript = lastResult[0]?.transcript.toLowerCase().trim() ?? "";
       const confidence = lastResult[0]?.confidence ?? 0;
 
-      console.log("[Voice] Transcript:", transcript, "| Confidence:", confidence);
-
       // Accept anything above 0.5 - Web Speech API on Chrome is conservative
       if (confidence < 0.5) {
-        console.log("[Voice] Confidence too low, ignoring");
         return;
       }
 
@@ -133,31 +130,19 @@ class VoiceEngine {
       const now = Date.now();
       const isWithinWakeWindow = now - this.lastWakeWordTime < VoiceEngine.WAKE_WORD_WINDOW_MS;
 
-      console.log("[Voice] Wake word match:", !!wakeMatch, "| Command text:", commandText);
-      console.log(
-        "[Voice] Within wake window:",
-        isWithinWakeWindow,
-        "| Registered commands:",
-        this.commands.length
-      );
-
       // Case 1: Wake word + command in same phrase
       if (wakeMatch && commandText) {
         this.lastWakeWordTime = 0; // Reset window
-        const matched = this.executeCommand(commandText, transcript);
-        console.log("[Voice] Command executed:", matched);
+        this.executeCommand(commandText, transcript);
       }
       // Case 2: Wake word only (no command) - start listening window
       else if (wakeMatch && !commandText) {
         this.lastWakeWordTime = now;
-        console.log("[Voice] Wake word detected, waiting for command...");
       }
       // Case 3: No wake word but within window - treat entire transcript as command
       else if (!wakeMatch && isWithinWakeWindow && transcript) {
         this.lastWakeWordTime = 0; // Reset window
-        console.log("[Voice] Processing command from wake window:", transcript);
-        const matched = this.executeCommand(transcript, transcript);
-        console.log("[Voice] Command executed:", matched);
+        this.executeCommand(transcript, transcript);
       }
 
       // Fire transcript callback
@@ -243,31 +228,25 @@ class VoiceEngine {
       (a, b) => (a.priority ?? 10) - (b.priority ?? 10)
     );
 
-    console.log("[Voice] Trying to match command:", commandText);
-
     for (const command of sortedCommands) {
       for (const pattern of command.patterns) {
         const match = commandText.match(pattern);
         if (match) {
-          console.log("[Voice] MATCHED command:", command.id, "| Pattern:", pattern.toString());
           try {
             // Pass the full match array and original transcript to the action
             // If action returns false, continue to next command (not handled)
             const result = command.action(match, originalTranscript);
             if (result === false) {
-              console.log("[Voice] Command", command.id, "declined to handle, trying next...");
               break; // Break inner loop, continue to next command
             }
             return true;
-          } catch (error) {
-            console.error("[Voice] Command handler error:", error);
+          } catch {
             return false;
           }
         }
       }
     }
 
-    console.log("[Voice] No command matched for:", commandText);
     // No match found - that's okay, user might just be talking
     return false;
   }

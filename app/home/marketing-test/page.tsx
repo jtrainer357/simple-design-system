@@ -217,7 +217,7 @@ function TierBadge({ tier }: { tier: string }) {
 
 function DirectoryList({ directories }: { directories: DirectoryListing[] }) {
   const found = directories.filter((d) => d.found);
-  const notFound = directories.filter((d) => !d.found);
+  const _notFound = directories.filter((d) => !d.found);
 
   return (
     <div className="space-y-3">

@@ -118,11 +118,11 @@ export function VoiceControl({
           "cursor-pointer border-none outline-none",
           "focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
           config.button,
-          isListening ? "bg-[var(--color-primary)] shadow-md" : "bg-transparent hover:bg-black/5"
+          isListening ? "bg-primary shadow-md" : "bg-transparent hover:bg-black/5"
         )}
       >
         <Mic
-          className={cn(config.icon, isListening ? "text-white" : "text-[var(--color-primary)]")}
+          className={cn(config.icon, isListening ? "text-white" : "text-primary")}
           strokeWidth={config.strokeWidth}
         />
       </button>
@@ -131,7 +131,7 @@ export function VoiceControl({
       <AnimatePresence>
         {isListening && (
           <motion.span
-            className="pointer-events-none absolute inset-0 rounded-full border-2 border-[var(--color-primary)]/40"
+            className="border-primary/40 pointer-events-none absolute inset-0 rounded-full border-2"
             initial={{ scale: 1, opacity: 0.6 }}
             animate={{ scale: 1.4, opacity: 0 }}
             transition={{ duration: 1.5, repeat: Infinity, ease: "easeOut" }}

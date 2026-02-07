@@ -45,13 +45,13 @@ export function TasksSection() {
             key={task.id}
             className="border-muted/50 hover:border-primary/20 overflow-hidden rounded-xl border shadow-none transition-all"
           >
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-4">
-                  <div className="bg-accent/30 flex h-10 w-10 items-center justify-center rounded-full">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="bg-accent/30 flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
                     <CheckCircle2 className="text-muted-foreground h-5 w-5" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <h4 className="text-sm font-bold">{task.title}</h4>
                     <p className="text-muted-foreground mt-1 text-xs font-bold tracking-wider uppercase">
                       {task.subtitle}
@@ -60,7 +60,7 @@ export function TasksSection() {
                 </div>
                 <Button
                   variant="outline"
-                  className="border-muted hover:bg-accent h-10 rounded-xl px-6 font-bold"
+                  className="border-muted hover:bg-accent h-10 w-full shrink-0 rounded-xl px-6 font-bold sm:w-auto"
                 >
                   {task.action}
                 </Button>

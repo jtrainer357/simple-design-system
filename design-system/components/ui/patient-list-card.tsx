@@ -90,39 +90,42 @@ export function PatientListCard({
         <Text size="xs" muted className="font-medium tracking-wide uppercase">
           Last Activity: {lastActivity}
         </Text>
-        <div className="flex items-center gap-0">
+        <div className="-mr-1 flex items-center">
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-foreground h-8 w-8"
+            className="text-muted-foreground hover:text-foreground relative h-11 w-11"
             onClick={(e) => {
               e.stopPropagation();
               onMessage?.();
             }}
+            aria-label={`Send message to ${name}`}
           >
-            <MessageSquare className="h-3.5 w-3.5" />
+            <MessageSquare className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-foreground h-8 w-8"
+            className="text-muted-foreground hover:text-foreground relative h-11 w-11"
             onClick={(e) => {
               e.stopPropagation();
               onEmail?.();
             }}
+            aria-label={`Send email to ${name}`}
           >
-            <Mail className="h-3.5 w-3.5" />
+            <Mail className="h-4 w-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
-            className="text-muted-foreground hover:text-foreground h-8 w-8"
+            className="text-muted-foreground hover:text-foreground relative h-11 w-11"
             onClick={(e) => {
               e.stopPropagation();
               onMore?.();
             }}
+            aria-label={`More options for ${name}`}
           >
-            <MoreHorizontal className="h-3.5 w-3.5" />
+            <MoreHorizontal className="h-4 w-4" />
           </Button>
         </div>
       </div>

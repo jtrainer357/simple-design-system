@@ -9,7 +9,6 @@ import {
   DialogDescription,
 } from "@/design-system/components/ui/dialog";
 import { TooltipProvider } from "@/design-system/components/ui/tooltip";
-import { Progress } from "@/design-system/components/ui/progress";
 import { Button } from "@/design-system/components/ui/button";
 import { useRouter } from "next/navigation";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -21,16 +20,12 @@ import {
 } from "./ExpressSetupSteps";
 import { PriceSummary } from "./PriceSummary";
 import {
-  validatePracticeInfo,
-  validateAccountInfo,
-  validatePaymentInfo,
   PracticeInfoData,
   AccountData,
   PaymentData,
   ValidationError,
 } from "@/src/lib/expressSetupValidation";
-import { AddOn, BASE_PLAN } from "@/src/lib/addOnsData";
-import { calculateTotal } from "@/src/lib/priceCalculator";
+import { AddOn } from "@/src/lib/addOnsData";
 import { cn } from "@/design-system/lib/utils";
 
 interface ExpressSetupModalProps {
@@ -157,13 +152,13 @@ export function ExpressSetupModal({ open, onOpenChange }: ExpressSetupModalProps
     });
   };
 
-  // Calculate progress percentage
-  const progress = (step / 3) * 100;
+  // Calculate progress percentage (available for UI if needed)
+  const _progress = (step / 3) * 100;
 
   return (
     <TooltipProvider>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="bg-card flex h-[90vh] flex-col gap-0 overflow-hidden p-0 sm:max-w-[1000px]">
+        <DialogContent className="bg-card flex max-h-[90vh] max-w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-[1000px]">
           <DialogHeader className="sr-only">
             <DialogTitle>Express Setup</DialogTitle>
             <DialogDescription>
@@ -173,7 +168,7 @@ export function ExpressSetupModal({ open, onOpenChange }: ExpressSetupModalProps
 
           {/* Header with Progress */}
           {step <= 3 && (
-            <div className="border-border absolute top-0 right-0 left-0 z-20 border-b bg-white/80 px-12 pt-12 pb-6 backdrop-blur-xl">
+            <div className="border-border absolute top-0 right-0 left-0 z-20 border-b bg-white/80 px-4 pt-6 pb-4 backdrop-blur-xl sm:px-6 sm:pt-8 sm:pb-6 md:px-12 md:pt-12">
               <Button
                 variant="ghost"
                 size="icon"
@@ -203,7 +198,14 @@ export function ExpressSetupModal({ open, onOpenChange }: ExpressSetupModalProps
           {/* Scrollable Content Area */}
           <div className="relative flex-1 overflow-hidden">
             <div className="h-full overflow-y-auto">
-              <div className={cn("min-h-full", step <= 3 ? "px-12 pt-36 pb-48" : "h-full p-0")}>
+              <div
+                className={cn(
+                  "min-h-full",
+                  step <= 3
+                    ? "px-4 pt-24 pb-32 sm:px-6 sm:pt-28 sm:pb-40 md:px-12 md:pt-36 md:pb-48"
+                    : "h-full p-0"
+                )}
+              >
                 {step === 1 && (
                   <AddOnSelectionStep
                     selectedAddOns={selectedAddOns}
@@ -251,7 +253,7 @@ export function ExpressSetupModal({ open, onOpenChange }: ExpressSetupModalProps
 
           {/* Footer with Price and Actions (Steps 1-3) */}
           {step <= 3 && (
-            <div className="border-border absolute right-0 bottom-0 left-0 z-20 flex items-end justify-between border-t bg-white/80 px-12 pt-6 pb-10 backdrop-blur-xl">
+            <div className="border-border absolute right-0 bottom-0 left-0 z-20 flex flex-col items-stretch justify-between gap-4 border-t bg-white/80 px-4 pt-4 pb-6 backdrop-blur-xl sm:flex-row sm:items-end sm:px-6 sm:pt-6 sm:pb-10 md:px-12">
               {/* Left Side: Back Button */}
               <div className="flex-1">
                 {step > 1 && (
@@ -272,7 +274,7 @@ export function ExpressSetupModal({ open, onOpenChange }: ExpressSetupModalProps
               </div>
 
               {/* Right Side: Price Summary and Primary Action */}
-              <div className="flex flex-col items-end gap-3">
+              <div className="flex flex-col items-stretch gap-3 sm:items-end">
                 {step < 3 && (
                   <PriceSummary
                     basePrice={basePlanOption}
@@ -292,7 +294,7 @@ export function ExpressSetupModal({ open, onOpenChange }: ExpressSetupModalProps
                   }
                   size="xl"
                   variant="marketing"
-                  className="w-auto min-w-[200px] text-lg"
+                  className="w-full min-w-[200px] text-base sm:w-auto sm:text-lg"
                   disabled={isLoading}
                 >
                   {step === 2

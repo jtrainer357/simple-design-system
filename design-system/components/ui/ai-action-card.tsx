@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Check, CheckCircle2 } from "lucide-react";
+import { Check } from "lucide-react";
 import { Card, CardContent } from "@/design-system/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/design-system/components/ui/avatar";
 import { Badge } from "@/design-system/components/ui/badge";
@@ -51,20 +51,20 @@ export function AIActionCard({
       opacity="solid"
       className={cn(
         "cursor-pointer border-0 shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg active:translate-y-0 active:shadow-md",
-        completed && "border-2 border-[#8CA7A2]/50 bg-[#8CA7A2]/5",
+        completed && "border-teal/50 bg-teal/5 border-2",
         className
       )}
     >
-      <CardContent className="p-4 sm:p-5">
-        {/* Three column table: avatar | content | badge */}
-        <div className="table w-full table-fixed">
+      <CardContent className="relative p-4 sm:p-5">
+        {/* Responsive layout: flex on mobile, table on larger screens */}
+        <div className="flex flex-col gap-3 sm:table sm:w-full sm:table-fixed">
           {/* Avatar column - fixed width with gap */}
-          <div className="table-cell w-[100px] align-middle">
+          <div className="flex items-center gap-3 sm:table-cell sm:w-[100px] sm:align-middle">
             <div className="relative">
               <Avatar
                 className={cn(
                   "h-16 w-16 border-4 border-white sm:h-20 sm:w-20",
-                  completed && "border-[#8CA7A2]/30"
+                  completed && "border-teal/30"
                 )}
               >
                 {avatarSrc && <AvatarImage src={avatarSrc} alt={patientName} />}
@@ -76,12 +76,12 @@ export function AIActionCard({
           </div>
 
           {/* Content column - takes remaining space */}
-          <div className="table-cell align-middle">
+          <div className="sm:table-cell sm:align-middle">
             {/* Patient Name */}
             <div
               className={cn(
                 "text-card-foreground truncate text-base font-bold sm:text-lg",
-                completed && "text-[#5A7A75]"
+                completed && "text-teal-dark"
               )}
             >
               {patientName}
@@ -111,10 +111,10 @@ export function AIActionCard({
             <div className="mt-2 flex items-center gap-2">
               {completed ? (
                 <>
-                  <div className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#8CA7A2]">
+                  <div className="bg-teal flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
                     <Check className="h-3 w-3 text-white" />
                   </div>
-                  <span className="text-sm font-medium text-[#5A7A75]">Completed successfully</span>
+                  <span className="text-teal-dark text-sm font-medium">Completed successfully</span>
                 </>
               ) : (
                 <>
@@ -135,15 +135,13 @@ export function AIActionCard({
           </div>
 
           {/* Badge column - fixed width, positioned with flex */}
-          <div className="table-cell w-[120px] pl-3 align-top">
-            <div className="flex justify-end">
+          <div className="absolute top-4 right-4 sm:static sm:table-cell sm:w-[120px] sm:pl-3 sm:align-top">
+            <div className="flex justify-end sm:justify-end">
               <Badge
                 variant="outline"
                 className={cn(
                   "rounded-md border px-2 py-0.5 text-[10px] font-bold tracking-wide whitespace-nowrap sm:text-xs",
-                  completed
-                    ? "border-[#8CA7A2] bg-[#8CA7A2]/10 text-[#5A7A75]"
-                    : badgeStyles[badgeVariant]
+                  completed ? "border-teal bg-teal/10 text-teal-dark" : badgeStyles[badgeVariant]
                 )}
               >
                 {completed ? "COMPLETED" : badgeText}

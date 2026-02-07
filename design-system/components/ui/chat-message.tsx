@@ -78,10 +78,11 @@ export function ChatMessage({
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "h-8 w-8 rounded-full",
+                  "h-11 w-11 rounded-full",
                   isOwn ? "hover:bg-primary-foreground/20" : "hover:bg-muted"
                 )}
                 onClick={() => setIsPlaying(!isPlaying)}
+                aria-label={isPlaying ? "Pause voice message" : "Play voice message"}
               >
                 {isPlaying ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4" />}
               </Button>
@@ -114,11 +115,12 @@ export function ChatMessage({
                 variant="ghost"
                 size="icon"
                 className={cn(
-                  "h-6 w-6 rounded-full",
+                  "h-11 w-11 rounded-full",
                   isOwn ? "hover:bg-primary-foreground/20" : "hover:bg-muted"
                 )}
+                aria-label="Add reaction"
               >
-                <Smile className="h-3.5 w-3.5" />
+                <Smile className="h-4 w-4" />
               </Button>
             </div>
           )}

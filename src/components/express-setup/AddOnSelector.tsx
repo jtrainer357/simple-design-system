@@ -31,11 +31,17 @@ export function AddOnSelector({ addon, isSelected, onToggle }: AddOnSelectorProp
     <Card
       className={cn(
         "relative cursor-pointer overflow-hidden p-4 transition-all duration-200",
+        "focus-visible:ring-teal focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         isSelected
           ? "border-teal-dark border-2 bg-gray-50/50 shadow-sm"
           : "bg-card/65 border-border/40 hover:border-border/60 hover:bg-card/80"
       )}
-      onClick={() => onToggle(addon)}
+      onClick={handleClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      role="checkbox"
+      aria-checked={isSelected}
+      aria-label={`${addon.name} - $${addon.price}/month`}
     >
       <div className="flex items-start gap-3">
         <Checkbox

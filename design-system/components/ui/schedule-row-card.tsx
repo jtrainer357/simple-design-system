@@ -40,7 +40,7 @@ export function ScheduleRowCard({
       opacity="transparent"
       className={cn("p-3 transition-all hover:bg-white/70 hover:shadow-md sm:p-4", className)}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-4">
         {/* Time */}
         <div className="flex shrink-0 items-center gap-1.5">
           <Clock className="text-muted-foreground h-4 w-4" />
@@ -48,8 +48,8 @@ export function ScheduleRowCard({
         </div>
 
         {/* Patient info */}
-        <div className="flex min-w-0 flex-1 items-center gap-5">
-          <Avatar className="ml-6 h-10 w-10 shrink-0">
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-5">
+          <Avatar className="h-10 w-10 shrink-0 sm:ml-6">
             {avatarSrc && <AvatarImage src={avatarSrc} alt={patient} />}
             <AvatarFallback className="bg-avatar-fallback text-xs text-white">
               {initials}
@@ -79,7 +79,7 @@ export function ScheduleRowCard({
         </Badge>
 
         {/* Room */}
-        <div className="text-muted-foreground ml-12 flex shrink-0 items-center gap-1 text-xs font-bold">
+        <div className="text-muted-foreground flex shrink-0 items-center gap-1 text-xs font-bold sm:ml-12">
           <MapPin className="h-3.5 w-3.5" />
           {room}
         </div>

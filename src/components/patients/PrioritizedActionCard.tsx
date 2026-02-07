@@ -115,7 +115,9 @@ export function PrioritizedActionCard({ action, onClick, className }: Prioritize
       className={cn(
         "flex items-start gap-3 rounded-lg p-3 transition-all sm:gap-4 sm:p-4",
         urgencyCardStyles[action.urgency],
-        onClick && "cursor-pointer",
+        onClick && "cursor-pointer hover:shadow-sm",
+        onClick &&
+          "focus-visible:ring-teal focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
         className
       )}
       onClick={handleClick}

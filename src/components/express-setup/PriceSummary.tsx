@@ -1,6 +1,6 @@
 import * as React from "react";
 import { cn } from "@/design-system/lib/utils";
-import { formatPrice, calculateTotal, formatTrialEndDate } from "@/src/lib/priceCalculator";
+import { formatPrice, formatTrialEndDate } from "@/src/lib/priceCalculator";
 import { BASE_PLAN, type AddOn } from "@/src/lib/addOnsData";
 import { Button } from "@/design-system/components/ui/button";
 import { HugeiconsIcon } from "@hugeicons/react";
@@ -97,7 +97,7 @@ export function PriceSummary({
       <div className="space-y-1 text-center">
         <p className="text-growth-2 text-xs font-medium">14-day free trial • Cancel anytime</p>
         <p className="text-muted-foreground text-xs">
-          You won't be charged until {formatTrialEndDate()}
+          You won&apos;t be charged until {formatTrialEndDate()}
         </p>
       </div>
     </div>

@@ -7,11 +7,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogDescription,
-  DialogClose,
 } from "@/design-system/components/ui/dialog";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Tick02Icon, Cancel01Icon } from "@hugeicons/core-free-icons";
-import { Button } from "@/design-system/components/ui/button";
+import { Tick02Icon } from "@hugeicons/core-free-icons";
 
 interface WelcomeModalProps {
   open: boolean;
@@ -38,7 +36,7 @@ export function WelcomeModal({ open, onOpenChange }: WelcomeModalProps) {
 
           {/* Description */}
           <p className="text-muted-foreground text-base leading-relaxed">
-            Your data has been successfully imported. We're excited to help your practice grow.
+            Your data has been successfully imported. We&apos;re excited to help your practice grow.
           </p>
         </div>
       </DialogContent>

@@ -157,32 +157,51 @@ export function ChatThread({
   return (
     <CardWrapper className={cn("flex h-full flex-col overflow-hidden p-0", className)}>
       {/* Header */}
-      <div className="border-border/50 flex items-center justify-between border-b p-4">
-        <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10">
+      <div className="border-border/50 flex items-center justify-between gap-2 border-b p-3 sm:p-4">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <Avatar className="h-8 w-8 shrink-0 sm:h-10 sm:w-10">
             {contactAvatar && <AvatarImage src={contactAvatar} alt={contactName} />}
-            <AvatarFallback className="bg-avatar-fallback text-primary-foreground text-sm font-medium">
+            <AvatarFallback className="bg-avatar-fallback text-primary-foreground text-xs font-medium sm:text-sm">
               {initials}
             </AvatarFallback>
           </Avatar>
-          <div>
-            <Heading level={5} className="text-base font-semibold">
+          <div className="min-w-0">
+            <Heading level={5} className="truncate text-sm font-semibold sm:text-base">
               {contactName}
             </Heading>
-            <Text size="xs" muted>
+            <Text size="xs" muted className="hidden sm:block">
               {contactRole}
             </Text>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" className="gap-2" onClick={onMarkDone}>
+        <div className="flex shrink-0 items-center gap-1 sm:gap-2">
+          <Button variant="outline" size="sm" className="hidden gap-2 sm:flex" onClick={onMarkDone}>
             <Check className="h-4 w-4" />
             Mark as Done
           </Button>
-          <Button variant="ghost" size="icon" className="h-9 w-9">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 sm:hidden"
+            onClick={onMarkDone}
+            aria-label="Mark as Done"
+          >
+            <Check className="h-4 w-4" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 sm:h-11 sm:w-11"
+            aria-label="Bookmark conversation"
+          >
             <Bookmark className="h-4 w-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="h-9 w-9">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-9 w-9 sm:h-11 sm:w-11"
+            aria-label="More options"
+          >
             <MoreVertical className="h-4 w-4" />
           </Button>
         </div>
@@ -222,23 +241,25 @@ export function ChatThread({
 
       {/* Channel Tabs */}
       <div className="border-border/50 border-t px-4 pt-3">
-        <div className="flex items-center gap-4">
-          {channels.map((channel) => (
-            <button
-              key={channel.id}
-              type="button"
-              onClick={() => handleChannelChange(channel.id)}
-              className={cn(
-                "flex items-center gap-2 border-b-2 pb-3 text-sm transition-colors",
-                activeChannel === channel.id
-                  ? "border-primary text-primary font-medium"
-                  : "text-muted-foreground hover:text-foreground border-transparent"
-              )}
-            >
-              <channel.icon className="h-4 w-4" />
-              {channel.label}
-            </button>
-          ))}
+        <div className="-mx-4 overflow-x-auto px-4">
+          <div className="flex items-center gap-4">
+            {channels.map((channel) => (
+              <button
+                key={channel.id}
+                type="button"
+                onClick={() => handleChannelChange(channel.id)}
+                className={cn(
+                  "flex shrink-0 items-center gap-2 border-b-2 pb-3 text-sm transition-colors",
+                  activeChannel === channel.id
+                    ? "border-primary text-primary font-medium"
+                    : "text-muted-foreground hover:text-foreground border-transparent"
+                )}
+              >
+                <channel.icon className="h-4 w-4" />
+                {channel.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 

@@ -38,7 +38,6 @@ const DEMO_PATIENTS = [
 function findPatient(query: string): (typeof DEMO_PATIENTS)[0] | null {
   const normalizedQuery = query.toLowerCase().trim();
   const queryWords = normalizedQuery.split(/\s+/);
-  console.log("[VoiceProvider] Finding patient for query:", normalizedQuery);
 
   // Try exact match first
   const exactMatch = DEMO_PATIENTS.find((p) => {
@@ -46,7 +45,6 @@ function findPatient(query: string): (typeof DEMO_PATIENTS)[0] | null {
     return fullName === normalizedQuery;
   });
   if (exactMatch) {
-    console.log("[VoiceProvider] Exact match:", exactMatch.first_name, exactMatch.last_name);
     return exactMatch;
   }
 
@@ -56,11 +54,6 @@ function findPatient(query: string): (typeof DEMO_PATIENTS)[0] | null {
     return fullName.startsWith(normalizedQuery);
   });
   if (startsWithMatch) {
-    console.log(
-      "[VoiceProvider] Starts-with match:",
-      startsWithMatch.first_name,
-      startsWithMatch.last_name
-    );
     return startsWithMatch;
   }
 
@@ -75,11 +68,6 @@ function findPatient(query: string): (typeof DEMO_PATIENTS)[0] | null {
       return hasFirstMatch && hasLastMatch;
     });
     if (bothPartsMatch) {
-      console.log(
-        "[VoiceProvider] Both-parts match:",
-        bothPartsMatch.first_name,
-        bothPartsMatch.last_name
-      );
       return bothPartsMatch;
     }
   }
@@ -90,11 +78,6 @@ function findPatient(query: string): (typeof DEMO_PATIENTS)[0] | null {
     return firstName === normalizedQuery || firstName.startsWith(normalizedQuery);
   });
   if (firstNameMatch) {
-    console.log(
-      "[VoiceProvider] First-name match:",
-      firstNameMatch.first_name,
-      firstNameMatch.last_name
-    );
     return firstNameMatch;
   }
 
@@ -104,11 +87,6 @@ function findPatient(query: string): (typeof DEMO_PATIENTS)[0] | null {
     return lastName === normalizedQuery || lastName.startsWith(normalizedQuery);
   });
   if (lastNameMatch) {
-    console.log(
-      "[VoiceProvider] Last-name match:",
-      lastNameMatch.first_name,
-      lastNameMatch.last_name
-    );
     return lastNameMatch;
   }
 
@@ -119,18 +97,7 @@ function findPatient(query: string): (typeof DEMO_PATIENTS)[0] | null {
     return firstName.includes(normalizedQuery) || lastName.includes(normalizedQuery);
   });
 
-  const result = partialMatch ?? null;
-  if (result) {
-    console.log(
-      "[VoiceProvider] Found patient:",
-      result.first_name,
-      result.last_name,
-      `(${result.id})`
-    );
-  } else {
-    console.log("[VoiceProvider] No patient found for:", normalizedQuery);
-  }
-  return result;
+  return partialMatch ?? null;
 }
 
 interface VoiceProviderProps {
@@ -145,7 +112,6 @@ export function VoiceProvider({ children }: VoiceProviderProps) {
   React.useEffect(() => {
     // Register all commands (registerCommands handles deduplication)
     const commands = createCommands();
-    console.log("[VoiceProvider] Registering", commands.length, "commands");
     voiceEngine.registerCommands(commands);
 
     return () => {
@@ -161,7 +127,6 @@ export function VoiceProvider({ children }: VoiceProviderProps) {
     unsubs.push(
       voiceEvents.on("navigate", (e) => {
         const route = e.payload.route;
-        console.log("[VoiceProvider] Navigate event received, route:", route);
         if (route) {
           router.push(route);
         }

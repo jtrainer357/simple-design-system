@@ -169,21 +169,22 @@ export function UploadStep({ sourceSystem, onComplete }: UploadStepProps) {
       {files.length > 0 && (
         <div className="space-y-3">
           {files.map((file, idx) => (
-            <Card key={idx} className="flex items-center justify-between p-4">
-              <div className="flex items-center space-x-4">
-                <div className="rounded-lg bg-gray-100 p-2 text-gray-500">
+            <Card
+              key={idx}
+              className="flex flex-col justify-between gap-3 p-3 sm:flex-row sm:items-center sm:p-4"
+            >
+              <div className="flex min-w-0 items-center space-x-3 sm:space-x-4">
+                <div className="shrink-0 rounded-lg bg-gray-100 p-2 text-gray-500">
                   <File className="h-5 w-5" />
                 </div>
-                <div>
-                  <p className="max-w-[200px] truncate text-sm font-medium text-gray-900">
-                    {file.file.name}
-                  </p>
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium text-gray-900">{file.file.name}</p>
                   <p className="text-xs text-gray-500 uppercase">
                     {file.type} &bull; {(file.file.size / 1024 / 1024).toFixed(2)} MB
                   </p>
                 </div>
               </div>
-              <div className="flex items-center space-x-3">
+              <div className="flex shrink-0 items-center space-x-3 self-end sm:self-auto">
                 {file.status === "uploading" && (
                   <div className="animate-pulse text-xs text-teal-600">Uploading...</div>
                 )}

@@ -426,7 +426,7 @@ export default function SchedulePage() {
 
   // Voice command integration
   const [selectedEventId, setSelectedEventId] = React.useState<string | null>(null);
-  const [movedEventId, setMovedEventId] = React.useState<string | null>(null);
+  const [_movedEventId, setMovedEventId] = React.useState<string | null>(null);
   const [localDemoEvents, setLocalDemoEvents] = React.useState<CalendarEvent[]>([]);
 
   // Load appointments from Supabase
@@ -525,6 +525,7 @@ export default function SchedulePage() {
   // Initialize local demo events when base events change
   React.useEffect(() => {
     setLocalDemoEvents(baseDemoEvents);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- baseDemoEvents is derived from weekStart, using weekStartTime to avoid re-renders
   }, [weekStartTime]);
 
   // Use local demo events (which can be modified by voice commands) or fall back to base
@@ -599,13 +600,14 @@ export default function SchedulePage() {
           <PageTransition>
             <div className="mx-auto flex max-w-[1600px] flex-col overflow-hidden lg:h-[calc(100vh-8.5rem)]">
               {/* Desktop: Filter tabs and Add Appointment button */}
-              <div className="mb-4 flex items-center justify-between">
+              <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <FilterTabs
                   tabs={filterTabs}
                   activeTab={activeFilter}
                   onTabChange={setActiveFilter}
+                  className="overflow-x-auto"
                 />
-                <Button className="gap-2">
+                <Button className="w-full shrink-0 gap-2 sm:w-auto">
                   <Plus className="h-4 w-4" />
                   New Appointment
                 </Button>
@@ -630,12 +632,13 @@ export default function SchedulePage() {
                     </div>
                     {/* Calendar grid skeleton */}
                     <div className="flex-1">
-                      <div className="mb-2 grid grid-cols-7 gap-1">
+                      {/* Mobile: single column, Desktop: 7 columns */}
+                      <div className="mb-2 grid grid-cols-2 gap-1 sm:grid-cols-4 lg:grid-cols-7">
                         {Array.from({ length: 7 }).map((_, i) => (
                           <Skeleton key={i} className="h-8" />
                         ))}
                       </div>
-                      <div className="grid grid-cols-7 gap-1">
+                      <div className="grid grid-cols-1 gap-1 sm:grid-cols-2 lg:grid-cols-7">
                         {Array.from({ length: 21 }).map((_, i) => (
                           <Skeleton key={i} className="h-16 rounded-lg" />
                         ))}

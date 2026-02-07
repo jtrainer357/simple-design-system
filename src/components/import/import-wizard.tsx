@@ -270,7 +270,7 @@ export function ImportWizard() {
               <p className="text-gray-500">Your practice data has been migrated successfully.</p>
             </div>
 
-            <div className="flex justify-center gap-6 text-sm">
+            <div className="flex flex-col items-center justify-center gap-3 text-sm sm:flex-row sm:gap-6">
               <div className="flex items-center gap-2 text-gray-600">
                 <Users className="h-4 w-4 text-teal-600" />
                 <span>

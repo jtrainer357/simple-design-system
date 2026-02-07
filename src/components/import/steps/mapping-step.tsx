@@ -89,22 +89,22 @@ export function MappingStep({ mappings: initialMappings, onComplete }: MappingSt
             <Card
               key={idx}
               className={cn(
-                "flex items-center justify-between p-4",
+                "flex flex-col justify-between gap-3 p-3 sm:flex-row sm:items-center sm:gap-0 sm:p-4",
                 isLowConfidence && "border-2 border-amber-400"
               )}
             >
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 sm:flex-1">
                 <p className="mb-1 text-xs font-semibold text-gray-500 uppercase">Source Column</p>
                 <span className="block truncate font-medium text-gray-900">
                   {mapping.sourceColumn}
                 </span>
               </div>
 
-              <div className="mx-4 shrink-0 text-gray-400">
+              <div className="mx-4 hidden shrink-0 text-gray-400 sm:block">
                 <ArrowRightIcon className="h-5 w-5" />
               </div>
 
-              <div className="min-w-0 flex-1">
+              <div className="min-w-0 sm:flex-1">
                 <p className="mb-1 text-xs font-semibold text-gray-500 uppercase">Target Field</p>
                 <div className="flex items-center gap-2">
                   <select

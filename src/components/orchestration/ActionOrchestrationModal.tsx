@@ -113,7 +113,7 @@ export function ActionOrchestrationModal() {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && !isExecuting && closeModal()}>
       <DialogContent
-        className="max-w-4xl gap-0 overflow-hidden p-0 sm:rounded-xl"
+        className="max-h-[90vh] max-w-full gap-0 overflow-hidden overflow-y-auto p-0 sm:max-w-4xl sm:rounded-xl"
         onPointerDownOutside={(e) => {
           if (isExecuting) e.preventDefault();
         }}
@@ -122,7 +122,7 @@ export function ActionOrchestrationModal() {
         }}
       >
         {/* Teal Gradient Header */}
-        <div className="bg-gradient-to-r from-teal-600 to-teal-500 px-6 py-4">
+        <div className="bg-gradient-to-r from-teal-600 to-teal-500 px-4 py-3 sm:px-6 sm:py-4">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-4">
               <Avatar className="h-14 w-14 border-2 border-white/30 shadow-lg">
@@ -173,7 +173,7 @@ export function ActionOrchestrationModal() {
         </div>
 
         {/* Modal Body - Two Column Layout */}
-        <div className="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 p-4 sm:gap-6 sm:p-6 md:grid-cols-2">
           {/* Left Column: Lab Results + Suggested Actions */}
           <div className="space-y-6">
             {clinicalData.labResults && clinicalData.labResults.length > 0 && (
@@ -206,8 +206,8 @@ export function ActionOrchestrationModal() {
         </div>
 
         {/* Footer */}
-        <DialogFooter className="border-t border-stone-200 bg-stone-50 px-6 py-4">
-          <div className="flex w-full items-center justify-between">
+        <DialogFooter className="border-t border-stone-200 bg-stone-50 px-4 py-3 sm:px-6 sm:py-4">
+          <div className="flex w-full flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-center sm:gap-0">
             <div className="text-sm text-stone-500">
               {isExecuting ? (
                 <span className="flex items-center gap-2">
@@ -225,9 +225,13 @@ export function ActionOrchestrationModal() {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col-reverse items-stretch gap-2 sm:flex-row sm:items-center sm:gap-3">
               {!isExecuting && !allCompleted && (
-                <Button variant="outline" onClick={closeModal} className="border-stone-300">
+                <Button
+                  variant="outline"
+                  onClick={closeModal}
+                  className="w-full border-stone-300 sm:w-auto"
+                >
                   Cancel
                 </Button>
               )}
@@ -235,7 +239,7 @@ export function ActionOrchestrationModal() {
                 onClick={handleExecuteAll}
                 disabled={isExecuting || checkedCount === 0 || allCompleted}
                 className={cn(
-                  "bg-orange-500 text-white hover:bg-orange-600",
+                  "w-full bg-orange-500 text-white hover:bg-orange-600 sm:w-auto",
                   "disabled:bg-orange-300 disabled:opacity-100"
                 )}
               >
@@ -250,7 +254,12 @@ export function ActionOrchestrationModal() {
                     Completed
                   </>
                 ) : (
-                  `Complete All Suggested Actions (${checkedCount})`
+                  <>
+                    <span className="hidden sm:inline">
+                      Complete All Suggested Actions ({checkedCount})
+                    </span>
+                    <span className="sm:hidden">Complete All ({checkedCount})</span>
+                  </>
                 )}
               </Button>
             </div>

@@ -222,15 +222,16 @@ export function CommunicationsPage({ className }: CommunicationsPageProps) {
   if (error) {
     return (
       <div className={cn("flex h-full flex-col overflow-hidden", className)}>
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <FilterTabs
             tabs={messageFilterTabs}
             activeTab={activeFilter}
             onTabChange={setActiveFilter}
           />
-          <Button className="gap-2">
+          <Button className="shrink-0 gap-2 self-start sm:self-auto">
             <Plus className="h-4 w-4" />
-            New Message
+            <span className="xs:inline hidden">New Message</span>
+            <span className="xs:hidden">New</span>
           </Button>
         </div>
         <CardWrapper className="flex flex-1 flex-col items-center justify-center">
@@ -256,15 +257,16 @@ export function CommunicationsPage({ className }: CommunicationsPageProps) {
   if (conversations.length === 0) {
     return (
       <div className={cn("flex h-full flex-col overflow-hidden", className)}>
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <FilterTabs
             tabs={messageFilterTabs}
             activeTab={activeFilter}
             onTabChange={setActiveFilter}
           />
-          <Button className="gap-2">
+          <Button className="shrink-0 gap-2 self-start sm:self-auto">
             <Plus className="h-4 w-4" />
-            New Message
+            <span className="xs:inline hidden">New Message</span>
+            <span className="xs:hidden">New</span>
           </Button>
         </div>
         <CardWrapper className="flex flex-1 flex-col items-center justify-center">
@@ -291,15 +293,16 @@ export function CommunicationsPage({ className }: CommunicationsPageProps) {
   return (
     <div className={cn("flex h-full flex-col overflow-hidden", className)}>
       {/* Filter Tabs and Add Message Button */}
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <FilterTabs
           tabs={messageFilterTabs}
           activeTab={activeFilter}
           onTabChange={setActiveFilter}
         />
-        <Button className="gap-2">
+        <Button className="shrink-0 gap-2 self-start sm:self-auto">
           <Plus className="h-4 w-4" />
-          New Message
+          <span className="xs:inline hidden">New Message</span>
+          <span className="xs:hidden">New</span>
         </Button>
       </div>
 

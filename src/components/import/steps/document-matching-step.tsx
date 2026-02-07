@@ -83,7 +83,7 @@ export function DocumentMatchingStep({ onComplete }: { onComplete: () => void })
         </p>
       </div>
 
-      <div className="flex items-center gap-4 text-sm">
+      <div className="flex flex-wrap items-center gap-3 text-sm sm:gap-4">
         <span className="flex items-center gap-1.5">
           <CheckCircle2 className="h-4 w-4 text-emerald-600" />
           <span className="text-gray-600">{matched} matched</span>
@@ -105,18 +105,20 @@ export function DocumentMatchingStep({ onComplete }: { onComplete: () => void })
           return (
             <Card
               key={doc.id}
-              className={`flex items-center gap-4 p-4 ${
+              className={`flex flex-col gap-3 p-3 sm:flex-row sm:items-center sm:gap-4 sm:p-4 ${
                 status === "review" ? "border-teal-500" : ""
               }`}
             >
-              <FileText className="h-5 w-5 shrink-0 text-gray-400" />
+              <div className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+                <FileText className="h-5 w-5 shrink-0 text-gray-400" />
 
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-gray-900">{doc.filename}</p>
-                <p className="text-xs text-gray-500">{doc.documentType}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-gray-900">{doc.filename}</p>
+                  <p className="text-xs text-gray-500">{doc.documentType}</p>
+                </div>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 pl-8 sm:pl-0">
                 {status === "matched" && (
                   <>
                     <span className="text-sm text-gray-600">{doc.detectedPatient}</span>

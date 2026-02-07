@@ -22,8 +22,6 @@ import {
   Send,
   Play,
   ArrowLeft,
-  Clock,
-  User,
   FileText,
   Stethoscope,
   ClipboardList,
@@ -200,8 +198,9 @@ function VoiceMessageBubble({ duration, isOutbound }: { duration: string; isOutb
     <div className="flex items-center gap-3">
       <button
         type="button"
+        aria-label="Play voice message"
         className={cn(
-          "flex h-10 w-10 shrink-0 items-center justify-center rounded-full transition-colors",
+          "flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-colors",
           isOutbound ? "bg-white/20 hover:bg-white/30" : "bg-gray-100 hover:bg-gray-200"
         )}
       >
@@ -277,15 +276,15 @@ function PatientChatThread({ patient }: { patient: PatientDetail }) {
         </div>
 
         {/* Channel tabs */}
-        <div className="border-border/50 border-t bg-white px-5 pt-3">
-          <div className="flex items-center gap-4">
+        <div className="border-border/50 border-t bg-white px-3 pt-3 sm:px-5">
+          <div className="-mx-3 flex items-center gap-3 overflow-x-auto px-3 sm:mx-0 sm:gap-4 sm:overflow-visible sm:px-0">
             {messageChannels.map((channel) => (
               <button
                 key={channel.id}
                 type="button"
                 onClick={() => setActiveChannel(channel.id)}
                 className={cn(
-                  "flex items-center gap-2 border-b-2 pb-3 text-sm transition-colors",
+                  "flex shrink-0 items-center gap-2 border-b-2 pb-3 text-sm transition-colors",
                   activeChannel === channel.id
                     ? "border-primary text-primary font-medium"
                     : "text-muted-foreground hover:text-foreground border-transparent"
@@ -299,50 +298,60 @@ function PatientChatThread({ patient }: { patient: PatientDetail }) {
         </div>
 
         {/* Message input */}
-        <div className="border-border/50 rounded-b-xl border-t bg-white p-3">
-          <div className="flex items-center gap-3">
-            <div className="border-border bg-background focus-within:ring-ring flex h-10 flex-1 items-center rounded-full border pr-2 pl-4 focus-within:ring-2">
+        <div className="border-border/50 rounded-b-xl border-t bg-white p-2 sm:p-3">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="border-border bg-background focus-within:ring-ring flex h-10 flex-1 items-center rounded-full border pr-1 pl-3 focus-within:ring-2 sm:pr-2 sm:pl-4">
               <input
                 type="text"
                 value={messageInput}
                 onChange={(e) => setMessageInput(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder="Write a message"
-                className="placeholder:text-muted-foreground flex-1 bg-transparent text-sm outline-none"
+                aria-label="Write a message to patient"
+                className="placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-sm outline-none"
               />
-              <div className="flex items-center gap-0.5">
+              <div className="hidden items-center sm:flex">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground hover:text-foreground h-7 w-7"
+                  className="text-muted-foreground hover:text-foreground relative h-11 w-11"
+                  aria-label="Attach file"
                 >
                   <Paperclip className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground hover:text-foreground h-7 w-7"
+                  className="text-muted-foreground hover:text-foreground relative h-11 w-11"
+                  aria-label="Attach image"
                 >
                   <ImageIcon className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground hover:text-foreground h-7 w-7"
+                  className="text-muted-foreground hover:text-foreground relative h-11 w-11"
+                  aria-label="AI assist"
                 >
                   <Wand2 className="h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-muted-foreground hover:text-foreground h-7 w-7"
+                  className="text-muted-foreground hover:text-foreground relative h-11 w-11"
+                  aria-label="Add emoji"
                 >
                   <Smile className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-            <Button onClick={handleSend} disabled={!messageInput.trim()} className="gap-2">
-              Send
+            <Button
+              onClick={handleSend}
+              disabled={!messageInput.trim()}
+              className="gap-2"
+              size="default"
+            >
+              <span className="hidden sm:inline">Send</span>
               <Send className="h-4 w-4" />
             </Button>
           </div>
@@ -447,15 +456,15 @@ function PatientChatThread({ patient }: { patient: PatientDetail }) {
       </div>
 
       {/* Channel tabs */}
-      <div className="border-border/50 border-t bg-white px-5 pt-3">
-        <div className="flex items-center gap-4">
+      <div className="border-border/50 border-t bg-white px-3 pt-3 sm:px-5">
+        <div className="-mx-3 flex items-center gap-3 overflow-x-auto px-3 sm:mx-0 sm:gap-4 sm:overflow-visible sm:px-0">
           {messageChannels.map((channel) => (
             <button
               key={channel.id}
               type="button"
               onClick={() => setActiveChannel(channel.id)}
               className={cn(
-                "flex items-center gap-2 border-b-2 pb-3 text-sm transition-colors",
+                "flex shrink-0 items-center gap-2 border-b-2 pb-3 text-sm transition-colors",
                 activeChannel === channel.id
                   ? "border-primary text-primary font-medium"
                   : "text-muted-foreground hover:text-foreground border-transparent"
@@ -469,50 +478,60 @@ function PatientChatThread({ patient }: { patient: PatientDetail }) {
       </div>
 
       {/* Message input */}
-      <div className="border-border/50 rounded-b-xl border-t bg-white p-3">
-        <div className="flex items-center gap-3">
-          <div className="border-border bg-background focus-within:ring-ring flex h-10 flex-1 items-center rounded-full border pr-2 pl-4 focus-within:ring-2">
+      <div className="border-border/50 rounded-b-xl border-t bg-white p-2 sm:p-3">
+        <div className="flex items-center gap-2 sm:gap-3">
+          <div className="border-border bg-background focus-within:ring-ring flex h-10 flex-1 items-center rounded-full border pr-1 pl-3 focus-within:ring-2 sm:pr-2 sm:pl-4">
             <input
               type="text"
               value={messageInput}
               onChange={(e) => setMessageInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Write a message"
-              className="placeholder:text-muted-foreground flex-1 bg-transparent text-sm outline-none"
+              aria-label="Write a message to patient"
+              className="placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent text-sm outline-none"
             />
-            <div className="flex items-center gap-0.5">
+            <div className="hidden items-center sm:flex">
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-muted-foreground hover:text-foreground h-7 w-7"
+                className="text-muted-foreground hover:text-foreground relative h-11 w-11"
+                aria-label="Attach file"
               >
                 <Paperclip className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-muted-foreground hover:text-foreground h-7 w-7"
+                className="text-muted-foreground hover:text-foreground relative h-11 w-11"
+                aria-label="Attach image"
               >
                 <ImageIcon className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-muted-foreground hover:text-foreground h-7 w-7"
+                className="text-muted-foreground hover:text-foreground relative h-11 w-11"
+                aria-label="AI assist"
               >
                 <Wand2 className="h-4 w-4" />
               </Button>
               <Button
                 variant="ghost"
                 size="icon"
-                className="text-muted-foreground hover:text-foreground h-7 w-7"
+                className="text-muted-foreground hover:text-foreground relative h-11 w-11"
+                aria-label="Add emoji"
               >
                 <Smile className="h-4 w-4" />
               </Button>
             </div>
           </div>
-          <Button onClick={handleSend} disabled={!messageInput.trim()} className="gap-2">
-            Send
+          <Button
+            onClick={handleSend}
+            disabled={!messageInput.trim()}
+            className="gap-2"
+            size="default"
+          >
+            <span className="hidden sm:inline">Send</span>
             <Send className="h-4 w-4" />
           </Button>
         </div>
@@ -596,7 +615,8 @@ function FullNoteView({
         <div className="flex items-center gap-3">
           <button
             onClick={onBack}
-            className="hover:bg-muted flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+            aria-label="Go back to visit summary"
+            className="hover:bg-muted flex h-11 w-11 items-center justify-center rounded-full transition-colors"
           >
             <ArrowLeft className="h-5 w-5" />
           </button>
@@ -618,7 +638,7 @@ function FullNoteView({
       <div className="flex-1 space-y-5 overflow-y-auto">
         {/* Patient & Session Info */}
         <Card className="bg-muted/30 p-4">
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
             <div>
               <Text size="xs" muted>
                 Patient
@@ -831,7 +851,8 @@ function VisitSummaryPanel({
           <div className="mb-4 flex items-center gap-3">
             <button
               onClick={onBack}
-              className="hover:bg-muted flex h-8 w-8 items-center justify-center rounded-full transition-colors"
+              aria-label="Go back to overview"
+              className="hover:bg-muted flex h-11 w-11 items-center justify-center rounded-full transition-colors"
             >
               <ArrowLeft className="h-5 w-5" />
             </button>
@@ -848,8 +869,8 @@ function VisitSummaryPanel({
           {/* Visit details */}
           <div className="flex-1 space-y-4 overflow-y-auto pr-2">
             {/* Session Info Card */}
-            <Card className="p-4">
-              <div className="grid grid-cols-4 gap-3">
+            <Card className="p-3 sm:p-4">
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 <div>
                   <Text size="xs" muted className="mb-0.5">
                     Duration
@@ -961,8 +982,8 @@ function VisitSummaryPanel({
                   Billing Summary
                 </Text>
               </div>
-              <Card className="p-4">
-                <div className="grid grid-cols-3 gap-3">
+              <Card className="p-3 sm:p-4">
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3 sm:gap-3">
                   <div>
                     <Text size="xs" muted className="mb-0.5">
                       Copay Collected
@@ -1121,9 +1142,10 @@ export function PatientDetailView({
           <Button
             variant="ghost"
             size="icon"
-            className="absolute top-4 right-4 h-8 w-8 shrink-0 sm:relative sm:top-auto sm:right-auto sm:self-start"
+            className="absolute top-4 right-4 h-11 w-11 shrink-0 sm:relative sm:top-auto sm:right-auto sm:self-start"
+            aria-label="More patient options"
           >
-            <MoreVertical className="h-4 w-4 sm:h-5 sm:w-5" />
+            <MoreVertical className="h-5 w-5" />
           </Button>
         </div>
 

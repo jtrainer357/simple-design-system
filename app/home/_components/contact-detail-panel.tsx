@@ -107,29 +107,37 @@ export function ContactDetailPanel({
   return (
     <CardWrapper className={cn("flex h-full flex-col overflow-hidden p-0", className)}>
       {/* Header Tabs */}
-      <div className="border-border/50 flex items-center justify-between border-b px-4">
-        <div className="flex items-center gap-6">
-          <button
-            type="button"
-            className="border-primary text-primary border-b-2 py-3 text-sm font-medium"
-          >
-            Info
-          </button>
-          <button
-            type="button"
-            className="text-muted-foreground hover:text-foreground border-b-2 border-transparent py-3 text-sm"
-          >
-            Viewed pages
-          </button>
-          <button
-            type="button"
-            className="text-muted-foreground hover:text-foreground border-b-2 border-transparent py-3 text-sm"
-          >
-            Notes
-          </button>
+      <div className="border-border/50 flex items-center justify-between gap-2 border-b px-3 sm:px-4">
+        <div className="-ml-3 flex-1 overflow-x-auto sm:ml-0">
+          <div className="flex items-center gap-4 sm:gap-6">
+            <button
+              type="button"
+              className="border-primary text-primary shrink-0 border-b-2 py-3 text-sm font-medium"
+            >
+              Info
+            </button>
+            <button
+              type="button"
+              className="text-muted-foreground hover:text-foreground shrink-0 border-b-2 border-transparent py-3 text-sm"
+            >
+              Viewed pages
+            </button>
+            <button
+              type="button"
+              className="text-muted-foreground hover:text-foreground shrink-0 border-b-2 border-transparent py-3 text-sm"
+            >
+              Notes
+            </button>
+          </div>
         </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={onClose}>
-          <X className="h-4 w-4" />
+        <Button
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 shrink-0 sm:h-11 sm:w-11"
+          onClick={onClose}
+          aria-label="Close panel"
+        >
+          <X className="h-5 w-5" />
         </Button>
       </div>
 

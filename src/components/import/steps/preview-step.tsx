@@ -36,7 +36,7 @@ export function PreviewStep({
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        <Card className="space-y-2 border-teal-200 bg-teal-50 p-6 text-center">
+        <Card className="space-y-2 border-teal-200 bg-teal-50 p-4 text-center sm:p-6">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-teal-100 text-teal-600">
             <UserIcon className="h-6 w-6" />
           </div>
@@ -46,7 +46,7 @@ export function PreviewStep({
           </div>
         </Card>
 
-        <Card className="space-y-2 p-6 text-center">
+        <Card className="space-y-2 p-4 text-center sm:p-6">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-gray-100 text-gray-500">
             <File className="h-6 w-6" />
           </div>
@@ -56,7 +56,7 @@ export function PreviewStep({
           </div>
         </Card>
 
-        <Card className="space-y-2 border-amber-200 bg-amber-50 p-6 text-center">
+        <Card className="space-y-2 border-amber-200 bg-amber-50 p-4 text-center sm:p-6">
           <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-full bg-amber-100 text-amber-600">
             <AlertCircleIcon className="h-6 w-6" />
           </div>
@@ -99,10 +99,12 @@ export function PreviewStep({
         </label>
       </div>
 
-      <div className="flex justify-between pt-4">
-        <Button variant="outline">Review Issues</Button>
+      <div className="flex flex-col gap-3 pt-4 sm:flex-row sm:justify-between">
+        <Button variant="outline" className="order-2 sm:order-1">
+          Review Issues
+        </Button>
         <Button
-          className="w-48 bg-teal-600 hover:bg-teal-700"
+          className="order-1 w-full bg-teal-600 hover:bg-teal-700 sm:order-2 sm:w-48"
           size="lg"
           onClick={onCommit}
           disabled={!confirmed || isCommitting}

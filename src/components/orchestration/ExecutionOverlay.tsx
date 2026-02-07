@@ -58,14 +58,14 @@ const statusConfig: Record<
   },
   executing: {
     icon: Loader2,
-    color: "text-[#8CA7A2]",
-    bgColor: "bg-[#8CA7A2]/10",
+    color: "text-teal",
+    bgColor: "bg-teal/10",
     label: "Executing...",
   },
   completed: {
     icon: CheckCircle2,
-    color: "text-[#8CA7A2]",
-    bgColor: "bg-[#8CA7A2]/10",
+    color: "text-teal",
+    bgColor: "bg-teal/10",
     label: "Completed",
   },
   failed: {
@@ -135,7 +135,7 @@ export function ExecutionOverlay({
 
           {/* Content card */}
           <motion.div
-            className="relative z-10 mx-4 w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl"
+            className="relative z-10 mx-2 w-full max-w-lg rounded-xl bg-white p-4 shadow-2xl sm:mx-4 sm:rounded-2xl sm:p-6"
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
@@ -144,14 +144,14 @@ export function ExecutionOverlay({
             {/* Header */}
             <div className="mb-6 text-center">
               <motion.div
-                className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#8CA7A2]/10"
+                className="bg-teal/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full"
                 animate={!allCompleted ? { scale: [1, 1.05, 1] } : { scale: 1 }}
                 transition={!allCompleted ? { repeat: Infinity, duration: 2 } : undefined}
               >
                 {allCompleted ? (
-                  <CheckCircle2 className="h-8 w-8 text-[#8CA7A2]" />
+                  <CheckCircle2 className="text-teal h-8 w-8" />
                 ) : (
-                  <Loader2 className="h-8 w-8 animate-spin text-[#8CA7A2]" />
+                  <Loader2 className="text-teal h-8 w-8 animate-spin" />
                 )}
               </motion.div>
               <h2 className="text-xl font-semibold text-stone-900">

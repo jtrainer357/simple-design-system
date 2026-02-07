@@ -223,15 +223,15 @@ export default function BillingPage() {
           <PageTransition>
             <div className="mx-auto max-w-[1600px] pb-10">
               {/* Upsell Banner - Teal Gradient */}
-              <div className="from-teal to-teal/80 mb-8 overflow-hidden rounded-xl bg-gradient-to-r p-8 text-white">
-                <div className="flex flex-col items-start gap-6 md:flex-row md:items-center md:justify-between">
-                  <div className="flex flex-1 items-start gap-6">
+              <div className="from-teal to-teal/80 mb-8 overflow-hidden rounded-xl bg-gradient-to-r p-4 text-white sm:p-6 md:p-8">
+                <div className="flex flex-col items-start gap-4 md:flex-row md:items-center md:justify-between md:gap-6">
+                  <div className="flex flex-1 items-start gap-4 md:gap-6">
                     <div className="hidden shrink-0 md:block">
                       <Lock className="h-16 w-16 text-white/90" strokeWidth={1.5} />
                     </div>
                     <div className="flex-1">
                       <div className="mb-2 flex items-center gap-2">
-                        <Sparkles className="h-5 w-5" />
+                        <Sparkles className="h-5 w-5 shrink-0" />
                         <Text
                           size="xs"
                           className="font-bold tracking-wider text-white/90 uppercase"
@@ -239,17 +239,20 @@ export default function BillingPage() {
                           Premium Feature
                         </Text>
                       </div>
-                      <Heading level={3} className="mb-2 text-3xl text-white">
+                      <Heading
+                        level={3}
+                        className="mb-2 text-xl text-white sm:text-2xl md:text-3xl"
+                      >
                         Unlock Complete Revenue Cycle Management
                       </Heading>
-                      <Text className="max-w-xl text-white/80">
+                      <Text className="max-w-xl text-sm text-white/80 sm:text-base">
                         Automate claims processing, patient statements, payment plans, and
                         collections. Get real-time insights into your practice finances with
                         AI-powered analytics.
                       </Text>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-3 sm:flex-row">
+                  <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
                     <Button
                       variant="ghost"
                       className="border border-white/30 text-white hover:bg-white/10"
@@ -347,7 +350,9 @@ export default function BillingPage() {
                     <Heading level={3} className="text-xl">
                       Advanced Billing Features
                     </Heading>
-                    <Text muted>Unlock the full power of Tebra's revenue cycle management</Text>
+                    <Text muted>
+                      Unlock the full power of Tebra&apos;s revenue cycle management
+                    </Text>
                   </div>
                   <Button className="shrink-0 gap-2">
                     Unlock Premium AI Features
@@ -394,12 +399,12 @@ export default function BillingPage() {
                 </div>
 
                 {/* Financial Performance Section */}
-                <CardWrapper className="border-0 bg-white p-6 shadow-sm">
-                  <div className="mb-4 flex items-start justify-between">
+                <CardWrapper className="border-0 bg-white p-4 shadow-sm sm:p-6">
+                  <div className="mb-4 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                     <Heading level={4} className="text-lg">
                       Financial Performance
                     </Heading>
-                    <Text size="xs" muted className="text-right">
+                    <Text size="xs" muted className="sm:text-right">
                       * Data is for display purposes only
                     </Text>
                   </div>
@@ -420,7 +425,7 @@ export default function BillingPage() {
                   </div>
 
                   {/* Circular Progress Indicators */}
-                  <div className="mb-6 grid grid-cols-3 gap-4">
+                  <div className="mb-6 grid grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-4">
                     <div className="flex flex-col items-center">
                       <CircularProgress percentage={92.4} color="teal" />
                       <Text size="sm" muted className="mt-2 text-center">
@@ -443,36 +448,36 @@ export default function BillingPage() {
 
                   {/* Alert Cards */}
                   <div className="space-y-3">
-                    <CardWrapper className="border-border flex items-center justify-between bg-white p-4 shadow-sm">
+                    <CardWrapper className="border-border flex flex-col gap-3 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-50">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-50">
                           <AlertTriangle className="h-5 w-5 text-red-500" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <Text className="font-medium">Denial Spikes</Text>
                           <Text size="sm" muted>
                             Unusual rate for CPT 99213
                           </Text>
                         </div>
                       </div>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="w-full shrink-0 sm:w-auto">
                         Learn More
                       </Button>
                     </CardWrapper>
 
-                    <CardWrapper className="border-border flex items-center justify-between bg-white p-4 shadow-sm">
+                    <CardWrapper className="border-border flex flex-col gap-3 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
                       <div className="flex items-center gap-3">
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-50">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-yellow-50">
                           <Clock className="h-5 w-5 text-yellow-600" />
                         </div>
-                        <div>
+                        <div className="min-w-0">
                           <Text className="font-medium">Aging A/R</Text>
                           <Text size="sm" muted>
                             $12k outstanding &gt; 90 days
                           </Text>
                         </div>
                       </div>
-                      <Button variant="outline" size="sm">
+                      <Button variant="outline" size="sm" className="w-full shrink-0 sm:w-auto">
                         Learn More
                       </Button>
                     </CardWrapper>

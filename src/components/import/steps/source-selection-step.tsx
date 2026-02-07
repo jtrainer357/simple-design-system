@@ -34,8 +34,16 @@ export function SourceSelectionStep({ onSelect }: SourceSelectionStepProps) {
         {sources.map((source) => (
           <motion.div key={source.id} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
             <Card
-              className="flex cursor-pointer items-center space-x-4 p-6 transition-colors hover:border-teal-500 hover:bg-teal-50/50"
+              className="focus-visible:ring-teal flex cursor-pointer items-center space-x-4 p-6 transition-colors hover:border-teal-500 hover:bg-teal-50/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
               onClick={() => onSelect(source.id)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  onSelect(source.id);
+                }
+              }}
+              tabIndex={0}
+              role="button"
             >
               <div className={`rounded-full bg-gray-100 p-3 ${source.color}`}>
                 <source.icon className="h-8 w-8" />

@@ -49,7 +49,6 @@ class VoiceEventBus {
    * Emit an event to all subscribed handlers
    */
   emit(event: VoiceEvent): void {
-    console.log("[VoiceEvents] Emitting:", event.type, event.payload);
     // Fire specific listeners
     this.listeners.get(event.type)?.forEach((fn) => fn(event));
     // Fire wildcard listeners

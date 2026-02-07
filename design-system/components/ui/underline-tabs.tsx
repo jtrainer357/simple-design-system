@@ -17,7 +17,7 @@ interface UnderlineTabsProps {
 
 export function UnderlineTabs({ tabs, activeTab, onTabChange, className }: UnderlineTabsProps) {
   return (
-    <div className={cn("flex items-center gap-8", className)}>
+    <div className={cn("flex items-center gap-4 sm:gap-8", className)}>
       {tabs.map((tab) => (
         <button
           key={tab.id}

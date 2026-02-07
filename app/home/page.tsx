@@ -42,14 +42,14 @@ function HomeContent() {
 
         <main className="px-4 py-4 sm:px-6 sm:py-6 md:py-8">
           <PageTransition>
-            <div className="mx-auto flex max-w-[1600px] flex-col gap-2 lg:h-[calc(100vh-8.5rem)] lg:flex-row">
+            <div className="mx-auto flex max-w-[1600px] flex-col gap-4 overflow-hidden xl:h-[calc(100vh-8.5rem)] xl:flex-row">
               {/* Main Content Area - Unified Card with Dynamic Canvas */}
-              <CardWrapper className="flex min-h-0 flex-1 flex-col overflow-visible">
+              <CardWrapper className="flex min-h-[500px] flex-1 flex-col overflow-visible xl:min-h-0">
                 <DynamicCanvas className="flex min-h-0 flex-1 flex-col" />
               </CardWrapper>
 
-              {/* Right Sidebar Widgets */}
-              <aside className="flex w-full shrink-0 flex-col gap-2 overflow-auto lg:w-[380px]">
+              {/* Right Sidebar Widgets - Hidden below xl, shown on xl+ */}
+              <aside className="hidden w-[320px] shrink-0 flex-col gap-2 overflow-auto xl:flex xl:w-[320px] 2xl:w-[380px]">
                 <MessagesWidget />
                 {/* <OutstandingItemsWidget /> */}
                 <BillingUpsellWidget />

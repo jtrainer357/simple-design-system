@@ -75,6 +75,7 @@ export function PatientRoster({
                 className={cn(
                   "flex w-full items-center gap-3 rounded-lg p-3 text-left transition-all",
                   "hover:bg-accent/50",
+                  "focus-visible:ring-teal focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
                   isSelected && "bg-accent border-selected-border border"
                 )}
               >

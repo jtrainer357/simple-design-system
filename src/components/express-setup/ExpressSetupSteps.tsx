@@ -11,10 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/design-system/components/ui/select";
-import { Card } from "@/design-system/components/ui/card";
-import { Checkbox } from "@/design-system/components/ui/checkbox";
 import { AddOnSelector } from "./AddOnSelector";
-import { PriceSummary } from "./PriceSummary";
 import {
   ADD_ONS,
   BASE_PLAN,
@@ -29,7 +26,6 @@ import {
   ValidationError,
   getPasswordStrength,
   getFieldError,
-  PASSWORD_REQUIREMENTS,
 } from "@/src/lib/expressSetupValidation";
 import {
   formatCardNumber,
@@ -37,27 +33,18 @@ import {
   formatPhoneNumber,
   formatCVV,
   formatZipCode,
-  formatPrice,
-  getTrialEndDate,
   formatTrialEndDate,
   calculateTotal,
 } from "@/src/lib/priceCalculator";
 import { HugeiconsIcon } from "@hugeicons/react";
 import {
   Tick02Icon,
-  UserIcon,
-  Calendar01Icon,
-  UserAdd01Icon,
-  BubbleChatIcon,
-  VideoReplayIcon,
-  Shield02Icon,
   LockKeyIcon,
   ViewIcon,
   ViewOffIcon,
   CreditCardIcon,
 } from "@hugeicons/core-free-icons";
 import { cn } from "@/design-system/lib/utils";
-import { ArrowLeft02Icon } from "@hugeicons/core-free-icons";
 
 // --- Step 1: Add-On Selection ---
 
@@ -72,7 +59,7 @@ interface AddOnSelectionStepProps {
 export function AddOnSelectionStep({
   selectedAddOns,
   onToggleAddOn,
-  onContinue,
+  onContinue: _onContinue,
   basePlanOption,
   onBasePlanChange,
 }: AddOnSelectionStepProps) {
@@ -89,15 +76,15 @@ export function AddOnSelectionStep({
 
       <div className="space-y-6">
         {/* Base Plan Display */}
-        <div className="border-border/50 rounded-xl border bg-white px-6 py-5">
-          <div className="mb-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <h3 className="text-xl font-bold">{BASE_PLAN.name}</h3>
+        <div className="border-border/50 rounded-xl border bg-white px-4 py-4 sm:px-6 sm:py-5">
+          <div className="mb-4 flex flex-col justify-between gap-3 sm:flex-row sm:items-center sm:gap-4">
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
+              <h3 className="text-lg font-bold sm:text-xl">{BASE_PLAN.name}</h3>
               <Select
                 value={basePlanOption.toString()}
                 onValueChange={(val) => onBasePlanChange(Number(val))}
               >
-                <SelectTrigger className="border-border/60 h-10 w-[240px] bg-white">
+                <SelectTrigger className="border-border/60 h-10 w-full bg-white sm:w-[240px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -174,15 +161,15 @@ export function CombinedAccountPaymentStep({
   onPracticeChange,
   onAccountChange,
   onPaymentChange,
-  onComplete,
+  onComplete: _onComplete,
   selectedAddOns,
-  isLoading,
+  isLoading: _isLoading,
   basePrice,
-  onBack,
+  onBack: _onBack,
 }: CombinedAccountPaymentStepProps) {
   const [showPassword, setShowPassword] = React.useState(false);
   const strength = getPasswordStrength(accountData.password);
-  const strengthColor = {
+  const _strengthColor = {
     weak: "bg-remedy",
     medium: "bg-neuron",
     strong: "bg-vigor",
@@ -200,8 +187,8 @@ export function CombinedAccountPaymentStep({
         </p>
       </div>
 
-      <div className="flex items-start gap-8">
-        <div className="flex-1 space-y-10">
+      <div className="flex flex-col items-start gap-6 lg:flex-row lg:gap-8">
+        <div className="w-full space-y-8 lg:flex-1 lg:space-y-10">
           {/* Section 1: Practice Info */}
           <div className="space-y-5">
             <h3 className="flex items-center gap-3 text-lg font-semibold">
@@ -210,7 +197,7 @@ export function CombinedAccountPaymentStep({
               </span>
               Practice Details
             </h3>
-            <div className="space-y-4 pl-8">
+            <div className="space-y-4 pl-0 sm:pl-8">
               <div className="space-y-2">
                 <Label htmlFor="practiceName">Practice Name</Label>
                 <Input
@@ -229,7 +216,7 @@ export function CombinedAccountPaymentStep({
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="specialty">Primary Specialty</Label>
                   <Select
@@ -319,8 +306,8 @@ export function CombinedAccountPaymentStep({
               </span>
               Account Login
             </h3>
-            <div className="space-y-4 pl-8">
-              <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-4 pl-0 sm:pl-8">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="fullName">Full Name</Label>
                   <Input
@@ -355,7 +342,7 @@ export function CombinedAccountPaymentStep({
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="phone">Phone Number</Label>
                   <Input
@@ -416,8 +403,8 @@ export function CombinedAccountPaymentStep({
               </span>
               Payment Method
             </h3>
-            <div className="space-y-4 pl-8">
-              <div className="mb-2 flex items-center gap-3">
+            <div className="space-y-4 pl-0 sm:pl-8">
+              <div className="mb-2 flex flex-wrap items-center gap-3">
                 <HugeiconsIcon
                   icon={LockKeyIcon}
                   className="text-growth-2 size-4"
@@ -467,7 +454,7 @@ export function CombinedAccountPaymentStep({
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="expirationDate">Expiration</Label>
                   <Input
@@ -528,8 +515,8 @@ export function CombinedAccountPaymentStep({
         </div>
 
         {/* Right Side: Order Summary */}
-        <div className="w-[320px] shrink-0">
-          <div className="border-border/50 sticky top-4 rounded-xl border bg-white p-6">
+        <div className="order-first w-full shrink-0 lg:order-last lg:w-[320px]">
+          <div className="border-border/50 rounded-xl border bg-white p-4 sm:p-6 lg:sticky lg:top-4">
             <h3 className="mb-5 text-lg font-bold">Summary</h3>
 
             <div className="mb-4 space-y-3 pb-4 text-sm">
@@ -558,7 +545,7 @@ export function CombinedAccountPaymentStep({
             <div className="text-muted-foreground border-border/30 rounded-lg border bg-gray-50 p-4 text-sm">
               <p className="text-foreground mb-1 font-semibold">Free Trial Terms:</p>
               <p className="leading-relaxed">
-                Your 14-day free trial begins today. You won't be charged until{" "}
+                Your 14-day free trial begins today. You won&apos;t be charged until{" "}
                 {formatTrialEndDate()}. Cancel anytime in your dashboard.
               </p>
             </div>
@@ -585,7 +572,11 @@ import {
   Loading03Icon,
 } from "@hugeicons/core-free-icons";
 
-export function UploadSuccessStep({ email, onClose, onBack }: UploadSuccessStepProps) {
+export function UploadSuccessStep({
+  email: _email,
+  onClose: _onClose,
+  onBack: _onBack,
+}: UploadSuccessStepProps) {
   const [isDragging, setIsDragging] = React.useState(false);
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -606,10 +597,10 @@ export function UploadSuccessStep({ email, onClose, onBack }: UploadSuccessStepP
     <div className="animate-in slide-in-from-right-4 fade-in flex flex-col pb-10 duration-300">
       <div className="w-full">
         <h2 className="text-foreground mb-3 text-3xl font-bold">
-          Let's Bring Your Practice Into Tebra
+          Let&apos;s Bring Your Practice Into Tebra
         </h2>
         <p className="text-muted-foreground mb-8 text-base">
-          Upload your files and we'll handle the rest
+          Upload your files and we&apos;ll handle the rest
         </p>
 
         {/* Drop Zone */}
@@ -709,7 +700,7 @@ export function UploadSuccessStep({ email, onClose, onBack }: UploadSuccessStepP
 
         {/* Start Empty */}
         <div className="flex items-center justify-center gap-3">
-          <span className="text-muted-foreground text-sm">Don't have files ready?</span>
+          <span className="text-muted-foreground text-sm">Don&apos;t have files ready?</span>
           <Button
             variant="outline"
             size="sm"

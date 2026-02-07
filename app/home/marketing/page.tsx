@@ -310,8 +310,8 @@ export default function MarketingPage() {
                     </Text>
                     <Text size="sm" className="text-warning">
                       Top-ranking practices are capturing 3-5x more patient inquiries through
-                      AI-powered search. You're missing opportunities to 60% of patients searching
-                      for care in your specialty.
+                      AI-powered search. You&apos;re missing opportunities to 60% of patients
+                      searching for care in your specialty.
                     </Text>
                   </div>
                 </div>
@@ -394,7 +394,7 @@ export default function MarketingPage() {
                 </div>
 
                 {/* Footer Stats */}
-                <div className="border-border mt-6 grid grid-cols-3 gap-4 border-t pt-6">
+                <div className="border-border mt-6 grid grid-cols-1 gap-4 border-t pt-6 sm:grid-cols-3">
                   <div className="text-center">
                     <Heading level={4} className="text-2xl">
                       85

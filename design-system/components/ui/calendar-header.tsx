@@ -65,9 +65,9 @@ export function CalendarHeader({
       </div>
 
       {/* Right side - Controls */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         {/* Search */}
-        <Button variant="ghost" size="icon" onClick={onSearch} className="h-9 w-9">
+        <Button variant="ghost" size="icon" onClick={onSearch} className="h-11 w-11">
           <Search className="h-4 w-4" />
           <span className="sr-only">Search events</span>
         </Button>
@@ -78,7 +78,7 @@ export function CalendarHeader({
             variant="ghost"
             size="icon"
             onClick={onPrevious}
-            className="h-9 w-9 rounded-r-none"
+            className="h-11 w-11 rounded-r-none"
           >
             <ChevronLeft className="h-4 w-4" />
             <span className="sr-only">Previous</span>
@@ -86,11 +86,11 @@ export function CalendarHeader({
           <Button
             variant="ghost"
             onClick={onToday}
-            className="border-border h-9 rounded-none border-x px-4"
+            className="border-border h-11 rounded-none border-x px-4"
           >
             Today
           </Button>
-          <Button variant="ghost" size="icon" onClick={onNext} className="h-9 w-9 rounded-l-none">
+          <Button variant="ghost" size="icon" onClick={onNext} className="h-11 w-11 rounded-l-none">
             <ChevronRight className="h-4 w-4" />
             <span className="sr-only">Next</span>
           </Button>
@@ -99,7 +99,7 @@ export function CalendarHeader({
         {/* View selector */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="h-9 gap-2 px-3">
+            <Button variant="outline" className="h-11 gap-2 px-3">
               {viewLabels[viewType]}
               <ChevronDown className="h-4 w-4" />
             </Button>

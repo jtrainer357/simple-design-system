@@ -28,7 +28,7 @@ const badgeVariants = cva(
         // LOW -> Gray
         low: "border-transparent bg-gray-400 text-white",
         // Active -> Green
-        active: "border-transparent bg-[#6FC691] text-white",
+        active: "border-transparent bg-success text-success-foreground",
         // Inactive -> Gray
         inactive: "border-transparent bg-gray-300 text-gray-600",
         // New Patient -> Blue
