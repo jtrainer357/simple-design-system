@@ -55,6 +55,8 @@ export function PatientListCard({
         className
       )}
       onClick={onSelect}
+      aria-label={`Patient ${name}, ${status.toLowerCase()}, Age ${age}`}
+      aria-selected={selected}
     >
       <div className="flex items-start gap-3">
         {/* Avatar */}

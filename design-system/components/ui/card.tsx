@@ -20,9 +20,29 @@ export interface CardProps
   extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof cardVariants> {}
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
-  ({ className, opacity, ...props }, ref) => (
-    <div ref={ref} className={cn(cardVariants({ opacity }), className)} {...props} />
-  )
+  ({ className, opacity, onClick, onKeyDown, ...props }, ref) => {
+    const isClickable = !!onClick;
+
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (isClickable && (e.key === "Enter" || e.key === " ")) {
+        e.preventDefault();
+        onClick?.(e as unknown as React.MouseEvent<HTMLDivElement>);
+      }
+      onKeyDown?.(e);
+    };
+
+    return (
+      <div
+        ref={ref}
+        className={cn(cardVariants({ opacity }), className)}
+        onClick={onClick}
+        onKeyDown={handleKeyDown}
+        role={isClickable ? "button" : undefined}
+        tabIndex={isClickable ? 0 : undefined}
+        {...props}
+      />
+    );
+  }
 );
 Card.displayName = "Card";
 

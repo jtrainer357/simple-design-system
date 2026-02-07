@@ -23,8 +23,22 @@ export function ActivityRow({
   className,
   onClick,
 }: ActivityRowProps) {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (onClick && (e.key === "Enter" || e.key === " ")) {
+      e.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <div className={cn("flex items-stretch gap-4 pl-0.5", className)} onClick={onClick}>
+    <div
+      className={cn("flex items-stretch gap-4 pl-0.5", className)}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      aria-label={onClick ? `View ${title}` : undefined}
+    >
       {/* Timeline column with dot and connecting line */}
       <div className="relative flex flex-col items-center">
         {/* Dot - solid fill with white ring outline */}

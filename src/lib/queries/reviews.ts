@@ -101,7 +101,7 @@ export async function getPracticeAverageRating(
     return null;
   }
 
-  const sum = data.reduce((acc, review) => acc + review.rating, 0);
+  const sum = data.reduce((acc: number, review: { rating: number }) => acc + review.rating, 0);
   return sum / data.length;
 }
 

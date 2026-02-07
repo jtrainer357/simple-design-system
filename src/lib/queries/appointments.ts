@@ -178,8 +178,8 @@ export async function getAppointmentStats(practiceId: string = DEMO_PRACTICE_ID)
     .lte("date", today)
     .in("status", ["No-Show", "Cancelled"]);
 
-  const todayAppts = todayData || [];
-  const weekAppts = weekData || [];
+  const todayAppts: { status: string }[] = todayData || [];
+  const weekAppts: { status: string }[] = weekData || [];
 
   return {
     todayCount: todayAppts.length,

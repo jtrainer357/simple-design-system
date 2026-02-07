@@ -40,9 +40,14 @@ function HomeContent() {
       <div className="lg:pl-36">
         <HeaderSearch />
 
-        <main className="px-4 py-4 sm:px-6 sm:py-6 md:py-8">
+        <main
+          id="main-content"
+          role="main"
+          aria-label="Dashboard content"
+          className="px-4 py-4 sm:px-6 sm:py-6 md:py-8"
+        >
           <PageTransition>
-            <div className="mx-auto flex max-w-[1600px] flex-col gap-4 overflow-hidden xl:h-[calc(100vh-8.5rem)] xl:flex-row">
+            <div className="mx-auto flex max-w-[1600px] flex-col gap-4 overflow-hidden xl:h-[calc(100vh-8.5rem)] xl:flex-row xl:gap-2">
               {/* Main Content Area - Unified Card with Dynamic Canvas */}
               <CardWrapper className="flex min-h-[500px] flex-1 flex-col overflow-visible xl:min-h-0">
                 <DynamicCanvas className="flex min-h-0 flex-1 flex-col" />

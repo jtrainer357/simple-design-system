@@ -19,7 +19,12 @@ export default function CommunicationsRoute() {
       <div className="lg:pl-36">
         <HeaderSearch />
 
-        <main className="px-4 py-4 sm:px-6 sm:py-6 md:py-8">
+        <main
+          id="main-content"
+          role="main"
+          aria-label="Communications content"
+          className="px-4 py-4 sm:px-6 sm:py-6 md:py-8"
+        >
           <PageTransition>
             <div className="mx-auto flex max-w-[1800px] flex-col lg:h-[calc(100vh-8.5rem)]">
               <CommunicationsPage />

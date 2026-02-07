@@ -8,3 +8,4 @@
 
 export { VoiceControl } from "./VoiceControl";
 export { VoiceProvider } from "./VoiceProvider";
+export { VoiceLiveRegion } from "./VoiceLiveRegion";

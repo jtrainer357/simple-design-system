@@ -48,6 +48,7 @@ export function ConversationCard({
         className
       )}
       onClick={onClick}
+      aria-label={`Conversation with ${name}${unreadCount ? `, ${unreadCount} unread messages` : ""}`}
     >
       <div className="flex items-start gap-3">
         <div className="relative">

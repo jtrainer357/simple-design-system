@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { voiceEngine } from "@/src/lib/voice/voice-engine";
 import { createCommands } from "@/src/lib/voice/command-registry";
 import { voiceEvents } from "@/src/lib/voice/voice-events";
+import { VoiceLiveRegion } from "./VoiceLiveRegion";
 
 // Demo patients data for voice commands - must match actual database patients
 // Using shorter names where possible for better speech recognition
@@ -228,7 +229,12 @@ export function VoiceProvider({ children }: VoiceProviderProps) {
     return () => unsubs.forEach((fn) => fn());
   }, [router]);
 
-  return <>{children}</>;
+  return (
+    <>
+      <VoiceLiveRegion />
+      {children}
+    </>
+  );
 }
 
 /**

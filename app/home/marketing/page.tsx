@@ -195,7 +195,12 @@ export default function MarketingPage() {
       <div className="flex min-h-0 flex-1 flex-col lg:pl-36">
         <HeaderSearch />
 
-        <main className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 md:py-8">
+        <main
+          id="main-content"
+          role="main"
+          aria-label="Marketing content"
+          className="flex-1 overflow-y-auto px-4 py-4 sm:px-6 sm:py-6 md:py-8"
+        >
           <PageTransition>
             <div className="mx-auto max-w-[1600px] pb-10">
               {/* Upsell Banner - Teal Gradient */}

@@ -45,7 +45,12 @@ export default function PatientsRoute() {
       <div className="lg:pl-36">
         <HeaderSearch />
 
-        <main className="px-4 py-4 sm:px-6 sm:py-6 md:py-8">
+        <main
+          id="main-content"
+          role="main"
+          aria-label="Patients content"
+          className="px-4 py-4 sm:px-6 sm:py-6 md:py-8"
+        >
           <PageTransition>
             <div className="mx-auto max-w-[1600px] lg:h-[calc(100vh-8.5rem)]">
               <React.Suspense fallback={<PatientsContentSkeleton />}>
