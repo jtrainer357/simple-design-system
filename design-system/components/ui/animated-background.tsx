@@ -17,7 +17,7 @@ export function AnimatedBackground() {
       <div
         className="pointer-events-none fixed inset-0 z-[-1]"
         style={{
-          background: "linear-gradient(225deg, rgba(128, 128, 128, 0.09) 0%, transparent 50%)",
+          background: "linear-gradient(225deg, rgba(128, 128, 128, 0.12) 0%, transparent 50%)",
         }}
       />
     </>

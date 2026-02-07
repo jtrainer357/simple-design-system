@@ -90,11 +90,10 @@ export function DynamicCanvas({ className }: DynamicCanvasProps) {
 
       {/* Scrollable Content - px-3 allows shadows to show */}
       <div className="min-h-0 flex-1 overflow-y-auto px-3">
-        {/* Grid container - both views exist, one is visible */}
-        <div className="grid">
-          {/* Actions View */}
+        {/* Container for views - relative positioning */}
+        <div className="relative">
+          {/* Actions View - in normal flow when visible */}
           <motion.div
-            className="col-start-1 row-start-1"
             initial={false}
             animate={{
               opacity: isActions ? 1 : 0,
@@ -103,6 +102,10 @@ export function DynamicCanvas({ className }: DynamicCanvasProps) {
             }}
             transition={transition}
             style={{
+              position: isActions ? "relative" : "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
               visibility: isActions ? "visible" : "hidden",
               zIndex: isActions ? 1 : 0,
             }}
@@ -110,9 +113,8 @@ export function DynamicCanvas({ className }: DynamicCanvasProps) {
             <PriorityActionsSection onSelectPatient={handleSelectPatient} hideHeader />
           </motion.div>
 
-          {/* Detail View */}
+          {/* Detail View - in normal flow when visible */}
           <motion.div
-            className="col-start-1 row-start-1"
             initial={false}
             animate={{
               opacity: isActions ? 0 : 1,
@@ -121,6 +123,10 @@ export function DynamicCanvas({ className }: DynamicCanvasProps) {
             }}
             transition={transition}
             style={{
+              position: isActions ? "absolute" : "relative",
+              top: 0,
+              left: 0,
+              right: 0,
               visibility: isActions ? "hidden" : "visible",
               zIndex: isActions ? 0 : 1,
             }}

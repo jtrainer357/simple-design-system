@@ -11,7 +11,7 @@ export function CardWrapper({ children, className }: CardWrapperProps) {
   return (
     <div
       className={cn(
-        "border-border/40 rounded-xl border bg-white/45 p-6 backdrop-blur-xl",
+        "border-border/40 rounded-xl border bg-white/50 p-6 backdrop-blur-lg",
         className
       )}
     >
