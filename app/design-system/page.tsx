@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 // Design System Components
 import { Button } from "@/design-system/components/ui/button";
@@ -1877,9 +1878,9 @@ import { Home, User, Calendar, MessageSquare } from 'lucide-react'`}
                   The LeftNav is a responsive navigation component. On desktop (lg+), it renders as
                   a fixed side navigation. On tablet/mobile, it renders as a fixed bottom navigation
                   bar. View the full implementation on the{" "}
-                  <a href="/home" className="text-primary underline">
+                  <Link href="/home" prefetch={true} className="text-primary underline">
                     home page
-                  </a>
+                  </Link>
                   .
                 </p>
                 <div className="bg-muted/30 relative h-[400px] overflow-hidden rounded-lg border">

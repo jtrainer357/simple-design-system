@@ -1,0 +1,100 @@
+import { Skeleton } from "@/design-system/components/ui/skeleton";
+
+export default function ScheduleLoading() {
+  return (
+    <div className="min-h-screen pb-24 lg:pb-0">
+      {/* Left Nav Skeleton */}
+      <div className="fixed bottom-0 z-40 flex w-full items-center justify-around border-t border-gray-200 bg-white/95 px-4 py-2 backdrop-blur-sm lg:top-0 lg:left-0 lg:h-screen lg:w-36 lg:flex-col lg:items-center lg:justify-start lg:gap-6 lg:border-t-0 lg:border-r lg:px-0 lg:py-8">
+        <Skeleton className="hidden h-8 w-20 lg:block" />
+        <div className="flex w-full items-center justify-around lg:mt-8 lg:flex-col lg:gap-4">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Skeleton key={i} className="h-10 w-10 rounded-lg lg:h-12 lg:w-24" />
+          ))}
+        </div>
+      </div>
+
+      {/* Main Content Wrapper */}
+      <div className="lg:pl-36">
+        {/* Header Search Skeleton */}
+        <header className="sticky top-0 z-30 border-b border-gray-200/50 bg-white/80 px-4 py-3 backdrop-blur-sm sm:px-6">
+          <div className="mx-auto flex max-w-[1600px] items-center gap-4">
+            <Skeleton className="h-10 max-w-md flex-1 rounded-full" />
+            <Skeleton className="h-10 w-10 rounded-full" />
+          </div>
+        </header>
+
+        <main className="px-4 py-4 sm:px-6 sm:py-6 md:py-8">
+          <div className="mx-auto flex max-w-[1600px] flex-col lg:h-[calc(100vh-8.5rem)]">
+            {/* Filter tabs and button */}
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex gap-2">
+                <Skeleton className="h-9 w-32 rounded-full" />
+                <Skeleton className="h-9 w-24 rounded-full" />
+                <Skeleton className="h-9 w-24 rounded-full" />
+              </div>
+              <Skeleton className="h-10 w-36 rounded-lg" />
+            </div>
+
+            {/* Calendar Card */}
+            <div className="flex flex-1 flex-col overflow-hidden rounded-xl border border-gray-200/50 bg-white/90 p-4 sm:p-6">
+              {/* Calendar Header */}
+              <div className="mb-6 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <Skeleton className="h-9 w-9 rounded-full" />
+                  <Skeleton className="h-6 w-48" />
+                  <Skeleton className="h-9 w-9 rounded-full" />
+                </div>
+                <div className="flex gap-2">
+                  <Skeleton className="h-9 w-20 rounded-full" />
+                  <Skeleton className="h-9 w-20 rounded-full" />
+                </div>
+              </div>
+
+              {/* Week Day Headers */}
+              <div className="mb-2 hidden grid-cols-7 gap-1 lg:grid">
+                {Array.from({ length: 7 }).map((_, i) => (
+                  <Skeleton key={i} className="h-8" />
+                ))}
+              </div>
+
+              {/* Calendar Grid */}
+              <div className="flex-1">
+                {/* Time slots and events grid */}
+                <div className="hidden lg:grid lg:grid-cols-7 lg:gap-1">
+                  {Array.from({ length: 7 }).map((_, dayIndex) => (
+                    <div key={dayIndex} className="space-y-1">
+                      {Array.from({ length: 8 }).map((_, slotIndex) => (
+                        <Skeleton key={slotIndex} className="h-12 rounded-lg" />
+                      ))}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Mobile: Day view */}
+                <div className="lg:hidden">
+                  <div className="mb-4 flex gap-1 overflow-x-auto pb-2">
+                    {Array.from({ length: 7 }).map((_, i) => (
+                      <Skeleton key={i} className="h-16 w-12 shrink-0 rounded-lg" />
+                    ))}
+                  </div>
+                  <div className="space-y-2">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <Skeleton key={i} className="h-16 w-full rounded-lg" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Calendar connect buttons */}
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Skeleton className="h-8 w-32 rounded-lg" />
+                <Skeleton className="h-8 w-32 rounded-lg" />
+                <Skeleton className="h-8 w-32 rounded-lg" />
+              </div>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}

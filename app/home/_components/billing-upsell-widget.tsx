@@ -13,6 +13,11 @@ interface BillingUpsellWidgetProps {
 export function BillingUpsellWidget({ className }: BillingUpsellWidgetProps) {
   const router = useRouter();
 
+  // Prefetch billing route on mount for instant navigation
+  React.useEffect(() => {
+    router.prefetch("/home/billing");
+  }, [router]);
+
   return (
     <OutstandingCard
       title="Try Our Billing Solution"

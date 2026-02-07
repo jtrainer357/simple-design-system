@@ -1,8 +1,10 @@
 import { ImportWizard } from "@/src/components/import";
 
-export const metadata = {
-  title: "Import Data | Tebra Mental Health",
-  description: "Import patients, documents, and appointments from your previous EHR system.",
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Data Import",
+  description: "AI-powered practice data migration wizard",
 };
 
 export default function ImportPage() {

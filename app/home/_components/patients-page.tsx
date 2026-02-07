@@ -654,7 +654,7 @@ export function PatientsPage({
           <Text size="xs" muted className="mt-1 max-w-sm text-center">
             Run the import wizard to populate the database with patient data.
           </Text>
-          <Link href="/import" className="mt-4">
+          <Link href="/import" prefetch={true} className="mt-4">
             <Button variant="default" size="sm">
               Start Import
             </Button>

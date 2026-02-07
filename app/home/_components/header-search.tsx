@@ -64,7 +64,7 @@ export function HeaderSearch() {
               asChild
               className="text-teal-dark h-11 w-11 rounded-full bg-white shadow-sm ring-1 ring-black/5 hover:bg-white/80"
             >
-              <Link href="/home/communications">
+              <Link href="/home/communications" prefetch={true}>
                 <MessageSquare className="h-5 w-5" />
                 <span className="sr-only">Messages</span>
               </Link>

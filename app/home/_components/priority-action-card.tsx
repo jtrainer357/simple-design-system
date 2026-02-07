@@ -49,7 +49,7 @@ export function PriorityActionCard({ action, className }: PriorityActionCardProp
     .join("");
 
   return (
-    <Link href={`/home/patients?patient=${action.patientId}`} className="block">
+    <Link href={`/home/patients?patient=${action.patientId}`} prefetch={true} className="block">
       <Card
         className={cn("cursor-pointer overflow-hidden transition-all hover:shadow-lg", className)}
       >

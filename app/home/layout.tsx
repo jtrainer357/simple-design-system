@@ -1,4 +1,3 @@
-import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -6,6 +5,6 @@ export const metadata: Metadata = {
   description: "AI-powered command center with prioritized clinical actions",
 };
 
-export default function Home() {
-  redirect("/home");
+export default function HomeLayout({ children }: { children: React.ReactNode }) {
+  return <>{children}</>;
 }

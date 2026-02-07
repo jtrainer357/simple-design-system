@@ -7,10 +7,11 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: {
-    template: "%s | Tebra Mental Health",
     default: "Tebra Mental Health",
+    template: "%s | Tebra Mental Health",
   },
-  description: "AI-powered mental health practice management system",
+  description: "AI-native practice management platform for mental health practitioners",
+  robots: { index: false, follow: false },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

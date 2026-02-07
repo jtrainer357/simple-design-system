@@ -153,6 +153,23 @@ vi.stubGlobal("webkitSpeechRecognition", MockSpeechRecognition);
 // Mock scrollTo
 window.scrollTo = vi.fn();
 
+// Mock Radix ScrollArea to avoid ResizeObserver issues in tests
+vi.mock("@radix-ui/react-scroll-area", () => ({
+  Root: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div data-radix-scroll-area-root className={className}>
+      {children}
+    </div>
+  ),
+  Viewport: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div data-radix-scroll-area-viewport className={className}>
+      {children}
+    </div>
+  ),
+  Scrollbar: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
+  Thumb: () => <div />,
+  Corner: () => <div />,
+}));
+
 // Suppress console during tests unless DEBUG is set
 if (!process.env.DEBUG) {
   vi.spyOn(console, "warn").mockImplementation(() => {});
