@@ -4,8 +4,11 @@
  */
 
 import { createClient } from "@/src/lib/supabase/client";
+import { createLogger } from "@/src/lib/logger";
 import type { Practice } from "@/src/lib/supabase/types";
 import { getDemoToday, DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
+
+const log = createLogger("queries/practice");
 
 /**
  * Get the demo practice (first practice in the database)
@@ -20,7 +23,7 @@ export async function getDemoPractice(): Promise<Practice | null> {
     .single();
 
   if (error) {
-    console.error("Failed to fetch demo practice:", error);
+    log.error("Failed to fetch demo practice", error, { action: "getDemoPractice" });
     return null;
   }
 
@@ -113,7 +116,10 @@ export async function isDatabasePopulated(practiceId: string = DEMO_PRACTICE_ID)
     .eq("practice_id", practiceId);
 
   if (error) {
-    console.error("Failed to check database population:", error);
+    log.error("Failed to check database population", error, {
+      action: "isDatabasePopulated",
+      practiceId,
+    });
     return false;
   }
 
@@ -146,7 +152,10 @@ export async function getRecentAnalysisRuns(
     .limit(limit);
 
   if (error) {
-    console.error("Failed to fetch analysis runs:", error);
+    log.error("Failed to fetch analysis runs", error, {
+      action: "getRecentAnalysisRuns",
+      practiceId,
+    });
     return [];
   }
 

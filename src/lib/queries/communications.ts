@@ -4,8 +4,11 @@
  */
 
 import { createClient } from "@/src/lib/supabase/client";
+import { createLogger } from "@/src/lib/logger";
 import type { Communication as CommunicationRow, Patient } from "@/src/lib/supabase/types";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
+
+const log = createLogger("queries/communications");
 
 // Re-export the Communication type for backwards compatibility
 export type Communication = CommunicationRow;
@@ -39,7 +42,7 @@ export async function getCommunications(
     .order("sent_at", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch communications:", error);
+    log.error("Failed to fetch communications", error, { action: "getCommunications", practiceId });
     throw error;
   }
 
@@ -65,7 +68,10 @@ export async function getPatientCommunications(
     .order("sent_at", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch patient communications:", error);
+    log.error("Failed to fetch patient communications", error, {
+      action: "getPatientCommunications",
+      patientId,
+    });
     throw error;
   }
 
@@ -86,7 +92,7 @@ export async function getUnreadCount(practiceId: string = DEMO_PRACTICE_ID): Pro
     .eq("is_read", false);
 
   if (error) {
-    console.error("Failed to fetch unread count:", error);
+    log.error("Failed to fetch unread count", error, { action: "getUnreadCount", practiceId });
     return 0;
   }
 
@@ -111,7 +117,10 @@ export async function markAsRead(
     .eq("practice_id", practiceId);
 
   if (error) {
-    console.error("Failed to mark communication as read:", error);
+    log.error("Failed to mark communication as read", error, {
+      action: "markAsRead",
+      communicationId,
+    });
     throw error;
   }
 }
@@ -147,7 +156,7 @@ export async function getCommunicationThreads(practiceId: string = DEMO_PRACTICE
     .order("sent_at", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch communications:", error);
+    log.error("Failed to fetch communications", error, { action: "getCommunications", practiceId });
     throw error;
   }
 

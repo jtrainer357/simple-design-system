@@ -4,12 +4,15 @@
  */
 
 import { createClient } from "@/src/lib/supabase/client";
+import { createLogger } from "@/src/lib/logger";
 import type {
   PrioritizedActionWithPatient,
   PrioritizedAction,
   Patient,
 } from "@/src/lib/supabase/types";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
+
+const log = createLogger("queries/priority-actions");
 
 // Type for prioritized action with patient relation from DB (raw form before mapping)
 type PrioritizedActionWithPatientRow = PrioritizedAction & {
@@ -56,7 +59,10 @@ export async function getPriorityActions(
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch priority actions:", error);
+    log.error("Failed to fetch priority actions", error, {
+      action: "getPriorityActions",
+      practiceId,
+    });
     throw error;
   }
 
@@ -121,7 +127,10 @@ export async function getPatientPriorityActions(
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch patient priority actions:", error);
+    log.error("Failed to fetch patient priority actions", error, {
+      action: "getPatientPriorityActions",
+      patientId,
+    });
     throw error;
   }
 
@@ -170,7 +179,7 @@ export async function completeAction(
     .eq("practice_id", practiceId);
 
   if (error) {
-    console.error("Failed to complete action:", error);
+    log.error("Failed to complete action", error, { action: "completeAction", actionId });
     throw error;
   }
 }
@@ -196,7 +205,7 @@ export async function dismissAction(
     .eq("practice_id", practiceId);
 
   if (error) {
-    console.error("Failed to dismiss action:", error);
+    log.error("Failed to dismiss action", error, { action: "dismissAction", actionId });
     throw error;
   }
 }
@@ -224,7 +233,10 @@ export async function completeAllPatientActions(
     .or("status.eq.pending,status.is.null");
 
   if (actionsError) {
-    console.error("Failed to complete patient actions:", actionsError);
+    log.error("Failed to complete patient actions", actionsError, {
+      action: "completeAllPatientActions",
+      patientId,
+    });
     throw actionsError;
   }
 
@@ -240,7 +252,10 @@ export async function completeAllPatientActions(
     .eq("status", "pending");
 
   if (tasksError) {
-    console.error("Failed to complete patient tasks:", tasksError);
+    log.error("Failed to complete patient tasks", tasksError, {
+      action: "completeAllPatientActions",
+      patientId,
+    });
     throw tasksError;
   }
 }
@@ -264,7 +279,7 @@ export async function getActionCounts(practiceId: string = DEMO_PRACTICE_ID): Pr
     .or("status.eq.pending,status.is.null");
 
   if (error) {
-    console.error("Failed to fetch action counts:", error);
+    log.error("Failed to fetch action counts", error, { action: "getActionCounts", practiceId });
     return { urgent: 0, high: 0, medium: 0, low: 0, total: 0 };
   }
 

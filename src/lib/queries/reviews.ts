@@ -4,8 +4,11 @@
  */
 
 import { createClient } from "@/src/lib/supabase/client";
+import { createLogger } from "@/src/lib/logger";
 import type { Review } from "@/src/lib/supabase/types";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
+
+const log = createLogger("queries/reviews");
 
 /**
  * Get all reviews for a specific patient
@@ -26,7 +29,7 @@ export async function getPatientReviews(
     .order("review_date", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch patient reviews:", error);
+    log.error("Failed to fetch patient reviews", error, { action: "getPatientReviews", patientId });
     throw error;
   }
 
@@ -48,7 +51,10 @@ export async function getReviewsByPractice(
     .order("review_date", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch practice reviews:", error);
+    log.error("Failed to fetch practice reviews", error, {
+      action: "getReviewsByPractice",
+      practiceId,
+    });
     throw error;
   }
 
@@ -72,7 +78,11 @@ export async function getReviewsByType(
     .order("review_date", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch reviews by type:", error);
+    log.error("Failed to fetch reviews by type", error, {
+      action: "getReviewsByType",
+      practiceId,
+      reviewType,
+    });
     throw error;
   }
 
@@ -93,7 +103,10 @@ export async function getPracticeAverageRating(
     .eq("practice_id", practiceId);
 
   if (error) {
-    console.error("Failed to fetch practice ratings:", error);
+    log.error("Failed to fetch practice ratings", error, {
+      action: "getPracticeAverageRating",
+      practiceId,
+    });
     throw error;
   }
 
@@ -122,7 +135,11 @@ export async function getRecentReviews(
     .limit(limit);
 
   if (error) {
-    console.error("Failed to fetch recent reviews:", error);
+    log.error("Failed to fetch recent reviews", error, {
+      action: "getRecentReviews",
+      practiceId,
+      limit,
+    });
     throw error;
   }
 

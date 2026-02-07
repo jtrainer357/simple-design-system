@@ -7,7 +7,10 @@
  */
 
 import { createClient } from "@/src/lib/supabase/client";
+import { createLogger } from "@/src/lib/logger";
 import { DEMO_PRACTICE_ID, getDemoToday, getDemoDaysAgo } from "@/src/lib/utils/demo-date";
+
+const log = createLogger("queries/billing");
 
 export interface Invoice {
   id: string;
@@ -81,7 +84,7 @@ export async function getInvoices(
     .order("date_of_service", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch invoices:", error);
+    log.error("Failed to fetch invoices", error, { action: "getInvoices", practiceId });
     throw error;
   }
 
@@ -107,7 +110,12 @@ export async function getInvoicesByDateRange(
     .order("date_of_service", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch invoices by date range:", error);
+    log.error("Failed to fetch invoices by date range", error, {
+      action: "getInvoicesByDateRange",
+      practiceId,
+      startDate,
+      endDate,
+    });
     throw error;
   }
 
@@ -132,7 +140,10 @@ export async function getBillingSummary(
     .lte("date_of_service", today);
 
   if (error) {
-    console.error("Failed to fetch billing summary:", error);
+    log.error("Failed to fetch billing summary", error, {
+      action: "getBillingSummary",
+      practiceId,
+    });
     return {
       totalCharged: 0,
       totalCollected: 0,
@@ -186,7 +197,10 @@ export async function getPatientInvoices(
     .order("date_of_service", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch patient invoices:", error);
+    log.error("Failed to fetch patient invoices", error, {
+      action: "getPatientInvoices",
+      patientId,
+    });
     throw error;
   }
 
@@ -219,7 +233,10 @@ export async function getOutstandingInvoices(
     .order("balance", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch outstanding invoices:", error);
+    log.error("Failed to fetch outstanding invoices", error, {
+      action: "getOutstandingInvoices",
+      practiceId,
+    });
     throw error;
   }
 
@@ -248,7 +265,10 @@ export async function getMonthlyBillingTotals(practiceId: string = DEMO_PRACTICE
     .lte("date_of_service", today);
 
   if (error) {
-    console.error("Failed to fetch monthly billing:", error);
+    log.error("Failed to fetch monthly billing", error, {
+      action: "getMonthlyBillingTotals",
+      practiceId,
+    });
     return [];
   }
 

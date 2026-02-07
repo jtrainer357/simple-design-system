@@ -4,6 +4,7 @@
  */
 
 import { createClient } from "@/src/lib/supabase/client";
+import { createLogger } from "@/src/lib/logger";
 import type { Appointment, Patient } from "@/src/lib/supabase/types";
 import {
   getDemoToday,
@@ -11,6 +12,8 @@ import {
   getDemoDaysAgo,
   DEMO_PRACTICE_ID,
 } from "@/src/lib/utils/demo-date";
+
+const log = createLogger("queries/appointments");
 
 export type AppointmentWithPatient = Appointment & {
   patient: Pick<
@@ -49,7 +52,10 @@ export async function getTodayAppointments(
     .order("start_time", { ascending: true });
 
   if (error) {
-    console.error("Failed to fetch today's appointments:", error);
+    log.error("Failed to fetch today's appointments", error, {
+      action: "getTodayAppointments",
+      practiceId,
+    });
     throw error;
   }
 
@@ -101,7 +107,11 @@ export async function getUpcomingAppointments(
     .order("start_time", { ascending: true });
 
   if (error) {
-    console.error("Failed to fetch upcoming appointments:", error);
+    log.error("Failed to fetch upcoming appointments", error, {
+      action: "getUpcomingAppointments",
+      practiceId,
+      days,
+    });
     throw error;
   }
 
@@ -141,7 +151,11 @@ export async function getRecentAppointments(
     .order("start_time", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch recent appointments:", error);
+    log.error("Failed to fetch recent appointments", error, {
+      action: "getRecentAppointments",
+      practiceId,
+      days,
+    });
     throw error;
   }
 
@@ -210,7 +224,11 @@ export async function updateAppointmentStatus(
     .eq("practice_id", practiceId);
 
   if (error) {
-    console.error("Failed to update appointment status:", error);
+    log.error("Failed to update appointment status", error, {
+      action: "updateAppointmentStatus",
+      appointmentId,
+      status,
+    });
     throw error;
   }
 }

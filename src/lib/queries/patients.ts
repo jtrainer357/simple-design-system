@@ -4,6 +4,7 @@
  */
 
 import { createClient } from "@/src/lib/supabase/client";
+import { createLogger } from "@/src/lib/logger";
 import type {
   Patient,
   Appointment,
@@ -14,6 +15,8 @@ import type {
   VisitSummary,
 } from "@/src/lib/supabase/types";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
+
+const log = createLogger("queries/patients");
 
 // Re-export Communication type for backwards compatibility
 export type { Communication };
@@ -33,7 +36,7 @@ export async function getPatients(practiceId: string = DEMO_PRACTICE_ID): Promis
     .order("first_name", { ascending: true });
 
   if (error) {
-    console.error("Failed to fetch patients:", error);
+    log.error("Failed to fetch patients", error, { action: "getPatients" });
     throw error;
   }
 
@@ -59,7 +62,7 @@ export async function getPatientById(
     .single();
 
   if (error) {
-    console.error("Failed to fetch patient:", error);
+    log.error("Failed to fetch patient", error, { action: "getPatientById", patientId });
     return null;
   }
 
@@ -85,7 +88,10 @@ export async function getPatientByExternalId(
     .single();
 
   if (error) {
-    console.error("Failed to fetch patient by external ID:", error);
+    log.error("Failed to fetch patient by external ID", error, {
+      action: "getPatientByExternalId",
+      externalId,
+    });
     return null;
   }
 
@@ -112,7 +118,10 @@ export async function getPatientAppointments(
     .order("start_time", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch patient appointments:", error);
+    log.error("Failed to fetch patient appointments", error, {
+      action: "getPatientAppointments",
+      patientId,
+    });
     throw error;
   }
 
@@ -138,7 +147,10 @@ export async function getPatientOutcomeMeasures(
     .order("measurement_date", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch patient outcome measures:", error);
+    log.error("Failed to fetch patient outcome measures", error, {
+      action: "getPatientOutcomeMeasures",
+      patientId,
+    });
     throw error;
   }
 
@@ -165,7 +177,10 @@ export async function getPatientMessages(
     .limit(50);
 
   if (error) {
-    console.error("Failed to fetch patient messages:", error);
+    log.error("Failed to fetch patient messages", error, {
+      action: "getPatientMessages",
+      patientId,
+    });
     throw error;
   }
 
@@ -191,7 +206,10 @@ export async function getPatientInvoices(
     .order("date_of_service", { ascending: false });
 
   if (error) {
-    console.error("Failed to fetch patient invoices:", error);
+    log.error("Failed to fetch patient invoices", error, {
+      action: "getPatientInvoices",
+      patientId,
+    });
     throw error;
   }
 
@@ -220,7 +238,11 @@ export async function getPatientReviews(
 
     if (error) {
       // Table might not exist yet - return empty array gracefully
-      console.warn("Reviews query failed (table may not exist):", error.message);
+      log.warn("Reviews query failed (table may not exist)", {
+        action: "getPatientReviews",
+        patientId,
+        errorMessage: error.message,
+      });
       return [];
     }
 
@@ -283,7 +305,7 @@ export async function searchPatients(
     .limit(20);
 
   if (error) {
-    console.error("Failed to search patients:", error);
+    log.error("Failed to search patients", error, { action: "searchPatients", query });
     throw error;
   }
 
@@ -307,7 +329,7 @@ export async function getHighRiskPatients(
     .order("last_name", { ascending: true });
 
   if (error) {
-    console.error("Failed to fetch high-risk patients:", error);
+    log.error("Failed to fetch high-risk patients", error, { action: "getHighRiskPatients" });
     throw error;
   }
 
@@ -337,7 +359,10 @@ export async function getPatientVisitSummaries(
     .limit(10);
 
   if (error) {
-    console.error("Failed to fetch patient visit summaries:", error);
+    log.error("Failed to fetch patient visit summaries", error, {
+      action: "getPatientVisitSummaries",
+      patientId,
+    });
     return [];
   }
 
