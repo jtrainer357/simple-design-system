@@ -2,6 +2,7 @@ import "@/design-system/styles/globals.css";
 import { PageBackground } from "@/design-system/components/ui/page-background";
 import { ActionOrchestrationModal } from "@/src/components/orchestration/ActionOrchestrationModal";
 import { VoiceProvider } from "@/src/components/voice";
+import { QueryProvider } from "@/src/lib/queries/query-provider";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -23,10 +24,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to main content
         </a>
-        <VoiceProvider>
-          <PageBackground>{children}</PageBackground>
-          <ActionOrchestrationModal />
-        </VoiceProvider>
+        <QueryProvider>
+          <VoiceProvider>
+            <PageBackground>{children}</PageBackground>
+            <ActionOrchestrationModal />
+          </VoiceProvider>
+        </QueryProvider>
       </body>
     </html>
   );
