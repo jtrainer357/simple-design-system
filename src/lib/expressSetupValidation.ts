@@ -156,7 +156,9 @@ export function validatePaymentInfo(data: PaymentData): ValidationError[] {
   if (!data.expirationDate) {
     errors.push({ field: "expirationDate", message: "Expiration date is required" });
   } else {
-    const [month, year] = data.expirationDate.split("/");
+    const parts = data.expirationDate.split("/");
+    const month = parts[0] ?? "";
+    const year = parts[1] ?? "";
     const monthNum = parseInt(month, 10);
     if (!month || !year || monthNum < 1 || monthNum > 12) {
       errors.push({

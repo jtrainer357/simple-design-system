@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { LeftNav } from "./_components/left-nav";
 import { HeaderSearch } from "./_components/header-search";
@@ -12,7 +13,7 @@ import { AnimatedBackground } from "@/design-system/components/ui/animated-backg
 import { PageTransition } from "@/design-system/components/ui/page-transition";
 import { WelcomeModal } from "./_components/welcome-modal";
 
-export default function HomePage() {
+function HomeContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const setupComplete = searchParams.get("setup_complete") === "true";
@@ -58,5 +59,13 @@ export default function HomePage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={null}>
+      <HomeContent />
+    </Suspense>
   );
 }
