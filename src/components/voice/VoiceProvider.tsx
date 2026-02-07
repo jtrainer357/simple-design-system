@@ -120,6 +120,19 @@ export function VoiceProvider({ children }: VoiceProviderProps) {
     };
   }, []);
 
+  // Prefetch common navigation routes for instant voice-commanded transitions
+  React.useEffect(() => {
+    const routes = [
+      "/home",
+      "/home/calendar",
+      "/home/patients",
+      "/home/billing",
+      "/home/marketing",
+      "/home/communications",
+    ];
+    routes.forEach((route) => router.prefetch(route));
+  }, [router]);
+
   // Set up event listeners for routing
   React.useEffect(() => {
     const unsubs: (() => void)[] = [];

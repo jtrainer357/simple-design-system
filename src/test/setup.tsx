@@ -154,21 +154,59 @@ vi.stubGlobal("webkitSpeechRecognition", MockSpeechRecognition);
 window.scrollTo = vi.fn();
 
 // Mock Radix ScrollArea to avoid ResizeObserver issues in tests
-vi.mock("@radix-ui/react-scroll-area", () => ({
-  Root: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-radix-scroll-area-root className={className}>
+vi.mock("@radix-ui/react-scroll-area", () => {
+  const MockRoot = React.forwardRef<
+    HTMLDivElement,
+    { children: React.ReactNode; className?: string }
+  >(({ children, className, ...props }, ref) => (
+    <div ref={ref} data-radix-scroll-area-root className={className} {...props}>
       {children}
     </div>
-  ),
-  Viewport: ({ children, className }: { children: React.ReactNode; className?: string }) => (
-    <div data-radix-scroll-area-viewport className={className}>
+  ));
+  MockRoot.displayName = "ScrollArea";
+
+  const MockViewport = React.forwardRef<
+    HTMLDivElement,
+    { children: React.ReactNode; className?: string }
+  >(({ children, className, ...props }, ref) => (
+    <div ref={ref} data-radix-scroll-area-viewport className={className} {...props}>
       {children}
     </div>
-  ),
-  Scrollbar: ({ children }: { children?: React.ReactNode }) => <div>{children}</div>,
-  Thumb: () => <div />,
-  Corner: () => <div />,
-}));
+  ));
+  MockViewport.displayName = "ScrollAreaViewport";
+
+  const MockScrollbar = React.forwardRef<
+    HTMLDivElement,
+    { children?: React.ReactNode; className?: string; orientation?: string }
+  >(({ children, className, ...props }, ref) => (
+    <div ref={ref} data-radix-scroll-area-scrollbar className={className} {...props}>
+      {children}
+    </div>
+  ));
+  MockScrollbar.displayName = "ScrollAreaScrollbar";
+
+  const MockThumb = React.forwardRef<HTMLDivElement, { className?: string }>(
+    ({ className, ...props }, ref) => (
+      <div ref={ref} data-radix-scroll-area-thumb className={className} {...props} />
+    )
+  );
+  MockThumb.displayName = "ScrollAreaThumb";
+
+  const MockCorner = React.forwardRef<HTMLDivElement, { className?: string }>(
+    ({ className, ...props }, ref) => (
+      <div ref={ref} data-radix-scroll-area-corner className={className} {...props} />
+    )
+  );
+  MockCorner.displayName = "ScrollAreaCorner";
+
+  return {
+    Root: MockRoot,
+    Viewport: MockViewport,
+    ScrollAreaScrollbar: MockScrollbar,
+    ScrollAreaThumb: MockThumb,
+    Corner: MockCorner,
+  };
+});
 
 // Suppress console during tests unless DEBUG is set
 if (!process.env.DEBUG) {
