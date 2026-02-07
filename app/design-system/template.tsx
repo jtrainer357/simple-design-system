@@ -7,7 +7,7 @@ import { Toaster } from "@/design-system/components/ui/toaster";
 import { TooltipProvider } from "@/design-system/components/ui/tooltip";
 import { AnimatedBackground } from "@/design-system/components/ui/animated-background";
 
-export function DesignSystemWrapper({ children }: { children: React.ReactNode }) {
+export default function DesignSystemTemplate({ children }: { children: React.ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
 
   return (
