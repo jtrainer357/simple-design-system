@@ -6,7 +6,7 @@ import { Input } from "@/design-system/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/design-system/components/ui/avatar";
 import { Text } from "@/design-system/components/ui/typography";
 import { cn } from "@/design-system/lib/utils";
-import { ScrollArea } from "@/design-system/components/ui/scroll-area";
+import { VirtualList } from "@/src/components/ui/VirtualList";
 
 export type PatientStatus = "ACTIVE" | "INACTIVE" | "NEW";
 
@@ -57,55 +57,66 @@ export function PatientRoster({
         </div>
       </div>
 
-      {/* Patient List */}
-      <ScrollArea className="flex-1 px-2">
-        <div className="space-y-1 pb-4">
-          {filteredPatients.map((patient) => {
-            const initials = patient.name
-              .split(" ")
-              .map((n) => n[0])
-              .join("");
-            const isSelected = selectedPatientId === patient.id;
-
-            return (
-              <button
-                key={patient.id}
-                type="button"
-                onClick={() => onPatientSelect?.(patient)}
-                className={cn(
-                  "flex w-full items-center gap-3 rounded-lg p-3 text-left transition-all",
-                  "hover:bg-accent/50",
-                  "focus-visible:ring-teal focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
-                  isSelected && "bg-accent border-selected-border border"
-                )}
-              >
-                <Avatar className="h-10 w-10 shrink-0">
-                  {patient.avatarSrc && <AvatarImage src={patient.avatarSrc} alt={patient.name} />}
-                  <AvatarFallback className="bg-avatar-fallback text-xs font-medium text-white">
-                    {initials}
-                  </AvatarFallback>
-                </Avatar>
-
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="text-foreground-strong truncate text-sm font-semibold">
-                      {patient.name}
-                    </span>
-                  </div>
-                  <Text size="xs" muted className="mt-0.5">
-                    Age {patient.age} &bull; {patient.dob}
-                  </Text>
-                </div>
-              </button>
-            );
-          })}
-          {filteredPatients.length === 0 && (
-            <Text size="sm" muted className="py-8 text-center">
-              No patients found
-            </Text>
-          )}
+      {/* Patient List - Virtualized for performance with large patient lists */}
+      {filteredPatients.length === 0 ? (
+        <div className="flex-1 px-2">
+          <Text size="sm" muted className="py-8 text-center">
+            No patients found
+          </Text>
         </div>
-      </ScrollArea>
+      ) : (
+        <div className="flex-1 px-2">
+          <VirtualList
+            items={filteredPatients}
+            estimateSize={64}
+            overscan={5}
+            gap={4}
+            height="100%"
+            className="pb-4"
+            aria-label="Patient list"
+            renderItem={(patient) => {
+              const initials = patient.name
+                .split(" ")
+                .map((n) => n[0])
+                .join("");
+              const isSelected = selectedPatientId === patient.id;
+
+              return (
+                <button
+                  type="button"
+                  onClick={() => onPatientSelect?.(patient)}
+                  className={cn(
+                    "flex w-full items-center gap-3 rounded-lg p-3 text-left transition-all",
+                    "hover:bg-accent/50",
+                    "focus-visible:ring-teal focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2",
+                    isSelected && "bg-accent border-selected-border border"
+                  )}
+                >
+                  <Avatar className="h-10 w-10 shrink-0">
+                    {patient.avatarSrc && (
+                      <AvatarImage src={patient.avatarSrc} alt={patient.name} />
+                    )}
+                    <AvatarFallback className="bg-avatar-fallback text-xs font-medium text-white">
+                      {initials}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-foreground-strong truncate text-sm font-semibold">
+                        {patient.name}
+                      </span>
+                    </div>
+                    <Text size="xs" muted className="mt-0.5">
+                      Age {patient.age} &bull; {patient.dob}
+                    </Text>
+                  </div>
+                </button>
+              );
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
