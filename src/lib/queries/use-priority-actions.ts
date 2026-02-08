@@ -11,8 +11,13 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { createClient } from "@/src/lib/supabase/client";
 import { createLogger } from "@/src/lib/logger";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
-import type { UrgencyLevel, SuggestedAction, SnoozeDuration, TimeFrame } from "@/src/lib/triggers";
-import { getSnoozedUntil } from "@/src/lib/triggers";
+import {
+  UrgencyLevel,
+  getSnoozedUntil,
+  type SuggestedAction,
+  type SnoozeDuration,
+  type TimeFrame,
+} from "@/src/lib/triggers";
 import type { PriorityActionData, ActionPatient } from "@/src/components/substrate";
 
 const log = createLogger("queries/use-priority-actions");
@@ -54,14 +59,14 @@ interface RawPriorityAction {
 }
 
 /**
- * Normalize urgency to lowercase enum value
+ * Normalize urgency to UrgencyLevel enum
  */
 function normalizeUrgency(urgency: string): UrgencyLevel {
   const lower = urgency.toLowerCase();
-  if (lower === "urgent") return "urgent";
-  if (lower === "high") return "high";
-  if (lower === "medium") return "medium";
-  return "low";
+  if (lower === "urgent") return UrgencyLevel.URGENT;
+  if (lower === "high") return UrgencyLevel.HIGH;
+  if (lower === "medium") return UrgencyLevel.MEDIUM;
+  return UrgencyLevel.LOW;
 }
 
 /**
@@ -300,7 +305,7 @@ export function useSnoozeAction(practiceId: string = DEMO_PRACTICE_ID) {
         .eq("practice_id", practiceId);
 
       if (error) {
-        log.error("Failed to snooze action", error, { actionId, duration });
+        log.error("Failed to snooze action", error, { actionId, snoozeDuration: String(duration) });
         throw error;
       }
     },

@@ -135,7 +135,7 @@ export function PriorityActionCard({
   const [isExpanded, setIsExpanded] = React.useState(defaultExpanded);
   const [isCompleting, setIsCompleting] = React.useState(false);
   const [showSnoozeOptions, setShowSnoozeOptions] = React.useState(false);
-  const { showToast } = useToast();
+  const { success: showSuccess, error: showError, info: showInfo } = useToast();
 
   const Icon = getIconFromTitle(title);
 
@@ -143,9 +143,9 @@ export function PriorityActionCard({
     setIsCompleting(true);
     try {
       await onComplete?.(id);
-      showToast({ type: "success", message: "Action completed" });
+      showSuccess("Action completed");
     } catch {
-      showToast({ type: "error", message: "Failed to complete action" });
+      showError("Failed to complete action");
     } finally {
       setIsCompleting(false);
     }
@@ -153,7 +153,7 @@ export function PriorityActionCard({
 
   const handleDismiss = () => {
     onDismiss?.(id);
-    showToast({ type: "info", message: "Action dismissed" });
+    showInfo("Action dismissed");
   };
 
   const handleSnooze = (duration: SnoozeDuration) => {
@@ -164,12 +164,12 @@ export function PriorityActionCard({
       "3d": "3 days",
       "1w": "1 week",
     };
-    showToast({ type: "info", message: `Snoozed for ${durationLabels[duration]}` });
+    showInfo(`Snoozed for ${durationLabels[duration]}`);
   };
 
   const handleActionClick = (action: SuggestedAction) => {
     onActionClick?.(action);
-    showToast({ type: "success", message: `${action.label} initiated` });
+    showSuccess(`${action.label} initiated`);
   };
 
   return (

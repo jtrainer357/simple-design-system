@@ -51,7 +51,10 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
-      log.error("Failed to fetch priority actions", error, { practiceId, patientId });
+      log.error("Failed to fetch priority actions", error, {
+        practiceId,
+        patientId: patientId ?? undefined,
+      });
       return NextResponse.json({ error: "Failed to fetch actions" }, { status: 500 });
     }
 
