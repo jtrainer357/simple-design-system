@@ -98,8 +98,8 @@ const STATUS_STYLES: Record<
     icon: <CheckCircle className="h-4 w-4" />,
   },
   "Checked-In": {
-    bg: "bg-purple-100 dark:bg-purple-900/30",
-    text: "text-purple-700 dark:text-purple-300",
+    bg: "bg-teal-100 dark:bg-teal-900/30",
+    text: "text-teal-700 dark:text-teal-300",
     icon: <User className="h-4 w-4" />,
   },
   "In Session": {

@@ -805,10 +805,7 @@ import { Card } from '@/design-system/components/ui/card'`}
               Cards support three opacity levels for different use cases.
             </p>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <div
-                className="rounded-lg border p-6"
-                style={{ background: "linear-gradient(135deg, #E8F5E9 0%, #C8E6C9 100%)" }}
-              >
+              <div className="rounded-lg border bg-gradient-to-br from-emerald-50 to-emerald-100 p-6">
                 <div className="space-y-4">
                   <Card opacity="default" className="p-4">
                     <p className="font-medium">Default (90% opacity)</p>

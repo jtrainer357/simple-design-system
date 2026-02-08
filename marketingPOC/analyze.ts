@@ -48,7 +48,8 @@ export async function analyzeProvider(
   const genAI = new GoogleGenerativeAI(apiKey);
 
   // Build tool config for Google Search grounding
-  const tools: any[] = enableGrounding
+  // Using unknown[] since Gemini SDK tool types are complex and version-dependent
+  const tools: unknown[] = enableGrounding
     ? [
         {
           googleSearchRetrieval: {
@@ -64,7 +65,8 @@ export async function analyzeProvider(
   const model = genAI.getGenerativeModel({
     model: GEMINI_MODEL,
     systemInstruction: SYSTEM_INSTRUCTION,
-    tools,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    tools: tools as any,
     generationConfig: {
       temperature: 0.2, // Low temp for factual analysis
       maxOutputTokens: 8192,
@@ -93,9 +95,10 @@ export async function analyzeProvider(
         const groundingMeta = candidate?.groundingMetadata;
         if (groundingMeta) {
           console.log(`   🌐 Grounding: ${groundingMeta.searchEntryPoint ? "Active" : "Passive"}`);
-          // Note: SDK has typo 'groundingChuncks' in type defs
-          const chunks =
-            (groundingMeta as any).groundingChunks ?? (groundingMeta as any).groundingChuncks;
+          // Note: SDK has typo 'groundingChuncks' in type defs - use type assertion with Record
+          const groundingMetaRecord = groundingMeta as unknown as Record<string, unknown>;
+          const chunks = (groundingMetaRecord.groundingChunks ??
+            groundingMetaRecord.groundingChuncks) as unknown[] | undefined;
           if (chunks) {
             console.log(`   📚 Sources: ${chunks.length} grounding chunks`);
           }
@@ -141,7 +144,7 @@ export async function analyzeProvider(
 
 // ─── JSON Parsing ────────────────────────────────────────────────────
 
-function parseJsonResponse(text: string): any {
+function parseJsonResponse(text: string): unknown {
   // Strip markdown code fences
   let cleaned = text.trim();
 
@@ -173,7 +176,19 @@ function parseJsonResponse(text: string): any {
 
 // ─── Validation ──────────────────────────────────────────────────────
 
-function validateAndFixScore(data: any, provider: ProviderInput): ProviderDiscoveryScore {
+interface RawScoreData {
+  provider?: Partial<ProviderInput>;
+  seo?: { score?: number; directoryPresence?: unknown[]; signals?: string[] };
+  geo?: { score?: number; signals?: string[] };
+  aio?: { score?: number; signals?: string[] };
+  competitors?: unknown[];
+  recommendations?: unknown[];
+  analyzedAt?: string;
+  [key: string]: unknown;
+}
+
+function validateAndFixScore(rawData: unknown, provider: ProviderInput): ProviderDiscoveryScore {
+  const data = (rawData ?? {}) as RawScoreData;
   // Ensure provider info is correct
   data.provider = { ...provider, ...data.provider };
 
@@ -191,7 +206,7 @@ function validateAndFixScore(data: any, provider: ProviderInput): ProviderDiscov
   data.aio.score = aioScore;
 
   data.compositeScore = calculateComposite(seoScore, geoScore, aioScore);
-  data.tier = calculateTier(data.compositeScore);
+  data.tier = calculateTier(data.compositeScore as number);
 
   // Ensure arrays exist
   data.competitors = data.competitors || [];
@@ -204,7 +219,7 @@ function validateAndFixScore(data: any, provider: ProviderInput): ProviderDiscov
   // Ensure timestamp
   data.analyzedAt = data.analyzedAt || new Date().toISOString();
 
-  return data as ProviderDiscoveryScore;
+  return data as unknown as ProviderDiscoveryScore;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────

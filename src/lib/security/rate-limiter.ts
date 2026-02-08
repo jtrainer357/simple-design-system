@@ -3,6 +3,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/src/lib/logger";
 
 export interface RateLimitConfig {
   requests: number;
@@ -140,7 +141,12 @@ export function rateLimitMiddleware(
   const path = new URL(request.url).pathname;
   const result = checkRateLimit(ip, userId || null, path);
   if (!result.allowed) {
-    console.warn("[Rate Limit] Blocked:", { ip, userId, path });
+    logger.warn("Rate limit exceeded", {
+      module: "RateLimiter",
+      ip: ip ?? undefined,
+      userId: userId ?? undefined,
+      path,
+    });
     return createRateLimitResponse(result);
   }
   return null;

@@ -123,7 +123,7 @@ const categoryColors: Record<string, string> = {
   appointments: "bg-green-100 text-green-800",
   documents: "bg-orange-100 text-orange-800",
   insurance: "bg-cyan-100 text-cyan-800",
-  messages: "bg-indigo-100 text-indigo-800",
+  messages: "bg-teal-100 text-teal-800",
   billing: "bg-emerald-100 text-emerald-800",
   clinical: "bg-rose-100 text-rose-800",
   access: "bg-gray-100 text-gray-800",

@@ -183,7 +183,7 @@ function ScoreBar({ score, label }: { score: number; label: string }) {
 
 function TierBadge({ tier }: { tier: string }) {
   const colors: Record<string, string> = {
-    S: "bg-purple-500 text-white",
+    S: "bg-teal-500 text-white",
     A: "bg-emerald-500 text-white",
     B: "bg-sky-500 text-white",
     C: "bg-amber-500 text-white",
@@ -309,7 +309,7 @@ function RecommendationList({ recommendations }: { recommendations: Recommendati
 
   const categoryColors: Record<string, string> = {
     seo: "bg-blue-100 text-blue-700",
-    geo: "bg-purple-100 text-purple-700",
+    geo: "bg-cyan-100 text-cyan-700",
     aio: "bg-teal-100 text-teal-700",
   };
 
@@ -666,7 +666,7 @@ export default function MarketingTestPage() {
 
                               <div className="space-y-3">
                                 <div className="flex items-center gap-2 font-medium">
-                                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-100 text-sm font-bold text-purple-700">
+                                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-100 text-sm font-bold text-cyan-700">
                                     {result.geo.score}
                                   </span>
                                   GEO - AI Citability
