@@ -1,21 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { Button } from "@/design-system/components/ui/button";
 import { Input } from "@/design-system/components/ui/input";
 import { Label } from "@/design-system/components/ui/label";
 import { Checkbox } from "@/design-system/components/ui/checkbox";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/design-system/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -23,671 +15,415 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/design-system/components/ui/select";
-import { Alert, AlertDescription } from "@/design-system/components/ui/alert";
 import {
-  AlertCircle,
-  Eye,
-  EyeOff,
   Loader2,
+  Mail,
+  Lock,
+  User,
+  Building2,
+  Phone,
+  MapPin,
   Check,
-  X,
-  ArrowRight,
-  ArrowLeft,
+  AlertCircle,
 } from "lucide-react";
+import { cn } from "@/design-system/lib/utils";
 
-// Password requirements
-const PASSWORD_REQUIREMENTS = [
-  { label: "At least 12 characters", test: (p: string) => p.length >= 12 },
-  { label: "One uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
-  { label: "One lowercase letter", test: (p: string) => /[a-z]/.test(p) },
-  { label: "One number", test: (p: string) => /[0-9]/.test(p) },
-  {
-    label: "One special character",
-    test: (p: string) => /[!@#$%^&*(),.?":{}|<>]/.test(p),
-  },
-];
-
-// Practice specialties
-const SPECIALTIES = [
-  "Individual Therapy",
-  "Group Practice",
-  "Psychiatry",
-  "Counseling Center",
-  "Substance Abuse",
-  "Child/Adolescent",
-  "Couples/Family",
-];
-
-// US States
 const US_STATES = [
-  "Alabama",
-  "Alaska",
-  "Arizona",
-  "Arkansas",
-  "California",
-  "Colorado",
-  "Connecticut",
-  "Delaware",
-  "Florida",
-  "Georgia",
-  "Hawaii",
-  "Idaho",
-  "Illinois",
-  "Indiana",
-  "Iowa",
-  "Kansas",
-  "Kentucky",
-  "Louisiana",
-  "Maine",
-  "Maryland",
-  "Massachusetts",
-  "Michigan",
-  "Minnesota",
-  "Mississippi",
-  "Missouri",
-  "Montana",
-  "Nebraska",
-  "Nevada",
-  "New Hampshire",
-  "New Jersey",
-  "New Mexico",
-  "New York",
-  "North Carolina",
-  "North Dakota",
-  "Ohio",
-  "Oklahoma",
-  "Oregon",
-  "Pennsylvania",
-  "Rhode Island",
-  "South Carolina",
-  "South Dakota",
-  "Tennessee",
-  "Texas",
-  "Utah",
-  "Vermont",
-  "Virginia",
-  "Washington",
-  "West Virginia",
-  "Wisconsin",
-  "Wyoming",
+  { value: "CA", label: "California" },
+  { value: "NY", label: "New York" },
+  { value: "TX", label: "Texas" },
+  { value: "FL", label: "Florida" },
+  { value: "IL", label: "Illinois" },
+  { value: "PA", label: "Pennsylvania" },
+  { value: "OH", label: "Ohio" },
+  { value: "GA", label: "Georgia" },
+  { value: "NC", label: "North Carolina" },
+  { value: "MI", label: "Michigan" },
+];
+const SPECIALTIES = [
+  { value: "psychiatry", label: "Psychiatry" },
+  { value: "psychology", label: "Psychology" },
+  { value: "counseling", label: "Counseling" },
+  { value: "clinical_social_work", label: "Clinical Social Work" },
+  { value: "marriage_family", label: "Marriage & Family Therapy" },
 ];
 
-type SignupStep = 1 | 2;
-type SignupError = "email_exists" | "network" | "validation" | null;
-
-const ERROR_MESSAGES: Record<Exclude<SignupError, null>, string> = {
-  email_exists: "An account with this email already exists.",
-  network: "Unable to connect. Please check your internet connection.",
-  validation: "Please fix the errors above and try again.",
-};
-
-interface FormData {
-  fullName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  practiceName: string;
-  specialty: string;
-  state: string;
-  acceptBaa: boolean;
-  acceptTerms: boolean;
-  acceptPrivacy: boolean;
+function checkPasswordStrength(password: string) {
+  const requirements = [
+    { met: password.length >= 12, text: "At least 12 characters" },
+    { met: /[A-Z]/.test(password), text: "One uppercase letter" },
+    { met: /[a-z]/.test(password), text: "One lowercase letter" },
+    { met: /[0-9]/.test(password), text: "One number" },
+    { met: /[^A-Za-z0-9]/.test(password), text: "One special character" },
+  ];
+  const metCount = requirements.filter((r) => r.met).length;
+  const score = Math.min(metCount, 4);
+  const labels = ["Very Weak", "Weak", "Fair", "Good", "Strong"];
+  const colors = ["bg-red-500", "bg-orange-500", "bg-yellow-500", "bg-blue-500", "bg-green-500"];
+  return { score, label: labels[score], color: colors[score], requirements };
 }
 
-function PasswordStrengthIndicator({ password }: { password: string }) {
-  const results = PASSWORD_REQUIREMENTS.map((req) => ({
-    ...req,
-    passed: req.test(password),
-  }));
-  const passedCount = results.filter((r) => r.passed).length;
-  const strength = passedCount / PASSWORD_REQUIREMENTS.length;
-
-  const getStrengthColor = () => {
-    if (strength === 0) return "bg-muted";
-    if (strength < 0.4) return "bg-destructive";
-    if (strength < 0.8) return "bg-warning";
-    return "bg-success";
-  };
-
-  const getStrengthLabel = () => {
-    if (strength === 0) return "";
-    if (strength < 0.4) return "Weak";
-    if (strength < 0.8) return "Fair";
-    if (strength < 1) return "Good";
-    return "Strong";
-  };
-
-  return (
-    <div className="mt-2 space-y-2">
-      <div className="flex items-center gap-2">
-        <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
-          <div
-            className={`h-full transition-all duration-300 ${getStrengthColor()}`}
-            style={{ width: `${strength * 100}%` }}
-          />
-        </div>
-        <span className="text-xs font-medium text-muted-foreground">
-          {getStrengthLabel()}
-        </span>
-      </div>
-      <ul className="grid grid-cols-1 gap-1 text-xs sm:grid-cols-2">
-        {results.map((req) => (
-          <li
-            key={req.label}
-            className={`flex items-center gap-1.5 ${
-              req.passed ? "text-success" : "text-muted-foreground"
-            }`}
-          >
-            {req.passed ? <Check className="h-3 w-3" /> : <X className="h-3 w-3" />}
-            {req.label}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
+type Step = 1 | 2;
 
 export default function SignupPage() {
   const router = useRouter();
-  const [step, setStep] = useState<SignupStep>(1);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<SignupError>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [step, setStep] = React.useState<Step>(1);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [formError, setFormError] = React.useState<string | null>(null);
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [firstName, setFirstName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
+  const [phone, setPhone] = React.useState("");
+  const [practiceName, setPracticeName] = React.useState("");
+  const [specialty, setSpecialty] = React.useState("");
+  const [state, setState] = React.useState("");
+  const [npi, setNpi] = React.useState("");
+  const [acceptedTerms, setAcceptedTerms] = React.useState(false);
+  const [acceptedBaa, setAcceptedBaa] = React.useState(false);
 
-  const [formData, setFormData] = useState<FormData>({
-    fullName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    practiceName: "",
-    specialty: "",
-    state: "",
-    acceptBaa: false,
-    acceptTerms: false,
-    acceptPrivacy: false,
-  });
+  const passwordStrength = checkPasswordStrength(password);
+  const passwordsMatch = password === confirmPassword;
+  const isStep1Valid =
+    email &&
+    password &&
+    confirmPassword &&
+    firstName &&
+    lastName &&
+    passwordsMatch &&
+    passwordStrength.score >= 3;
+  const isStep2Valid = practiceName && specialty && state && acceptedTerms && acceptedBaa;
 
-  const [fieldErrors, setFieldErrors] = useState<
-    Partial<Record<keyof FormData, string>>
-  >({});
-
-  const updateField = <K extends keyof FormData>(field: K, value: FormData[K]) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-    if (fieldErrors[field]) {
-      setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
-    }
-  };
-
-  const isPasswordValid = useMemo(() => {
-    return PASSWORD_REQUIREMENTS.every((req) => req.test(formData.password));
-  }, [formData.password]);
-
-  const validateStep1 = (): boolean => {
-    const errors: Partial<Record<keyof FormData, string>> = {};
-
-    if (!formData.fullName.trim()) {
-      errors.fullName = "Full name is required";
-    }
-
-    if (!formData.email.trim()) {
-      errors.email = "Email is required";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      errors.email = "Please enter a valid email address";
-    }
-
-    if (!formData.password) {
-      errors.password = "Password is required";
-    } else if (!isPasswordValid) {
-      errors.password = "Password does not meet all requirements";
-    }
-
-    if (!formData.confirmPassword) {
-      errors.confirmPassword = "Please confirm your password";
-    } else if (formData.password !== formData.confirmPassword) {
-      errors.confirmPassword = "Passwords do not match";
-    }
-
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const validateStep2 = (): boolean => {
-    const errors: Partial<Record<keyof FormData, string>> = {};
-
-    if (!formData.practiceName.trim()) {
-      errors.practiceName = "Practice name is required";
-    }
-
-    if (!formData.specialty) {
-      errors.specialty = "Please select a specialty";
-    }
-
-    if (!formData.state) {
-      errors.state = "Please select a state";
-    }
-
-    if (!formData.acceptBaa) {
-      errors.acceptBaa = "You must accept the BAA to continue";
-    }
-
-    if (!formData.acceptTerms) {
-      errors.acceptTerms = "You must accept the Terms of Service";
-    }
-
-    if (!formData.acceptPrivacy) {
-      errors.acceptPrivacy = "You must accept the Privacy Policy";
-    }
-
-    setFieldErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const handleNextStep = () => {
-    if (validateStep1()) {
-      setStep(2);
-      setError(null);
-    }
-  };
-
-  const handlePrevStep = () => {
-    setStep(1);
-    setError(null);
+  const handleStep1Submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (isStep1Valid) setStep(2);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-
-    if (!validateStep2()) {
-      setError("validation");
-      return;
-    }
-
+    if (!isStep2Valid) return;
     setIsLoading(true);
-
+    setFormError(null);
     try {
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          fullName: formData.fullName.trim(),
-          email: formData.email.toLowerCase().trim(),
-          password: formData.password,
-          practiceName: formData.practiceName.trim(),
-          specialty: formData.specialty,
-          state: formData.state,
+          email,
+          password,
+          firstName,
+          lastName,
+          phone,
+          practiceName,
+          specialty,
+          state,
+          npi,
         }),
       });
-
       const data = await response.json();
-
-      if (!response.ok) {
-        if (data.error?.includes("exists") || data.error?.includes("duplicate")) {
-          setError("email_exists");
-        } else {
-          setError("network");
-        }
-        setIsLoading(false);
-        return;
-      }
-
-      router.push("/home");
-    } catch {
-      setError("network");
+      if (!response.ok) throw new Error(data.error || "Failed to create account");
+      router.push("/login?registered=true");
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : "An error occurred");
+    } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-8">
-      <div className="w-full max-w-md space-y-8">
-        <div className="flex justify-center">
-          <Image
-            src="/tebra-logo.svg"
-            alt="Tebra Mental Health"
-            width={140}
-            height={34}
-            priority
-          />
+    <div className="flex min-h-screen flex-col items-center justify-center px-4 py-12">
+      <div className="w-full max-w-lg space-y-8">
+        <div className="flex flex-col items-center">
+          <Image src="/tebra-logo.svg" alt="Tebra Mental Health" width={150} height={36} priority />
+          <h1 className="mt-6 text-2xl font-bold text-gray-900">Create your account</h1>
+          <p className="text-muted-foreground mt-2 text-sm">Get started with Tebra Mental Health</p>
         </div>
-
-        <Card opacity="solid" className="shadow-lg">
-          <CardHeader className="space-y-1 text-center">
-            <CardTitle className="text-2xl font-semibold tracking-tight">
-              Create your account
-            </CardTitle>
-            <CardDescription>
-              {step === 1 ? "Step 1 of 2: Account details" : "Step 2 of 2: Practice setup"}
-            </CardDescription>
-            <div className="flex justify-center gap-2 pt-2">
-              <div
-                className={`h-1.5 w-12 rounded-full ${step >= 1 ? "bg-primary" : "bg-muted"}`}
-              />
-              <div
-                className={`h-1.5 w-12 rounded-full ${step >= 2 ? "bg-primary" : "bg-muted"}`}
-              />
-            </div>
-          </CardHeader>
-          <CardContent>
-            {error && (
-              <Alert variant="destructive" className="mb-4">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{ERROR_MESSAGES[error]}</AlertDescription>
-              </Alert>
-            )}
-
-            <form
-              onSubmit={
-                step === 2
-                  ? handleSubmit
-                  : (e) => {
-                      e.preventDefault();
-                      handleNextStep();
-                    }
-              }
-            >
-              {step === 1 ? (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName">Full Name</Label>
-                    <Input
-                      id="fullName"
-                      type="text"
-                      placeholder="Dr. Jane Smith"
-                      value={formData.fullName}
-                      onChange={(e) => updateField("fullName", e.target.value)}
-                      disabled={isLoading}
-                      className={fieldErrors.fullName ? "border-destructive" : ""}
-                      autoComplete="name"
-                    />
-                    {fieldErrors.fullName && (
-                      <p className="text-sm text-destructive">{fieldErrors.fullName}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@practice.com"
-                      value={formData.email}
-                      onChange={(e) => updateField("email", e.target.value)}
-                      disabled={isLoading}
-                      className={fieldErrors.email ? "border-destructive" : ""}
-                      autoComplete="email"
-                    />
-                    {fieldErrors.email && (
-                      <p className="text-sm text-destructive">{fieldErrors.email}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type={showPassword ? "text" : "password"}
-                        placeholder="Create a strong password"
-                        value={formData.password}
-                        onChange={(e) => updateField("password", e.target.value)}
-                        disabled={isLoading}
-                        className={`pr-10 ${fieldErrors.password ? "border-destructive" : ""}`}
-                        autoComplete="new-password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                        aria-label={showPassword ? "Hide password" : "Show password"}
-                      >
-                        {showPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                    <PasswordStrengthIndicator password={formData.password} />
-                    {fieldErrors.password && (
-                      <p className="text-sm text-destructive">{fieldErrors.password}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
-                    <div className="relative">
-                      <Input
-                        id="confirmPassword"
-                        type={showConfirmPassword ? "text" : "password"}
-                        placeholder="Confirm your password"
-                        value={formData.confirmPassword}
-                        onChange={(e) => updateField("confirmPassword", e.target.value)}
-                        disabled={isLoading}
-                        className={`pr-10 ${fieldErrors.confirmPassword ? "border-destructive" : ""}`}
-                        autoComplete="new-password"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                        aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                      >
-                        {showConfirmPassword ? (
-                          <EyeOff className="h-4 w-4" />
-                        ) : (
-                          <Eye className="h-4 w-4" />
-                        )}
-                      </button>
-                    </div>
-                    {fieldErrors.confirmPassword && (
-                      <p className="text-sm text-destructive">{fieldErrors.confirmPassword}</p>
-                    )}
-                  </div>
-
-                  <Button type="submit" className="h-12 w-full" disabled={isLoading}>
-                    Continue
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="practiceName">Practice Name</Label>
-                    <Input
-                      id="practiceName"
-                      type="text"
-                      placeholder="Serenity Mental Health"
-                      value={formData.practiceName}
-                      onChange={(e) => updateField("practiceName", e.target.value)}
-                      disabled={isLoading}
-                      className={fieldErrors.practiceName ? "border-destructive" : ""}
-                      autoComplete="organization"
-                    />
-                    {fieldErrors.practiceName && (
-                      <p className="text-sm text-destructive">{fieldErrors.practiceName}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="specialty">Specialty</Label>
-                    <Select
-                      value={formData.specialty}
-                      onValueChange={(value) => updateField("specialty", value)}
-                      disabled={isLoading}
-                    >
-                      <SelectTrigger
-                        id="specialty"
-                        className={fieldErrors.specialty ? "border-destructive" : ""}
-                      >
-                        <SelectValue placeholder="Select your specialty" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {SPECIALTIES.map((specialty) => (
-                          <SelectItem key={specialty} value={specialty}>
-                            {specialty}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {fieldErrors.specialty && (
-                      <p className="text-sm text-destructive">{fieldErrors.specialty}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="state">State</Label>
-                    <Select
-                      value={formData.state}
-                      onValueChange={(value) => updateField("state", value)}
-                      disabled={isLoading}
-                    >
-                      <SelectTrigger
-                        id="state"
-                        className={fieldErrors.state ? "border-destructive" : ""}
-                      >
-                        <SelectValue placeholder="Select your state" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {US_STATES.map((state) => (
-                          <SelectItem key={state} value={state}>
-                            {state}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {fieldErrors.state && (
-                      <p className="text-sm text-destructive">{fieldErrors.state}</p>
-                    )}
-                  </div>
-
-                  <div className="space-y-3 pt-2">
-                    <div className="flex items-start space-x-2">
-                      <Checkbox
-                        id="acceptBaa"
-                        checked={formData.acceptBaa}
-                        onCheckedChange={(checked) =>
-                          updateField("acceptBaa", checked === true)
-                        }
-                        disabled={isLoading}
-                        className="mt-0.5"
-                      />
-                      <div>
-                        <Label
-                          htmlFor="acceptBaa"
-                          className="cursor-pointer text-sm font-normal"
-                        >
-                          I accept the{" "}
-                          <Link
-                            href="/baa"
-                            className="text-teal-dark hover:underline"
-                            target="_blank"
-                          >
-                            Business Associate Agreement (BAA)
-                          </Link>
-                        </Label>
-                        {fieldErrors.acceptBaa && (
-                          <p className="text-sm text-destructive">{fieldErrors.acceptBaa}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-start space-x-2">
-                      <Checkbox
-                        id="acceptTerms"
-                        checked={formData.acceptTerms}
-                        onCheckedChange={(checked) =>
-                          updateField("acceptTerms", checked === true)
-                        }
-                        disabled={isLoading}
-                        className="mt-0.5"
-                      />
-                      <div>
-                        <Label
-                          htmlFor="acceptTerms"
-                          className="cursor-pointer text-sm font-normal"
-                        >
-                          I accept the{" "}
-                          <Link
-                            href="/terms"
-                            className="text-teal-dark hover:underline"
-                            target="_blank"
-                          >
-                            Terms of Service
-                          </Link>
-                        </Label>
-                        {fieldErrors.acceptTerms && (
-                          <p className="text-sm text-destructive">{fieldErrors.acceptTerms}</p>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex items-start space-x-2">
-                      <Checkbox
-                        id="acceptPrivacy"
-                        checked={formData.acceptPrivacy}
-                        onCheckedChange={(checked) =>
-                          updateField("acceptPrivacy", checked === true)
-                        }
-                        disabled={isLoading}
-                        className="mt-0.5"
-                      />
-                      <div>
-                        <Label
-                          htmlFor="acceptPrivacy"
-                          className="cursor-pointer text-sm font-normal"
-                        >
-                          I accept the{" "}
-                          <Link
-                            href="/privacy"
-                            className="text-teal-dark hover:underline"
-                            target="_blank"
-                          >
-                            Privacy Policy
-                          </Link>
-                        </Label>
-                        {fieldErrors.acceptPrivacy && (
-                          <p className="text-sm text-destructive">{fieldErrors.acceptPrivacy}</p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-3 pt-2">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handlePrevStep}
-                      disabled={isLoading}
-                      className="h-12 flex-1"
-                    >
-                      <ArrowLeft className="mr-2 h-4 w-4" />
-                      Back
-                    </Button>
-                    <Button type="submit" className="h-12 flex-1" disabled={isLoading}>
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Creating...
-                        </>
-                      ) : (
-                        "Create Account"
-                      )}
-                    </Button>
-                  </div>
-                </div>
+        <div className="flex items-center justify-center gap-4">
+          <div className="flex items-center gap-2">
+            <div
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium",
+                step >= 1 ? "bg-teal-dark text-white" : "bg-gray-200 text-gray-500"
               )}
-            </form>
-
-            <div className="mt-6 text-center text-sm">
-              <span className="text-muted-foreground">Already have an account? </span>
-              <Link href="/login" className="font-medium text-teal-dark hover:underline">
-                Sign in
-              </Link>
+            >
+              {step > 1 ? <Check className="h-4 w-4" /> : "1"}
             </div>
-          </CardContent>
-        </Card>
+            <span className="text-sm font-medium">Account</span>
+          </div>
+          <div className="h-px w-12 bg-gray-300" />
+          <div className="flex items-center gap-2">
+            <div
+              className={cn(
+                "flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium",
+                step >= 2 ? "bg-teal-dark text-white" : "bg-gray-200 text-gray-500"
+              )}
+            >
+              2
+            </div>
+            <span className="text-sm font-medium">Practice</span>
+          </div>
+        </div>
+        <div className="rounded-xl border bg-white p-8 shadow-sm">
+          {formError && (
+            <div className="border-destructive/20 bg-destructive/10 mb-6 flex items-start gap-3 rounded-lg border p-4">
+              <AlertCircle className="text-destructive mt-0.5 h-5 w-5 shrink-0" />
+              <p className="text-destructive text-sm">{formError}</p>
+            </div>
+          )}
+          {step === 1 && (
+            <form onSubmit={handleStep1Submit} className="space-y-5">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">First Name</Label>
+                  <div className="relative">
+                    <User className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                    <Input
+                      id="firstName"
+                      placeholder="Jane"
+                      value={firstName}
+                      onChange={(e) => setFirstName(e.target.value)}
+                      className="pl-10"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    placeholder="Doe"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <div className="relative">
+                  <Mail className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="provider@practice.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="phone">Phone Number (Optional)</Label>
+                <div className="relative">
+                  <Phone className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="(555) 123-4567"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="Create a strong password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+                {password && (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-200">
+                        <div
+                          className={cn("h-full transition-all", passwordStrength.color)}
+                          style={{ width: `${(passwordStrength.score / 4) * 100}%` }}
+                        />
+                      </div>
+                      <span className="text-xs font-medium">{passwordStrength.label}</span>
+                    </div>
+                    <ul className="grid grid-cols-2 gap-1">
+                      {passwordStrength.requirements.map((req, i) => (
+                        <li
+                          key={i}
+                          className={cn(
+                            "flex items-center gap-1 text-xs",
+                            req.met ? "text-green-600" : "text-muted-foreground"
+                          )}
+                        >
+                          <Check className={cn("h-3 w-3", !req.met && "opacity-0")} />
+                          {req.text}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <div className="relative">
+                  <Lock className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                  <Input
+                    id="confirmPassword"
+                    type="password"
+                    placeholder="Confirm your password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className={cn(
+                      "pl-10",
+                      confirmPassword && !passwordsMatch && "border-destructive"
+                    )}
+                    required
+                  />
+                </div>
+                {confirmPassword && !passwordsMatch && (
+                  <p className="text-destructive text-xs">Passwords do not match</p>
+                )}
+              </div>
+              <Button type="submit" className="w-full" size="lg" disabled={!isStep1Valid}>
+                Continue to Practice Setup
+              </Button>
+            </form>
+          )}
+          {step === 2 && (
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="practiceName">Practice Name</Label>
+                <div className="relative">
+                  <Building2 className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                  <Input
+                    id="practiceName"
+                    placeholder="Mental Health Associates"
+                    value={practiceName}
+                    onChange={(e) => setPracticeName(e.target.value)}
+                    className="pl-10"
+                    required
+                  />
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="specialty">Primary Specialty</Label>
+                <Select value={specialty} onValueChange={setSpecialty}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select your specialty" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {SPECIALTIES.map((s) => (
+                      <SelectItem key={s.value} value={s.value}>
+                        {s.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="state">Practice State</Label>
+                <div className="relative">
+                  <MapPin className="text-muted-foreground absolute top-1/2 left-3 z-10 h-4 w-4 -translate-y-1/2" />
+                  <Select value={state} onValueChange={setState}>
+                    <SelectTrigger className="pl-10">
+                      <SelectValue placeholder="Select state" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {US_STATES.map((s) => (
+                        <SelectItem key={s.value} value={s.value}>
+                          {s.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="npi">NPI Number (Optional)</Label>
+                <Input
+                  id="npi"
+                  placeholder="1234567890"
+                  value={npi}
+                  onChange={(e) => setNpi(e.target.value)}
+                  maxLength={10}
+                />
+                <p className="text-muted-foreground text-xs">
+                  10-digit National Provider Identifier
+                </p>
+              </div>
+              <div className="space-y-3 pt-2">
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="terms"
+                    checked={acceptedTerms}
+                    onCheckedChange={(checked) => setAcceptedTerms(checked as boolean)}
+                  />
+                  <Label htmlFor="terms" className="text-sm leading-snug font-normal">
+                    I agree to the{" "}
+                    <Link href="/terms" className="text-teal-dark hover:underline" target="_blank">
+                      Terms of Service
+                    </Link>{" "}
+                    and{" "}
+                    <Link
+                      href="/privacy"
+                      className="text-teal-dark hover:underline"
+                      target="_blank"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </Label>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="baa"
+                    checked={acceptedBaa}
+                    onCheckedChange={(checked) => setAcceptedBaa(checked as boolean)}
+                  />
+                  <Label htmlFor="baa" className="text-sm leading-snug font-normal">
+                    I agree to the{" "}
+                    <Link href="/baa" className="text-teal-dark hover:underline" target="_blank">
+                      Business Associate Agreement
+                    </Link>
+                  </Label>
+                </div>
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="flex-1"
+                  onClick={() => setStep(1)}
+                  disabled={isLoading}
+                >
+                  Back
+                </Button>
+                <Button type="submit" className="flex-1" disabled={!isStep2Valid || isLoading}>
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    "Create Account"
+                  )}
+                </Button>
+              </div>
+            </form>
+          )}
+        </div>
+        <p className="text-muted-foreground text-center text-sm">
+          Already have an account?{" "}
+          <Link href="/login" className="text-teal-dark hover:text-teal-dark/80 font-medium">
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );

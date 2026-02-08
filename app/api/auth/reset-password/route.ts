@@ -8,98 +8,41 @@ async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder();
   const data = encoder.encode(password);
   const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-}
-
-interface ResetPasswordRequest {
-  token: string;
-  password: string;
+  return Array.from(new Uint8Array(hashBuffer), (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const body = (await request.json()) as ResetPasswordRequest;
-    const { token, password } = body;
-
-    if (!token) {
-      return NextResponse.json({ error: "Token is required" }, { status: 400 });
-    }
-
-    if (!password) {
-      return NextResponse.json({ error: "Password is required" }, { status: 400 });
-    }
-
-    if (password.length < 12) {
+    const { token, password } = await request.json();
+    if (!token || !password)
+      return NextResponse.json({ error: "Token and password required" }, { status: 400 });
+    if (password.length < 12)
       return NextResponse.json(
         { error: "Password must be at least 12 characters" },
         { status: 400 }
       );
-    }
-
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: { persistSession: false },
     });
-
-    const { data: tokenRecord, error: tokenError } = await supabase
+    const { data: resetToken, error } = await supabase
       .from("password_reset_tokens")
-      .select("id, user_id, expires_at, used_at")
+      .select("id, user_id, expires_at, used")
       .eq("token", token)
       .single();
-
-    if (tokenError || !tokenRecord) {
-      return NextResponse.json({ error: "Invalid reset token" }, { status: 400 });
-    }
-
-    if (tokenRecord.used_at) {
-      return NextResponse.json(
-        { error: "This reset link has already been used" },
-        { status: 400 }
-      );
-    }
-
-    const expiresAt = new Date(tokenRecord.expires_at);
-    if (expiresAt < new Date()) {
-      return NextResponse.json({ error: "This reset link has expired" }, { status: 400 });
-    }
-
+    if (error || !resetToken)
+      return NextResponse.json({ error: "Invalid or expired reset link" }, { status: 400 });
+    if (resetToken.used) return NextResponse.json({ error: "Link already used" }, { status: 400 });
+    if (new Date(resetToken.expires_at) < new Date())
+      return NextResponse.json({ error: "Link expired" }, { status: 400 });
     const passwordHash = await hashPassword(password);
-
-    const { error: updateError } = await supabase
+    await supabase
       .from("users")
-      .update({
-        password_hash: passwordHash,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", tokenRecord.user_id);
-
-    if (updateError) {
-      console.error("[ResetPassword] Password update failed:", updateError);
-      return NextResponse.json({ error: "Failed to update password" }, { status: 500 });
-    }
-
-    await supabase
-      .from("password_reset_tokens")
-      .update({ used_at: new Date().toISOString() })
-      .eq("id", tokenRecord.id);
-
-    await supabase
-      .from("password_reset_tokens")
-      .update({ used_at: new Date().toISOString() })
-      .eq("user_id", tokenRecord.user_id)
-      .is("used_at", null);
-
-    console.info("[ResetPassword] Password reset successful:", {
-      userId: tokenRecord.user_id,
-      timestamp: new Date().toISOString(),
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: "Password has been reset successfully",
-    });
+      .update({ password_hash: passwordHash, updated_at: new Date().toISOString() })
+      .eq("id", resetToken.user_id);
+    await supabase.from("password_reset_tokens").update({ used: true }).eq("id", resetToken.id);
+    return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("[ResetPassword] Unexpected error:", error);
-    return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 });
+    console.error("[ResetPassword] Error:", error);
+    return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
   }
 }
