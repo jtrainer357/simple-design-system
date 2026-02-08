@@ -173,6 +173,7 @@ export default function SchedulePage() {
                 size="icon"
                 onClick={goToPrevious}
                 className="min-h-[44px] min-w-[44px]"
+                aria-label={`Previous ${viewMode}`}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -181,6 +182,7 @@ export default function SchedulePage() {
                 size="icon"
                 onClick={goToNext}
                 className="min-h-[44px] min-w-[44px]"
+                aria-label={`Next ${viewMode}`}
               >
                 <ChevronRight className="h-4 w-4" />
               </Button>

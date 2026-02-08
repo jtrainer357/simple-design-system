@@ -148,6 +148,7 @@ export function ActionOrchestrationModal() {
             {!isExecuting && (
               <button
                 onClick={closeModal}
+                aria-label="Close modal"
                 className="rounded-full p-1.5 text-white/80 transition-colors hover:bg-white/10 hover:text-white"
               >
                 <X className="h-5 w-5" />

@@ -174,6 +174,8 @@ export const PreSessionBriefing = memo(function PreSessionBriefing({
               size="icon"
               onClick={handleToggle}
               className="h-8 w-8 text-white hover:bg-white/20"
+              aria-label={isExpanded ? "Collapse briefing" : "Expand briefing"}
+              aria-expanded={isExpanded}
             >
               {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
             </Button>
@@ -183,6 +185,7 @@ export const PreSessionBriefing = memo(function PreSessionBriefing({
                 size="icon"
                 onClick={onDismiss}
                 className="h-8 w-8 text-white hover:bg-white/20"
+                aria-label="Dismiss briefing"
               >
                 <X className="h-4 w-4" />
               </Button>

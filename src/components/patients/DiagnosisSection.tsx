@@ -215,6 +215,7 @@ export function DiagnosisSection({
                         className="text-destructive h-8 w-8"
                         onClick={() => onRemove(primaryDiagnosis.id)}
                         disabled={isLoading}
+                        aria-label={`Remove diagnosis ${primaryDiagnosis.icd10Code}`}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -249,7 +250,7 @@ export function DiagnosisSection({
                         className="h-8 w-8"
                         onClick={() => handleSetPrimary(diagnosis.id)}
                         disabled={isLoading}
-                        title="Set as primary"
+                        aria-label={`Set ${diagnosis.icd10Code} as primary diagnosis`}
                       >
                         <StarOff className="h-4 w-4" />
                       </Button>
@@ -275,6 +276,7 @@ export function DiagnosisSection({
                         className="text-destructive h-8 w-8"
                         onClick={() => onRemove(diagnosis.id)}
                         disabled={isLoading}
+                        aria-label={`Remove diagnosis ${diagnosis.icd10Code}`}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

@@ -17,6 +17,9 @@ import type { PrioritizedActionWithPatient } from "@/src/lib/supabase/types";
 import type { AppointmentWithPatient } from "@/src/lib/queries/appointments";
 import type { OrchestrationContext } from "@/src/lib/orchestration/types";
 import { useCompletedPatients } from "@/src/components/orchestration";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("PriorityActionsSection");
 
 interface PriorityActionsSectionProps {
   className?: string;
@@ -36,7 +39,14 @@ export function TodaysActionsHeader({ appointmentCount, isLoading }: TodaysActio
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center">
       <div className="flex items-center gap-4">
-        <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
+        <Image
+          src="/icons/caring-hands.png"
+          alt=""
+          role="presentation"
+          width={56}
+          height={56}
+          className="shrink-0"
+        />
         <div className="min-w-0 flex-1">
           <Heading level={3} className="text-xl sm:text-2xl">
             Today&apos;s Actions
@@ -176,7 +186,7 @@ export function PriorityActionsSection({
         setActions(actionsData.slice(0, 3)); // Show top 3
         setTodayAppts(apptsData);
       } catch (err) {
-        console.error("Failed to load priority actions:", err);
+        log.error("Failed to load priority actions", err);
         setError("Failed to load data. Please try again.");
       } finally {
         setLoading(false);
@@ -237,6 +247,7 @@ export function PriorityActionsSection({
             <Image
               src="/icons/caring-hands.png"
               alt=""
+              role="presentation"
               width={56}
               height={56}
               className="shrink-0"
@@ -284,7 +295,14 @@ export function PriorityActionsSection({
     return (
       <section className={className}>
         <div className="mb-10 flex items-center gap-4">
-          <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
+          <Image
+            src="/icons/caring-hands.png"
+            alt=""
+            role="presentation"
+            width={56}
+            height={56}
+            className="shrink-0"
+          />
           <div>
             <Heading level={3} className="text-xl sm:text-2xl">
               Today&apos;s Actions
@@ -318,7 +336,14 @@ export function PriorityActionsSection({
     return (
       <section className={className}>
         <div className="mb-10 flex items-center gap-4">
-          <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
+          <Image
+            src="/icons/caring-hands.png"
+            alt=""
+            role="presentation"
+            width={56}
+            height={56}
+            className="shrink-0"
+          />
           <div>
             <Heading level={3} className="text-xl sm:text-2xl">
               Today&apos;s Actions
@@ -351,7 +376,14 @@ export function PriorityActionsSection({
     return (
       <section className={className}>
         <div className="mb-10 flex items-center gap-4">
-          <Image src="/icons/caring-hands.png" alt="" width={56} height={56} className="shrink-0" />
+          <Image
+            src="/icons/caring-hands.png"
+            alt=""
+            role="presentation"
+            width={56}
+            height={56}
+            className="shrink-0"
+          />
           <div>
             <Heading level={3} className="text-xl sm:text-2xl">
               Today&apos;s Actions
@@ -381,6 +413,7 @@ export function PriorityActionsSection({
             <Image
               src="/icons/caring-hands.png"
               alt=""
+              role="presentation"
               width={56}
               height={56}
               className="shrink-0"

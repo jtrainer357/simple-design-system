@@ -166,7 +166,7 @@ export default function PricingDemoPage() {
         <div className="flex justify-center">
           <img
             src="/assets/pricing/header.png"
-            alt="Pricing Header"
+            alt="Tebra Mental Health pricing plans - Choose the right plan for your practice"
             className="block flex-shrink-0"
             style={{
               width: "1698px",
@@ -236,7 +236,7 @@ export default function PricingDemoPage() {
         <div className="flex justify-center">
           <img
             src="/assets/pricing/footer.png"
-            alt="Pricing Footer"
+            alt="Ready to get started? Contact us for a personalized demo"
             className="block flex-shrink-0"
             style={{
               width: "2064px",

@@ -335,11 +335,14 @@ export function ContactDetailPanel({
 
         {/* Notes Section */}
         <div className="p-4">
-          <Text size="xs" muted className="mb-3 font-semibold tracking-wider uppercase">
-            Notes
-          </Text>
+          <label htmlFor="contact-notes">
+            <Text size="xs" muted className="mb-3 font-semibold tracking-wider uppercase">
+              Notes
+            </Text>
+          </label>
           <Textarea
-            placeholder="Nate"
+            id="contact-notes"
+            placeholder="Add notes about this contact..."
             value={notes}
             onChange={(e) => onNotesChange?.(e.target.value)}
             className="min-h-[80px] resize-none"

@@ -27,6 +27,9 @@ import {
 } from "@/src/lib/expressSetupValidation";
 import { AddOn } from "@/src/lib/addOnsData";
 import { cn } from "@/design-system/lib/utils";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("ExpressSetupModal");
 
 interface ExpressSetupModalProps {
   open: boolean;
@@ -81,7 +84,7 @@ export function ExpressSetupModal({ open, onOpenChange }: ExpressSetupModalProps
         if (data.practiceData) setPracticeData(data.practiceData);
         if (data.accountData) setAccountData(data.accountData);
       } catch (e) {
-        console.error("Failed to load saved setup data", e);
+        log.error("Failed to load saved setup data", e);
       }
     }
   }, []);
@@ -174,6 +177,7 @@ export function ExpressSetupModal({ open, onOpenChange }: ExpressSetupModalProps
                 size="icon"
                 className="text-muted-foreground hover:text-foreground absolute top-4 right-4 z-30"
                 onClick={() => onOpenChange(false)}
+                aria-label="Close setup dialog"
               >
                 <HugeiconsIcon icon={Cancel01Icon} className="size-5" />
               </Button>

@@ -111,6 +111,7 @@ export function PatientHeader({ patient, className, onMoreClick }: PatientHeader
           size="icon"
           className="absolute top-4 right-4 h-8 w-8 shrink-0 sm:relative sm:top-auto sm:right-auto sm:self-start"
           onClick={onMoreClick}
+          aria-label="More patient options"
         >
           <MoreVertical className="h-4 w-4 sm:h-5 sm:w-5" />
         </Button>

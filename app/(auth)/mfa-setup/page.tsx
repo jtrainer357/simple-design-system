@@ -220,7 +220,12 @@ export default function MFASetupPage() {
                     <code className="bg-muted flex-1 rounded px-3 py-2 text-center font-mono text-sm">
                       {secret}
                     </code>
-                    <Button variant="outline" size="icon" onClick={copySecret}>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={copySecret}
+                      aria-label={secretCopied ? "Copied" : "Copy secret code"}
+                    >
                       {secretCopied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
                     </Button>
                   </div>
