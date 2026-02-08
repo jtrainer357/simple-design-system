@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import { createClient } from "@supabase/supabase-js";
 import { authOptions } from "@/src/lib/auth/auth-options";
 import { verifyTOTPCode } from "@/src/lib/auth/mfa/totp";
+import type { AuthUser } from "@/src/lib/auth/types";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -14,7 +15,8 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 export async function DELETE(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const user = session?.user as AuthUser | undefined;
+    if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { code } = await request.json();
     if (!code || !/^\d{6}$/.test(code.replace(/\s/g, "")))
@@ -27,7 +29,7 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
     const { data: mfaData, error: mfaError } = await supabase
       .from("user_mfa")
       .select("totp_secret, is_enabled")
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .single();
 
     if (mfaError || !mfaData)
@@ -41,7 +43,7 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
 
     if (!isValid) {
       await supabase.from("mfa_audit_log").insert({
-        user_id: session.user.id,
+        user_id: user.id,
         action: "disable_failed",
         ip_address: ip,
         user_agent: ua,
@@ -54,13 +56,13 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    await supabase.from("user_mfa").delete().eq("user_id", session.user.id);
+    await supabase.from("user_mfa").delete().eq("user_id", user.id);
     await supabase
       .from("users")
       .update({ mfa_enabled: false, mfa_pending: false })
-      .eq("id", session.user.id);
+      .eq("id", user.id);
     await supabase.from("mfa_audit_log").insert({
-      user_id: session.user.id,
+      user_id: user.id,
       action: "mfa_disabled",
       ip_address: ip,
       user_agent: ua,

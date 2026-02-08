@@ -142,8 +142,8 @@ export default function MFASetupPage() {
                   <div className="bg-primary/10 mb-4 flex h-16 w-16 items-center justify-center rounded-full">
                     <ShieldCheck className="text-primary h-8 w-8" />
                   </div>
-                  <h1 className="text-2xl font-bold">{STEPS[0].title}</h1>
-                  <p className="text-muted-foreground mt-2">{STEPS[0].description}</p>
+                  <h1 className="text-2xl font-bold">{STEPS[0]!.title}</h1>
+                  <p className="text-muted-foreground mt-2">{STEPS[0]!.description}</p>
                 </div>
                 <div className="bg-muted/50 space-y-3 rounded-lg p-4">
                   <div className="flex items-start gap-3">
@@ -196,8 +196,8 @@ export default function MFASetupPage() {
                 className="space-y-6"
               >
                 <div className="text-center">
-                  <h1 className="text-2xl font-bold">{STEPS[1].title}</h1>
-                  <p className="text-muted-foreground mt-2">{STEPS[1].description}</p>
+                  <h1 className="text-2xl font-bold">{STEPS[1]!.title}</h1>
+                  <p className="text-muted-foreground mt-2">{STEPS[1]!.description}</p>
                 </div>
                 <div className="flex justify-center">
                   <div className="rounded-lg bg-white p-4">
@@ -247,8 +247,8 @@ export default function MFASetupPage() {
                 className="space-y-6"
               >
                 <div className="text-center">
-                  <h1 className="text-2xl font-bold">{STEPS[2].title}</h1>
-                  <p className="text-muted-foreground mt-2">{STEPS[2].description}</p>
+                  <h1 className="text-2xl font-bold">{STEPS[2]!.title}</h1>
+                  <p className="text-muted-foreground mt-2">{STEPS[2]!.description}</p>
                 </div>
                 <div className="space-y-4">
                   <Input

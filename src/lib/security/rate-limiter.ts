@@ -41,7 +41,7 @@ function findRateLimitConfig(path: string): RateLimitConfig | null {
     (a, b) => b.split("/").length - a.split("/").length
   );
   for (const pattern of patterns) {
-    if (matchPattern(pattern, path)) return RATE_LIMITS[pattern];
+    if (matchPattern(pattern, path)) return RATE_LIMITS[pattern] ?? null;
   }
   return null;
 }
@@ -122,8 +122,10 @@ export function createRateLimitResponse(result: RateLimitResult): NextResponse {
 }
 
 export function getClientIP(request: NextRequest): string | null {
+  const forwarded = request.headers.get("x-forwarded-for");
+  const forwardedFirst = forwarded?.split(",")[0]?.trim();
   return (
-    request.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+    forwardedFirst ||
     request.headers.get("x-real-ip") ||
     request.headers.get("cf-connecting-ip") ||
     null

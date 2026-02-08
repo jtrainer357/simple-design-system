@@ -1,2 +1,2 @@
-export { SessionProvider } from "./SessionProvider";
-export { SessionTimeoutModal, SESSION_TIMEOUT } from "./SessionTimeoutModal";
+// Auth components
+export { MFASettings } from "./mfa/MFASettings";

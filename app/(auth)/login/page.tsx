@@ -42,7 +42,7 @@ function LoginForm() {
       SessionRequired: "Please sign in to continue.",
       default: "An error occurred. Please try again.",
     };
-    return messages[errorCode] || messages.default;
+    return messages[errorCode] ?? messages.default ?? null;
   };
 
   const getReasonMessage = (reasonCode: string | null): string | null => {

@@ -14,6 +14,7 @@ import {
   hashBackupCodes,
   formatBackupCodes,
 } from "@/src/lib/auth/mfa/totp";
+import type { AuthUser } from "@/src/lib/auth/types";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -21,7 +22,8 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const user = session?.user as AuthUser | undefined;
+    if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const supabase = createClient(supabaseUrl, supabaseServiceKey, {
       auth: { persistSession: false },
@@ -30,17 +32,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { data: existingMfa } = await supabase
       .from("user_mfa")
       .select("is_enabled")
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .single();
     if (existingMfa?.is_enabled)
       return NextResponse.json({ error: "MFA is already enabled" }, { status: 400 });
 
-    const { secret, uri } = generateTOTPSecret(session.user.email);
+    const { secret, uri } = generateTOTPSecret(user.email);
     const qrCodeDataUrl = await generateQRCode(uri);
 
     await supabase.from("user_mfa").upsert(
       {
-        user_id: session.user.id,
+        user_id: user.id,
         totp_secret: secret,
         backup_codes: [],
         is_enabled: false,
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
 
     await supabase.from("mfa_audit_log").insert({
-      user_id: session.user.id,
+      user_id: user.id,
       action: "setup_initiated",
       ip_address: request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip"),
       user_agent: request.headers.get("user-agent"),
@@ -71,7 +73,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const user = session?.user as AuthUser | undefined;
+    if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { code } = await request.json();
     if (!code || !/^\d{6}$/.test(code.replace(/\s/g, "")))
@@ -84,7 +87,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
     const { data: mfaData, error: mfaError } = await supabase
       .from("user_mfa")
       .select("totp_secret, is_enabled")
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .single();
     if (mfaError || !mfaData)
       return NextResponse.json({ error: "MFA setup not initialized" }, { status: 400 });
@@ -97,7 +100,7 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
 
     if (!isValid) {
       await supabase.from("mfa_audit_log").insert({
-        user_id: session.user.id,
+        user_id: user.id,
         action: "setup_completed",
         ip_address: ip,
         user_agent: ua,
@@ -123,11 +126,11 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
         failed_attempts: 0,
         locked_until: null,
       })
-      .eq("user_id", session.user.id);
+      .eq("user_id", user.id);
 
-    await supabase.from("users").update({ mfa_enabled: true }).eq("id", session.user.id);
+    await supabase.from("users").update({ mfa_enabled: true }).eq("id", user.id);
     await supabase.from("mfa_audit_log").insert({
-      user_id: session.user.id,
+      user_id: user.id,
       action: "setup_completed",
       ip_address: ip,
       user_agent: ua,

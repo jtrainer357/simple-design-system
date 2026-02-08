@@ -12,6 +12,7 @@ import {
   hashBackupCodes,
   formatBackupCodes,
 } from "@/src/lib/auth/mfa/totp";
+import type { AuthUser } from "@/src/lib/auth/types";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -19,7 +20,8 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const user = session?.user as AuthUser | undefined;
+    if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { code } = await request.json();
     if (!code || !/^\d{6}$/.test(code.replace(/\s/g, "")))
@@ -32,7 +34,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { data: mfaData, error: mfaError } = await supabase
       .from("user_mfa")
       .select("totp_secret, is_enabled")
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .single();
 
     if (mfaError || !mfaData)
@@ -46,7 +48,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     if (!isValid) {
       await supabase.from("mfa_audit_log").insert({
-        user_id: session.user.id,
+        user_id: user.id,
         action: "backup_regen_failed",
         ip_address: ip,
         user_agent: ua,
@@ -68,10 +70,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         backup_codes: hashedBackupCodes,
         updated_at: new Date().toISOString(),
       })
-      .eq("user_id", session.user.id);
+      .eq("user_id", user.id);
 
     await supabase.from("mfa_audit_log").insert({
-      user_id: session.user.id,
+      user_id: user.id,
       action: "backup_regenerated",
       ip_address: ip,
       user_agent: ua,

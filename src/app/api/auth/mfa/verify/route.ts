@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import { createClient } from "@supabase/supabase-js";
 import { authOptions } from "@/src/lib/auth/auth-options";
 import { verifyTOTPCode, verifyBackupCode } from "@/src/lib/auth/mfa/totp";
+import type { AuthUser } from "@/src/lib/auth/types";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -16,7 +17,8 @@ const LOCKOUT_DURATION_MS = 15 * 60 * 1000;
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const user = session?.user as AuthUser | undefined;
+    if (!user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const { code, useBackupCode = false } = await request.json();
     if (!code)
@@ -29,7 +31,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const { data: mfaData, error: mfaError } = await supabase
       .from("user_mfa")
       .select("*")
-      .eq("user_id", session.user.id)
+      .eq("user_id", user.id)
       .single();
     if (mfaError || !mfaData)
       return NextResponse.json({ error: "MFA not configured" }, { status: 400 });
@@ -79,9 +81,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       await supabase
         .from("user_mfa")
         .update({ failed_attempts: newFailedAttempts, locked_until: lockedUntil })
-        .eq("user_id", session.user.id);
+        .eq("user_id", user.id);
       await supabase.from("mfa_audit_log").insert({
-        user_id: session.user.id,
+        user_id: user.id,
         action: "verify_failed",
         ip_address: ip,
         user_agent: ua,
@@ -115,17 +117,15 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     };
     if (useBackupCode) updateData.backup_codes = newBackupCodes;
 
-    await supabase.from("user_mfa").update(updateData).eq("user_id", session.user.id);
-    await supabase.from("users").update({ mfa_pending: false }).eq("id", session.user.id);
-    await supabase
-      .from("mfa_audit_log")
-      .insert({
-        user_id: session.user.id,
-        action: auditAction,
-        ip_address: ip,
-        user_agent: ua,
-        success: true,
-      });
+    await supabase.from("user_mfa").update(updateData).eq("user_id", user.id);
+    await supabase.from("users").update({ mfa_pending: false }).eq("id", user.id);
+    await supabase.from("mfa_audit_log").insert({
+      user_id: user.id,
+      action: auditAction,
+      ip_address: ip,
+      user_agent: ua,
+      success: true,
+    });
 
     return NextResponse.json({
       success: true,
