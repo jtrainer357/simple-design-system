@@ -1,0 +1,216 @@
+"use client";
+
+import * as React from "react";
+import { ChevronDown } from "lucide-react";
+import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
+import { Button } from "@/design-system/components/ui/button";
+import { FilterTabs } from "@/design-system/components/ui/filter-tabs";
+import { PatientListSidebar } from "../patient-list-sidebar";
+import { PatientDetailView } from "../patient-detail-view";
+import {
+  getPatients,
+  getPatientDetails as getPatientDetailsQuery,
+  getPatientVisitSummaries,
+} from "@/src/lib/queries/patients";
+import { getPatientPriorityActions } from "@/src/lib/queries/priority-actions";
+import { isDatabasePopulated } from "@/src/lib/queries/practice";
+import type { DbPatient, Patient, PatientDetail, PatientsPageProps } from "./types";
+import { patientFilterTabs } from "./types";
+import { dbPatientToListItem, createPatientDetail, dbActionToUiAction } from "./utils";
+import { PatientsPageSkeleton, PatientDetailSkeleton } from "./loading-skeleton";
+import { EmptyPatients, DatabaseNotReady } from "./empty-states";
+
+export function PatientsPage({
+  initialPatientId,
+  initialPatientName,
+  initialTab,
+}: PatientsPageProps) {
+  const [loading, setLoading] = React.useState(true);
+  const [dbReady, setDbReady] = React.useState<boolean | null>(null);
+  const [patients, setPatients] = React.useState<DbPatient[]>([]);
+  const [selectedPatient, setSelectedPatient] = React.useState<Patient | null>(null);
+  const [patientDetails, setPatientDetails] = React.useState<PatientDetail | null>(null);
+  const [detailLoading, setDetailLoading] = React.useState(false);
+  const [activeFilter, setActiveFilter] = React.useState("all");
+
+  // Stabilize props for useEffect dependencies
+  const patientIdKey = initialPatientId ?? "";
+  const patientNameKey = initialPatientName ?? "";
+
+  // Load initial patients list
+  React.useEffect(() => {
+    async function loadPatients() {
+      try {
+        setLoading(true);
+
+        // Check if database is populated
+        const populated = await isDatabasePopulated();
+        setDbReady(populated);
+
+        if (!populated) {
+          setLoading(false);
+          return;
+        }
+
+        // Load patients list
+        const patientsData = await getPatients();
+        setPatients(patientsData);
+
+        // Select patient from URL param (by ID or name), or default to first patient
+        let targetPatient: DbPatient | undefined;
+
+        if (patientNameKey) {
+          // Search by name (case-insensitive, fuzzy)
+          const searchName = patientNameKey.toLowerCase();
+          // Try exact match first
+          targetPatient = patientsData.find((p) => {
+            const fullName = `${p.first_name} ${p.last_name}`.toLowerCase();
+            return fullName === searchName;
+          });
+          // Try starts-with match for partial names
+          if (!targetPatient) {
+            targetPatient = patientsData.find((p) => {
+              const fullName = `${p.first_name} ${p.last_name}`.toLowerCase();
+              return fullName.startsWith(searchName);
+            });
+          }
+          // Try first name only match
+          if (!targetPatient) {
+            targetPatient = patientsData.find((p) => {
+              return p.first_name.toLowerCase() === searchName;
+            });
+          }
+        } else if (patientIdKey) {
+          targetPatient = patientsData.find((p) => p.id === patientIdKey);
+        }
+
+        if (targetPatient) {
+          setSelectedPatient(dbPatientToListItem(targetPatient));
+        } else if (patientsData.length > 0 && patientsData[0]) {
+          setSelectedPatient(dbPatientToListItem(patientsData[0]));
+        }
+      } catch {
+        // Error loading patients
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    void loadPatients();
+  }, [patientIdKey, patientNameKey]);
+
+  // Load selected patient details
+  React.useEffect(() => {
+    if (!selectedPatient || !dbReady) return;
+
+    const patientId = selectedPatient.id;
+    let cancelled = false;
+
+    async function loadPatientDetails() {
+      try {
+        setDetailLoading(true);
+
+        // Fetch patient details, priority actions, and visit summaries in parallel
+        const [details, priorityActions, visitSummaries] = await Promise.all([
+          getPatientDetailsQuery(patientId),
+          getPatientPriorityActions(patientId),
+          getPatientVisitSummaries(patientId),
+        ]);
+
+        if (cancelled) return;
+
+        if (details) {
+          const detailData = createPatientDetail(
+            details.patient,
+            details.appointments,
+            details.invoices,
+            visitSummaries,
+            details.messages,
+            details.outcomeMeasures,
+            details.reviews
+          );
+          // Add priority actions to the detail data
+          detailData.prioritizedActions = priorityActions.map(dbActionToUiAction);
+          setPatientDetails(detailData);
+        }
+      } catch {
+        // Error loading patient details
+      } finally {
+        if (!cancelled) setDetailLoading(false);
+      }
+    }
+
+    void loadPatientDetails();
+    return () => {
+      cancelled = true;
+    };
+  }, [selectedPatient, dbReady]);
+
+  const handlePatientSelect = (patient: Patient) => {
+    setSelectedPatient(patient);
+  };
+
+  // Convert patients for list
+  const patientListItems = patients.map(dbPatientToListItem);
+
+  // Loading state with skeleton
+  if (loading) {
+    return <PatientsPageSkeleton />;
+  }
+
+  // Empty state (no patients after loading)
+  if (patientListItems.length === 0 && dbReady) {
+    return <EmptyPatients activeFilter={activeFilter} onFilterChange={setActiveFilter} />;
+  }
+
+  // Database not ready state
+  if (dbReady === false) {
+    return <DatabaseNotReady />;
+  }
+
+  return (
+    <div className="flex h-full flex-col">
+      {/* Main Content */}
+      <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-12">
+        {/* Patient List Column */}
+        <div className="flex min-h-0 flex-col lg:col-span-5 xl:col-span-4">
+          {/* Filter Tabs - aligned with patient list column */}
+          <div className="mb-4 flex items-center justify-between">
+            <FilterTabs
+              tabs={patientFilterTabs}
+              activeTab={activeFilter}
+              onTabChange={setActiveFilter}
+            />
+          </div>
+          <PatientListSidebar
+            patients={patientListItems}
+            selectedPatientId={selectedPatient?.id}
+            onPatientSelect={handlePatientSelect}
+            activeFilter={activeFilter}
+            className="min-h-0 flex-1"
+          />
+        </div>
+
+        {/* Patient Detail Column */}
+        <div className="flex min-h-0 flex-col lg:col-span-7 xl:col-span-8">
+          {/* Add Patient Button - aligned with detail view */}
+          <div className="mb-4 flex items-center justify-end">
+            <Button className="gap-1.5 text-sm sm:gap-2 sm:text-base">
+              Add Patient
+              <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+            </Button>
+          </div>
+          {detailLoading ? (
+            <PatientDetailSkeleton />
+          ) : (
+            <PatientDetailView
+              patient={patientDetails}
+              className="min-h-0 flex-1"
+              initialTab={initialTab}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

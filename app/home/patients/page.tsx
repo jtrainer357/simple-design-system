@@ -6,7 +6,7 @@ import { LeftNav } from "../_components/left-nav";
 import { HeaderSearch } from "../_components/header-search";
 import { AnimatedBackground } from "@/design-system/components/ui/animated-background";
 import { PageTransition } from "@/design-system/components/ui/page-transition";
-import { PatientsPage } from "../_components/patients-page";
+import { PatientsPage } from "../_components/patients";
 import { Skeleton } from "@/design-system/components/ui/skeleton";
 
 function PatientsContent() {
