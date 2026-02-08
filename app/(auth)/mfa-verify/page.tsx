@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { Button } from "@/design-system/components/ui/button";
@@ -8,7 +8,7 @@ import { Input } from "@/design-system/components/ui/input";
 import { ShieldCheck, Key, Loader2, AlertTriangle } from "lucide-react";
 import type { MFAVerifyMode } from "@/src/lib/auth/mfa/types";
 
-export default function MFAVerifyPage() {
+function MFAVerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
@@ -209,5 +209,13 @@ export default function MFAVerifyPage() {
         </div>
       </motion.div>
     </div>
+  );
+}
+
+export default function MFAVerifyPage() {
+  return (
+    <Suspense fallback={null}>
+      <MFAVerifyContent />
+    </Suspense>
   );
 }
