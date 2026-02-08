@@ -38,7 +38,7 @@ export function Patient360PriorityActions({
   onActionClick,
   className,
 }: Patient360PriorityActionsProps) {
-  const { showToast } = useToast();
+  const { success: showSuccess, error: showError, info: showInfo } = useToast();
 
   // Fetch patient-specific actions
   const { data: actions, isLoading, error } = usePatientPriorityActions(patientId, practiceId);
@@ -61,7 +61,7 @@ export function Patient360PriorityActions({
         newSet.delete(actionId);
         return newSet;
       });
-      showToast({ type: "error", message: "Failed to complete action" });
+      showError("Failed to complete action");
     }
   };
 
@@ -75,7 +75,7 @@ export function Patient360PriorityActions({
         newSet.delete(actionId);
         return newSet;
       });
-      showToast({ type: "error", message: "Failed to dismiss action" });
+      showError("Failed to dismiss action");
     }
   };
 
@@ -89,7 +89,7 @@ export function Patient360PriorityActions({
         newSet.delete(actionId);
         return newSet;
       });
-      showToast({ type: "error", message: "Failed to snooze action" });
+      showError("Failed to snooze action");
     }
   };
 
