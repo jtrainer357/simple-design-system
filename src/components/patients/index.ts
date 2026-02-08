@@ -36,3 +36,4 @@ export {
   type PatientTabsProps,
 } from "./PatientTabs";
 export { PatientStatusManager, type PatientStatusManagerProps } from './PatientStatusManager';
+export { PatientRosterEnhanced, type PatientRosterEnhancedProps, type PatientRosterItem as EnhancedPatientRosterItem, type SortField, type SortOrder } from './PatientRosterEnhanced';
