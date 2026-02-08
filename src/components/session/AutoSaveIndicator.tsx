@@ -1,0 +1,36 @@
+"use client";
+
+import { Cloud, Check, AlertCircle, Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import type { AutoSaveStatus } from "@/lib/session";
+
+interface AutoSaveIndicatorProps {
+  status: AutoSaveStatus;
+  lastSavedAt?: Date | null;
+  error?: string | null;
+  className?: string;
+}
+
+const statusConfig: Record<AutoSaveStatus, { icon: typeof Cloud; text: string; className: string }> = {
+  idle: { icon: Cloud, text: "Saved", className: "text-muted-foreground" },
+  pending: { icon: Cloud, text: "Unsaved changes", className: "text-yellow-600" },
+  saving: { icon: Loader2, text: "Saving...", className: "text-blue-600" },
+  saved: { icon: Check, text: "Saved", className: "text-green-600" },
+  error: { icon: AlertCircle, text: "Save failed", className: "text-red-600" },
+};
+
+export function AutoSaveIndicator({ status, lastSavedAt, error, className }: AutoSaveIndicatorProps) {
+  const config = statusConfig[status];
+  const Icon = config.icon;
+  const formatTime = (date: Date) => date.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+
+  return (
+    <div className={cn("flex items-center gap-2 text-sm", config.className, className)} title={error || undefined}>
+      <Icon className={cn("h-4 w-4", status === "saving" && "animate-spin")} />
+      <span>{config.text}</span>
+      {lastSavedAt && status !== "saving" && status !== "error" && <span className="text-muted-foreground">at {formatTime(lastSavedAt)}</span>}
+    </div>
+  );
+}
+
+export default AutoSaveIndicator;
