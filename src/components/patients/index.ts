@@ -38,6 +38,7 @@ export {
 
 // Patient Management Components
 export { AddPatientModal, type AddPatientModalProps } from "./AddPatientModal";
-export { EditPatientDemographics, type EditPatientDemographicsProps } from './EditPatientDemographics';
-export { PatientRosterEnhanced, type PatientRosterEnhancedProps, type SortField, type SortOrder } from './PatientRosterEnhanced';
-export { DocumentsTab, type DocumentsTabProps, type PatientDocument } from './DocumentsTab';
+export { EditPatientDemographics, type EditPatientDemographicsProps } from "./EditPatientDemographics";
+export { PatientRosterEnhanced, type PatientRosterEnhancedProps, type SortField, type SortOrder } from "./PatientRosterEnhanced";
+export { DocumentsTab, type DocumentsTabProps, type PatientDocument } from "./DocumentsTab";
+export { InsuranceTab, type InsuranceTabProps, type InsuranceInfo, type Authorization } from "./InsuranceTab";
