@@ -35,3 +35,38 @@ export {
   ReviewsTabContent,
   type PatientTabsProps,
 } from "./PatientTabs";
+
+// Patient Management Components
+export { AddPatientModal, type AddPatientModalProps } from "./AddPatientModal";
+export {
+  EditPatientDemographics,
+  type EditPatientDemographicsProps,
+} from "./EditPatientDemographics";
+export {
+  PatientRosterEnhanced,
+  type PatientRosterEnhancedProps,
+  type SortField,
+  type SortOrder,
+} from "./PatientRosterEnhanced";
+export { DocumentsTab, type DocumentsTabProps, type PatientDocument } from "./DocumentsTab";
+export {
+  InsuranceTab,
+  type InsuranceTabProps,
+  type InsuranceInfo,
+  type Authorization,
+} from "./InsuranceTab";
+export {
+  ActivityLogTab,
+  type ActivityLogTabProps,
+  type ActivityLogEntry,
+  type ActivityType,
+  generateDemoActivities,
+} from "./ActivityLogTab";
+export {
+  ArchivePatientDialog,
+  ArchivePatientButton,
+  RestorePatientDialog,
+  type ArchivePatientDialogProps,
+  type ArchivePatientData,
+  type RestorePatientDialogProps,
+} from "./ArchivePatientDialog";
