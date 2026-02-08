@@ -19,7 +19,7 @@ import type { SuggestedAction, SnoozeDuration } from "@/src/lib/triggers";
 /**
  * Props for Patient360PriorityActions component
  */
-interface Patient360PriorityActionsProps {
+export interface Patient360PriorityActionsProps {
   patientId: string;
   patientName: string;
   practiceId?: string;

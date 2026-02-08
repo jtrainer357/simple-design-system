@@ -45,6 +45,7 @@ export {
 export {
   PatientRosterEnhanced,
   type PatientRosterEnhancedProps,
+  type PatientRosterItem as EnhancedPatientRosterItem,
   type SortField,
   type SortOrder,
 } from "./PatientRosterEnhanced";
@@ -70,3 +71,4 @@ export {
   type ArchivePatientData,
   type RestorePatientDialogProps,
 } from "./ArchivePatientDialog";
+export { PatientStatusManager, type PatientStatusManagerProps } from "./PatientStatusManager";
