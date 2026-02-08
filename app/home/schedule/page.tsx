@@ -1,13 +1,14 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
 import { LeftNav } from "../_components/left-nav";
 import { HeaderSearch } from "../_components/header-search";
 import { AnimatedBackground } from "@/design-system/components/ui/animated-background";
 import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
 import { CalendarHeader, CalendarViewType } from "@/design-system/components/ui/calendar-header";
-import { CalendarWeekView, CalendarEvent } from "@/design-system/components/ui/calendar-week-view";
-import { CalendarDayView, DayEvent } from "@/design-system/components/ui/calendar-day-view";
+import type { CalendarEvent } from "@/design-system/components/ui/calendar-week-view";
+import type { DayEvent } from "@/design-system/components/ui/calendar-day-view";
 import { CalendarDateStrip } from "@/design-system/components/ui/calendar-date-strip";
 import { FilterTabs } from "@/design-system/components/ui/filter-tabs";
 import { PageTransition } from "@/design-system/components/ui/page-transition";
@@ -16,6 +17,25 @@ import { Text } from "@/design-system/components/ui/typography";
 import { Plus, Calendar, Trash2, AlertTriangle, RefreshCw, CalendarX } from "lucide-react";
 import { Skeleton } from "@/design-system/components/ui/skeleton";
 import { Heading } from "@/design-system/components/ui/typography";
+
+// Dynamic imports for heavy calendar components - code splitting for better performance
+const CalendarWeekView = dynamic(
+  () =>
+    import("@/design-system/components/ui/calendar-week-view").then((mod) => mod.CalendarWeekView),
+  {
+    loading: () => <Skeleton className="h-full w-full rounded-lg" />,
+    ssr: false,
+  }
+);
+
+const CalendarDayView = dynamic(
+  () =>
+    import("@/design-system/components/ui/calendar-day-view").then((mod) => mod.CalendarDayView),
+  {
+    loading: () => <Skeleton className="h-64 w-full rounded-lg" />,
+    ssr: false,
+  }
+);
 import {
   addDays,
   startOfWeek,

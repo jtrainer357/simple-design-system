@@ -42,7 +42,7 @@ export const PII_PATTERNS: PIIPattern[] = [
   {
     name: "PHONE",
     // Matches various phone formats: XXX-XXX-XXXX, XXX.XXX.XXXX, (XXX) XXX-XXXX
-    pattern: /\b(?:\(\d{3}\)\s?|\d{3}[-.])\d{3}[-.]?\d{4}\b/g,
+    pattern: /(?:\(\d{3}\)\s*|\b\d{3}[-.])\d{3}[-.]?\d{4}\b/g,
     replacement: "[PHONE]",
   },
   {
