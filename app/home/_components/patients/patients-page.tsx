@@ -1,11 +1,12 @@
 "use client";
 
 import * as React from "react";
-import { ChevronDown } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "@/design-system/components/ui/button";
 import { FilterTabs } from "@/design-system/components/ui/filter-tabs";
 import { PatientListSidebar } from "../patient-list-sidebar";
 import { PatientDetailView } from "../patient-detail-view";
+import { AddPatientModal } from "@/src/components/patients/AddPatientModal";
 import {
   getPatients,
   getPatientDetails as getPatientDetailsQuery,
@@ -18,6 +19,7 @@ import { patientFilterTabs } from "./types";
 import { dbPatientToListItem, createPatientDetail, dbActionToUiAction } from "./utils";
 import { PatientsPageSkeleton, PatientDetailSkeleton } from "./loading-skeleton";
 import { EmptyPatients, DatabaseNotReady } from "./empty-states";
+import type { Patient as DbPatientType } from "@/src/lib/supabase/types";
 
 export function PatientsPage({
   initialPatientId,
@@ -31,6 +33,7 @@ export function PatientsPage({
   const [patientDetails, setPatientDetails] = React.useState<PatientDetail | null>(null);
   const [detailLoading, setDetailLoading] = React.useState(false);
   const [activeFilter, setActiveFilter] = React.useState("all");
+  const [addPatientOpen, setAddPatientOpen] = React.useState(false);
 
   // Stabilize props for useEffect dependencies
   const patientIdKey = initialPatientId ?? "";
@@ -149,6 +152,13 @@ export function PatientsPage({
     setSelectedPatient(patient);
   };
 
+  const handlePatientCreated = (newPatient: DbPatientType) => {
+    // DbPatientType and DbPatient are the same type (Patient from supabase/types)
+    // Just add to list and select
+    setPatients((prev) => [newPatient, ...prev]);
+    setSelectedPatient(dbPatientToListItem(newPatient));
+  };
+
   // Convert patients for list
   const patientListItems = patients.map(dbPatientToListItem);
 
@@ -168,48 +178,60 @@ export function PatientsPage({
   }
 
   return (
-    <div className="flex h-full flex-col">
-      {/* Main Content */}
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-12">
-        {/* Patient List Column */}
-        <div className="flex min-h-0 flex-col lg:col-span-5 xl:col-span-4">
-          {/* Filter Tabs - aligned with patient list column */}
-          <div className="mb-4 flex items-center justify-between">
-            <FilterTabs
-              tabs={patientFilterTabs}
-              activeTab={activeFilter}
-              onTabChange={setActiveFilter}
-            />
-          </div>
-          <PatientListSidebar
-            patients={patientListItems}
-            selectedPatientId={selectedPatient?.id}
-            onPatientSelect={handlePatientSelect}
-            activeFilter={activeFilter}
-            className="min-h-0 flex-1"
-          />
-        </div>
-
-        {/* Patient Detail Column */}
-        <div className="flex min-h-0 flex-col lg:col-span-7 xl:col-span-8">
-          {/* Add Patient Button - aligned with detail view */}
-          <div className="mb-4 flex items-center justify-end">
-            <Button className="gap-1.5 text-sm sm:gap-2 sm:text-base">
-              Add Patient
-              <ChevronDown className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
-            </Button>
-          </div>
-          {detailLoading ? (
-            <PatientDetailSkeleton />
-          ) : (
-            <PatientDetailView
-              patient={patientDetails}
+    <>
+      <div className="flex h-full flex-col">
+        {/* Main Content */}
+        <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-12">
+          {/* Patient List Column */}
+          <div className="flex min-h-0 flex-col lg:col-span-5 xl:col-span-4">
+            {/* Filter Tabs - aligned with patient list column */}
+            <div className="mb-4 flex items-center justify-between">
+              <FilterTabs
+                tabs={patientFilterTabs}
+                activeTab={activeFilter}
+                onTabChange={setActiveFilter}
+              />
+            </div>
+            <PatientListSidebar
+              patients={patientListItems}
+              selectedPatientId={selectedPatient?.id}
+              onPatientSelect={handlePatientSelect}
+              activeFilter={activeFilter}
               className="min-h-0 flex-1"
-              initialTab={initialTab}
             />
-          )}
+          </div>
+
+          {/* Patient Detail Column */}
+          <div className="flex min-h-0 flex-col lg:col-span-7 xl:col-span-8">
+            {/* Add Patient Button - aligned with detail view */}
+            <div className="mb-4 flex items-center justify-end">
+              <Button
+                onClick={() => setAddPatientOpen(true)}
+                className="gap-1.5 text-sm sm:gap-2 sm:text-base"
+              >
+                <Plus className="h-4 w-4" />
+                Add Patient
+              </Button>
+            </div>
+            {detailLoading ? (
+              <PatientDetailSkeleton />
+            ) : (
+              <PatientDetailView
+                patient={patientDetails}
+                className="min-h-0 flex-1"
+                initialTab={initialTab}
+              />
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Add Patient Modal */}
+      <AddPatientModal
+        open={addPatientOpen}
+        onOpenChange={setAddPatientOpen}
+        onPatientCreated={handlePatientCreated}
+      />
+    </>
   );
 }
