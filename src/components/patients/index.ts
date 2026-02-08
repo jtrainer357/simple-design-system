@@ -35,3 +35,4 @@ export {
   ReviewsTabContent,
   type PatientTabsProps,
 } from "./PatientTabs";
+export { PatientStatusManager, type PatientStatusManagerProps } from './PatientStatusManager';
