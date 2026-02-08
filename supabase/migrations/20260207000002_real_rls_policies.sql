@@ -30,7 +30,7 @@ DROP POLICY IF EXISTS "demo_ai_runs_all" ON ai_analysis_runs;
 CREATE POLICY practices_select ON practices
     FOR SELECT
     USING (
-        id = auth.practice_id()
+        id = public.practice_id()
         OR EXISTS (
             SELECT 1 FROM practice_users pu
             WHERE pu.user_id = auth.uid()
@@ -45,8 +45,8 @@ CREATE POLICY practices_update ON practices
     FOR UPDATE
     USING (
         (
-            id = auth.practice_id()
-            AND auth.has_role('owner')
+            id = public.practice_id()
+            AND public.has_role('owner')
         )
         OR auth.role() = 'service_role'
     );
@@ -68,7 +68,7 @@ CREATE POLICY practices_delete ON practices
 CREATE POLICY patients_select ON patients
     FOR SELECT
     USING (
-        practice_id = auth.practice_id()
+        practice_id = public.practice_id()
         OR auth.role() = 'service_role'
     );
 
@@ -77,8 +77,8 @@ CREATE POLICY patients_insert ON patients
     FOR INSERT
     WITH CHECK (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('provider')
+            practice_id = public.practice_id()
+            AND public.has_role('provider')
         )
         OR auth.role() = 'service_role'
     );
@@ -88,8 +88,8 @@ CREATE POLICY patients_update ON patients
     FOR UPDATE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('provider')
+            practice_id = public.practice_id()
+            AND public.has_role('provider')
         )
         OR auth.role() = 'service_role'
     );
@@ -99,8 +99,8 @@ CREATE POLICY patients_delete ON patients
     FOR DELETE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('owner')
+            practice_id = public.practice_id()
+            AND public.has_role('owner')
         )
         OR auth.role() = 'service_role'
     );
@@ -113,7 +113,7 @@ CREATE POLICY patients_delete ON patients
 CREATE POLICY appointments_select ON appointments
     FOR SELECT
     USING (
-        practice_id = auth.practice_id()
+        practice_id = public.practice_id()
         OR auth.role() = 'service_role'
     );
 
@@ -122,8 +122,8 @@ CREATE POLICY appointments_insert ON appointments
     FOR INSERT
     WITH CHECK (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('staff')
+            practice_id = public.practice_id()
+            AND public.has_role('staff')
         )
         OR auth.role() = 'service_role'
     );
@@ -133,8 +133,8 @@ CREATE POLICY appointments_update ON appointments
     FOR UPDATE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('staff')
+            practice_id = public.practice_id()
+            AND public.has_role('staff')
         )
         OR auth.role() = 'service_role'
     );
@@ -144,8 +144,8 @@ CREATE POLICY appointments_delete ON appointments
     FOR DELETE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('admin')
+            practice_id = public.practice_id()
+            AND public.has_role('admin')
         )
         OR auth.role() = 'service_role'
     );
@@ -158,7 +158,7 @@ CREATE POLICY appointments_delete ON appointments
 CREATE POLICY outcome_measures_select ON outcome_measures
     FOR SELECT
     USING (
-        practice_id = auth.practice_id()
+        practice_id = public.practice_id()
         OR auth.role() = 'service_role'
     );
 
@@ -167,8 +167,8 @@ CREATE POLICY outcome_measures_insert ON outcome_measures
     FOR INSERT
     WITH CHECK (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('provider')
+            practice_id = public.practice_id()
+            AND public.has_role('provider')
         )
         OR auth.role() = 'service_role'
     );
@@ -178,8 +178,8 @@ CREATE POLICY outcome_measures_update ON outcome_measures
     FOR UPDATE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('provider')
+            practice_id = public.practice_id()
+            AND public.has_role('provider')
         )
         OR auth.role() = 'service_role'
     );
@@ -189,8 +189,8 @@ CREATE POLICY outcome_measures_delete ON outcome_measures
     FOR DELETE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('admin')
+            practice_id = public.practice_id()
+            AND public.has_role('admin')
         )
         OR auth.role() = 'service_role'
     );
@@ -203,7 +203,7 @@ CREATE POLICY outcome_measures_delete ON outcome_measures
 CREATE POLICY messages_select ON messages
     FOR SELECT
     USING (
-        practice_id = auth.practice_id()
+        practice_id = public.practice_id()
         OR auth.role() = 'service_role'
     );
 
@@ -212,8 +212,8 @@ CREATE POLICY messages_insert ON messages
     FOR INSERT
     WITH CHECK (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('staff')
+            practice_id = public.practice_id()
+            AND public.has_role('staff')
         )
         OR auth.role() = 'service_role'
     );
@@ -223,8 +223,8 @@ CREATE POLICY messages_update ON messages
     FOR UPDATE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('staff')
+            practice_id = public.practice_id()
+            AND public.has_role('staff')
         )
         OR auth.role() = 'service_role'
     );
@@ -234,8 +234,8 @@ CREATE POLICY messages_delete ON messages
     FOR DELETE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('admin')
+            practice_id = public.practice_id()
+            AND public.has_role('admin')
         )
         OR auth.role() = 'service_role'
     );
@@ -249,8 +249,8 @@ CREATE POLICY invoices_select ON invoices
     FOR SELECT
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('billing')
+            practice_id = public.practice_id()
+            AND public.has_role('billing')
         )
         OR auth.role() = 'service_role'
     );
@@ -260,8 +260,8 @@ CREATE POLICY invoices_insert ON invoices
     FOR INSERT
     WITH CHECK (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('billing')
+            practice_id = public.practice_id()
+            AND public.has_role('billing')
         )
         OR auth.role() = 'service_role'
     );
@@ -271,8 +271,8 @@ CREATE POLICY invoices_update ON invoices
     FOR UPDATE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('billing')
+            practice_id = public.practice_id()
+            AND public.has_role('billing')
         )
         OR auth.role() = 'service_role'
     );
@@ -282,8 +282,8 @@ CREATE POLICY invoices_delete ON invoices
     FOR DELETE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('admin')
+            practice_id = public.practice_id()
+            AND public.has_role('admin')
         )
         OR auth.role() = 'service_role'
     );
@@ -296,7 +296,7 @@ CREATE POLICY invoices_delete ON invoices
 CREATE POLICY priority_actions_select ON priority_actions
     FOR SELECT
     USING (
-        practice_id = auth.practice_id()
+        practice_id = public.practice_id()
         OR auth.role() = 'service_role'
     );
 
@@ -305,8 +305,8 @@ CREATE POLICY priority_actions_insert ON priority_actions
     FOR INSERT
     WITH CHECK (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('provider')
+            practice_id = public.practice_id()
+            AND public.has_role('provider')
         )
         OR auth.role() = 'service_role'
     );
@@ -316,8 +316,8 @@ CREATE POLICY priority_actions_update ON priority_actions
     FOR UPDATE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('staff')
+            practice_id = public.practice_id()
+            AND public.has_role('staff')
         )
         OR auth.role() = 'service_role'
     );
@@ -327,8 +327,8 @@ CREATE POLICY priority_actions_delete ON priority_actions
     FOR DELETE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('admin')
+            practice_id = public.practice_id()
+            AND public.has_role('admin')
         )
         OR auth.role() = 'service_role'
     );
@@ -341,7 +341,7 @@ CREATE POLICY priority_actions_delete ON priority_actions
 CREATE POLICY clinical_tasks_select ON clinical_tasks
     FOR SELECT
     USING (
-        practice_id = auth.practice_id()
+        practice_id = public.practice_id()
         OR auth.role() = 'service_role'
     );
 
@@ -350,8 +350,8 @@ CREATE POLICY clinical_tasks_insert ON clinical_tasks
     FOR INSERT
     WITH CHECK (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('staff')
+            practice_id = public.practice_id()
+            AND public.has_role('staff')
         )
         OR auth.role() = 'service_role'
     );
@@ -361,8 +361,8 @@ CREATE POLICY clinical_tasks_update ON clinical_tasks
     FOR UPDATE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('staff')
+            practice_id = public.practice_id()
+            AND public.has_role('staff')
         )
         OR auth.role() = 'service_role'
     );
@@ -372,8 +372,8 @@ CREATE POLICY clinical_tasks_delete ON clinical_tasks
     FOR DELETE
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('admin')
+            practice_id = public.practice_id()
+            AND public.has_role('admin')
         )
         OR auth.role() = 'service_role'
     );
@@ -387,8 +387,8 @@ CREATE POLICY ai_runs_select ON ai_analysis_runs
     FOR SELECT
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('provider')
+            practice_id = public.practice_id()
+            AND public.has_role('provider')
         )
         OR auth.role() = 'service_role'
     );

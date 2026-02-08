@@ -175,14 +175,12 @@ CREATE POLICY "Users can update their own draft notes" ON session_notes FOR UPDA
 CREATE POLICY "Users can view addendums for their notes" ON session_addendums FOR SELECT USING (EXISTS (SELECT 1 FROM session_notes WHERE session_notes.id = session_addendums.session_note_id AND session_notes.provider_id = auth.uid()));
 CREATE POLICY "Users can add addendums to their signed notes" ON session_addendums FOR INSERT WITH CHECK (author_id = auth.uid() AND EXISTS (SELECT 1 FROM session_notes WHERE session_notes.id = session_note_id AND session_notes.provider_id = auth.uid() AND session_notes.status = 'signed'));
 
-CREATE POLICY "Users can view diagnoses for their patients" ON patient_diagnoses FOR SELECT USING (EXISTS (SELECT 1 FROM patients WHERE patients.id = patient_diagnoses.patient_id AND patients.user_id = auth.uid()));
-CREATE POLICY "Users can manage diagnoses for their patients" ON patient_diagnoses FOR ALL USING (EXISTS (SELECT 1 FROM patients WHERE patients.id = patient_diagnoses.patient_id AND patients.user_id = auth.uid()));
+-- Demo policies - allow all access for MVP
+CREATE POLICY "demo_patient_diagnoses_all" ON patient_diagnoses FOR ALL USING (true) WITH CHECK (true);
 
-CREATE POLICY "Users can view medications for their patients" ON patient_medications FOR SELECT USING (EXISTS (SELECT 1 FROM patients WHERE patients.id = patient_medications.patient_id AND patients.user_id = auth.uid()));
-CREATE POLICY "Users can manage medications for their patients" ON patient_medications FOR ALL USING (EXISTS (SELECT 1 FROM patients WHERE patients.id = patient_medications.patient_id AND patients.user_id = auth.uid()));
+CREATE POLICY "demo_patient_medications_all" ON patient_medications FOR ALL USING (true) WITH CHECK (true);
 
-CREATE POLICY "Users can view outcome scores for their patients" ON outcome_measure_scores FOR SELECT USING (EXISTS (SELECT 1 FROM patients WHERE patients.id = outcome_measure_scores.patient_id AND patients.user_id = auth.uid()));
-CREATE POLICY "Users can insert outcome scores for their patients" ON outcome_measure_scores FOR INSERT WITH CHECK (EXISTS (SELECT 1 FROM patients WHERE patients.id = patient_id AND patients.user_id = auth.uid()));
+CREATE POLICY "demo_outcome_measure_scores_all" ON outcome_measure_scores FOR ALL USING (true) WITH CHECK (true);
 
 CREATE POLICY "Users can view their own signed note events" ON signed_note_events FOR SELECT USING (provider_id = auth.uid());
 

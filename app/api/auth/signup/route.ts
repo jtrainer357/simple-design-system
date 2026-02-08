@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createLogger } from "@/src/lib/logger";
+import { logAudit } from "@/src/lib/audit";
 
 const log = createLogger("api/auth/signup");
 
@@ -119,6 +120,23 @@ export async function POST(request: NextRequest) {
     log.info("Account created successfully", {
       userId: user.id,
       practiceId: practice.id,
+    });
+
+    // Audit log for account creation
+    await logAudit({
+      action: "create",
+      resourceType: "user",
+      resourceId: user.id,
+      userId: user.id,
+      userEmail: user.email,
+      userName: user.name,
+      practiceId: practice.id,
+      practiceName: practice.name,
+      details: {
+        event: "account_signup",
+        specialty,
+        state,
+      },
     });
 
     return NextResponse.json(

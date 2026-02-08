@@ -4,6 +4,7 @@
 
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
+import { logger } from "@/src/lib/logger";
 
 const CSRF_TOKEN_LENGTH = 32;
 const CSRF_HEADER_NAME = "x-csrf-token";
@@ -47,7 +48,7 @@ export function csrfMiddleware(request: NextRequest): NextResponse | null {
   if (!requiresCSRFProtection(method) || isCSRFExempt(path) || !path.startsWith("/api/"))
     return null;
   if (!validateCSRFToken(request)) {
-    console.warn("[CSRF] Invalid token:", { method, path });
+    logger.warn("Invalid CSRF token", { module: "CSRF", method, path });
     return new NextResponse(
       JSON.stringify({ error: "Forbidden", message: "Invalid or missing CSRF token" }),
       { status: 403, headers: { "Content-Type": "application/json" } }

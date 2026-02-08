@@ -13,6 +13,9 @@ import { toast } from "sonner";
 import { CheckCircle2Icon, FileText, Users, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
 import type { ColumnMapping } from "@/src/lib/ai/gemini-import";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("ImportWizard");
 
 export type ImportStep =
   | "source-selection"
@@ -129,7 +132,7 @@ export function ImportWizard() {
         await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate AI analysis
         setColumnMappings(DEMO_MAPPINGS);
       } catch (err) {
-        console.error("Analysis failed", err);
+        log.error("Analysis failed", err);
         toast.error("AI Analysis failed. Please try again.");
       } finally {
         setIsAnalyzing(false);
@@ -187,7 +190,7 @@ export function ImportWizard() {
 
       toast.success(`Successfully imported ${result.imported} patients!`);
     } catch (err) {
-      console.error("Commit failed", err);
+      log.error("Commit failed", err);
       toast.error(err instanceof Error ? err.message : "Import failed. Please try again.");
       setCurrentStep("preview"); // Go back to preview on error
     } finally {

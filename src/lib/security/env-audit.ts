@@ -2,6 +2,8 @@
  * Environment Variable Audit
  */
 
+import { logger } from "@/src/lib/logger";
+
 interface EnvVarConfig {
   name: string;
   required: boolean;
@@ -56,14 +58,19 @@ export function auditEnvironmentVariables(): AuditResult {
 }
 
 export function logAuditResults(result: AuditResult): void {
-  if (result.valid) console.log("[Env Audit] All required environment variables are set");
-  else {
-    console.error("[Env Audit] Missing required environment variables:");
-    result.missing.forEach((v) => console.error(`  - ${v}`));
+  if (result.valid) {
+    logger.info("All required environment variables are set", { module: "EnvAudit" });
+  } else {
+    logger.error("Missing required environment variables", undefined, {
+      module: "EnvAudit",
+      missing: result.missing,
+    });
   }
   if (result.warnings.length > 0) {
-    console.warn("[Env Audit] Warnings:");
-    result.warnings.forEach((w) => console.warn(`  - ${w}`));
+    logger.warn("Environment variable warnings", {
+      module: "EnvAudit",
+      warnings: result.warnings,
+    });
   }
 }
 

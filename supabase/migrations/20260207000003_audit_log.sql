@@ -130,8 +130,8 @@ CREATE POLICY audit_logs_select ON audit_logs
     FOR SELECT
     USING (
         (
-            practice_id = auth.practice_id()
-            AND auth.has_role('admin')
+            practice_id = public.practice_id()
+            AND public.has_role('admin')
         )
         OR auth.role() = 'service_role'
     );
@@ -169,7 +169,7 @@ DECLARE
 BEGIN
     -- Get current user info from JWT
     v_user_id := auth.uid();
-    v_practice_id := auth.practice_id();
+    v_practice_id := public.practice_id();
 
     -- Look up user and practice names for denormalization
     IF v_user_id IS NOT NULL THEN

@@ -7,6 +7,10 @@
  * @module voice-engine
  */
 
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("VoiceEngine");
+
 // Type definitions for Web Speech API (not included in standard TypeScript)
 interface SpeechRecognitionEvent {
   results: SpeechRecognitionResultList;
@@ -94,7 +98,7 @@ class VoiceEngine {
       | undefined;
 
     if (!SpeechRecognition) {
-      console.warn("[Voice] Web Speech API not supported in this browser");
+      log.warn("Web Speech API not supported in this browser");
       return;
     }
 
@@ -173,7 +177,7 @@ class VoiceEngine {
           // Intentional stop - no error
           break;
         default:
-          console.warn("[Voice] Speech recognition error:", errorType);
+          log.warn("Speech recognition error", { errorType });
           if (this.shouldRestart && !this.isPaused) {
             this.scheduleRestart();
           }

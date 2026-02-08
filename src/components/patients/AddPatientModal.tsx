@@ -41,6 +41,9 @@ import {
 } from "@/src/lib/queries/use-patients";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
 import type { Patient } from "@/src/lib/supabase/types";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("AddPatientModal");
 
 export interface AddPatientModalProps {
   open: boolean;
@@ -160,7 +163,7 @@ export function AddPatientModal({
         handleClose();
       }
     } catch (error) {
-      console.error("Failed to create patient:", error);
+      log.error("Failed to create patient", error);
     }
   };
 
@@ -172,7 +175,7 @@ export function AddPatientModal({
       onPatientCreated?.(patient);
       handleClose();
     } catch (error) {
-      console.error("Failed to force create patient:", error);
+      log.error("Failed to force create patient", error);
     }
   };
 

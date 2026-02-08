@@ -8,6 +8,9 @@ import QRCode from "qrcode";
 import crypto from "crypto";
 import type { TOTPSecret, BackupCodeVerificationResult } from "./types";
 import { MFA_CONFIG } from "./types";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("TOTP");
 
 export function generateTOTPSecret(email: string): TOTPSecret {
   const totp = new OTPAuth.TOTP({
@@ -49,7 +52,7 @@ export function verifyTOTPCode(secret: string, code: string): boolean {
     const delta = totp.validate({ token: cleanCode, window: 1 });
     return delta !== null;
   } catch (error) {
-    console.error("[TOTP] Verification error:", error);
+    log.error("Verification error", error);
     return false;
   }
 }

@@ -51,7 +51,10 @@ import {
   type AppointmentWithPatient,
 } from "@/src/lib/queries/appointments";
 import { DEMO_DATE_OBJECT } from "@/src/lib/utils/demo-date";
+import { createLogger } from "@/src/lib/logger";
 // Voice command integration uses custom events instead of store
+
+const log = createLogger("SchedulePage");
 
 // Color mapping based on appointment type
 function getEventColor(serviceType: string, status: string): CalendarEvent["color"] {
@@ -458,7 +461,7 @@ export default function SchedulePage() {
       const data = await getUpcomingAppointments(undefined, 14, "all");
       setAppointments(data);
     } catch (err) {
-      console.error("Failed to load appointments:", err);
+      log.error("Failed to load appointments", err);
       setError("Unable to load schedule. Please try again.");
     } finally {
       setLoading(false);
@@ -483,7 +486,7 @@ export default function SchedulePage() {
       const targetId = detail.appointmentId || selectedEventId;
 
       if (!targetId) {
-        console.warn("No appointment selected for voice move command");
+        log.warn("No appointment selected for voice move command");
         return;
       }
 

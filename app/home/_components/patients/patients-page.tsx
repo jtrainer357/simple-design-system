@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { ChevronDown } from "lucide-react";
-import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
 import { Button } from "@/design-system/components/ui/button";
 import { FilterTabs } from "@/design-system/components/ui/filter-tabs";
 import { PatientListSidebar } from "../patient-list-sidebar";

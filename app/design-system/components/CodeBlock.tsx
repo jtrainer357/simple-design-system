@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { Button } from "@/design-system/components/ui/button";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("CodeBlock");
 
 interface CodeBlockProps {
   code: string;
@@ -18,7 +21,7 @@ export function CodeBlock({ code, label, language: _language = "typescript" }: C
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (error) {
-      console.error("Failed to copy to clipboard:", error);
+      log.error("Failed to copy to clipboard", error);
     }
   };
 

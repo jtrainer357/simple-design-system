@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import { Loader2, AlertTriangle } from "lucide-react";
-import { Button } from "@/design-system/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -33,6 +32,9 @@ import {
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
 import type { Patient } from "@/src/lib/supabase/types";
 import { toast } from "sonner";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("PatientStatusManager");
 
 export interface PatientStatusManagerProps {
   patient: Patient;
@@ -100,7 +102,7 @@ export function PatientStatusManager({
       setPendingStatus(null);
       setReason("");
     } catch (error) {
-      console.error("Failed to update patient status:", error);
+      log.error("Failed to update patient status", error, { patientId: patient.id });
       toast.error("Failed to update patient status");
     }
   };

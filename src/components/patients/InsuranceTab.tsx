@@ -3,13 +3,10 @@
 import * as React from "react";
 import { Shield, Plus, Pencil, AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { Button } from "@/design-system/components/ui/button";
-import { Input } from "@/design-system/components/ui/input";
-import { Label } from "@/design-system/components/ui/label";
 import { Text } from "@/design-system/components/ui/typography";
 import { Badge } from "@/design-system/components/ui/badge";
 import { CardWrapper } from "@/design-system/components/ui/card-wrapper";
 import { cn } from "@/design-system/lib/utils";
-import { toast } from "sonner";
 
 export interface InsuranceInfo {
   id: string;

@@ -9,6 +9,9 @@ import { getTodayAppointments } from "@/src/lib/queries/appointments";
 import { useShallow } from "zustand/react/shallow";
 import { ExecutionOverlay, useOrchestrationStore } from "@/src/components/orchestration";
 import type { OrchestrationContext } from "@/src/lib/orchestration/types";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("DynamicCanvas");
 
 type CanvasView = "actions" | "patient-detail";
 
@@ -52,7 +55,7 @@ export function DynamicCanvas({ className }: DynamicCanvasProps) {
         const appointments = await getTodayAppointments();
         setAppointmentCount(appointments.length);
       } catch (err) {
-        console.error("Failed to load appointment count:", err);
+        log.error("Failed to load appointment count", err);
       } finally {
         setIsLoading(false);
       }

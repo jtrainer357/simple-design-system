@@ -19,6 +19,9 @@ import { useUpdatePatient, type UpdatePatientData } from "@/src/lib/queries/use-
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
 import type { Patient } from "@/src/lib/supabase/types";
 import { toast } from "sonner";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("EditPatientDemographics");
 
 export interface EditPatientDemographicsProps {
   patient: Patient;
@@ -143,7 +146,7 @@ export function EditPatientDemographics({
       setIsEditing(false);
       toast.success("Patient demographics updated");
     } catch (error) {
-      console.error("Failed to update patient:", error);
+      log.error("Failed to update patient", error, { patientId: patient.id });
       toast.error("Failed to update patient demographics");
     }
   };

@@ -9,6 +9,9 @@ import { getTodayAppointments } from "@/src/lib/queries/appointments";
 import { isDatabasePopulated } from "@/src/lib/queries/practice";
 import type { AppointmentWithPatient } from "@/src/lib/queries/appointments";
 import type { OrchestrationContext } from "@/src/lib/orchestration/types";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("TodaysPatientsList");
 
 type AppointmentStatus = "ENDED" | "IN PROGRESS" | "CHECKED IN" | "SCHEDULED";
 
@@ -92,7 +95,7 @@ export function TodaysPatientsList({ className, onSelectPatient }: TodaysPatient
         const data = await getTodayAppointments();
         setAppointments(data);
       } catch (err) {
-        console.error("Failed to load today's appointments:", err);
+        log.error("Failed to load today's appointments", err);
       } finally {
         setLoading(false);
       }

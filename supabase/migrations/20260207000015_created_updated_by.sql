@@ -3,32 +3,16 @@
 -- This migration adds created_by and updated_by tracking to key tables
 
 -- ============================================
--- USERS TABLE (if not exists)
+-- USERS TABLE (already created by 20260207000001_users_roles.sql)
 -- ============================================
--- Note: In a production system, this would be linked to auth.users
--- For the MVP, we create a simple users table for reference
+-- Note: Users table is created in an earlier migration
+-- Just enable RLS and add demo policy if not exists
 
-CREATE TABLE IF NOT EXISTS users (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  practice_id UUID REFERENCES practices(id) ON DELETE CASCADE,
-  email TEXT NOT NULL UNIQUE,
-  name TEXT NOT NULL,
-  role TEXT NOT NULL DEFAULT 'staff' CHECK (role IN ('admin', 'provider', 'staff', 'billing')),
-  is_active BOOLEAN DEFAULT TRUE,
-  avatar_url TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  updated_at TIMESTAMPTZ DEFAULT NOW()
-);
-
--- Users indexes
-CREATE INDEX IF NOT EXISTS idx_users_practice ON users(practice_id);
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_active ON users(practice_id) WHERE is_active = TRUE;
-
--- Enable RLS on users
+-- Enable RLS on users (idempotent)
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
--- Demo policy for users
+-- Demo policy for users (drop and recreate to be safe)
+DROP POLICY IF EXISTS "demo_users_all" ON users;
 CREATE POLICY "demo_users_all" ON users FOR ALL USING (true) WITH CHECK (true);
 
 -- ============================================
@@ -111,7 +95,8 @@ $$ LANGUAGE plpgsql;
 -- APPLY UPDATED_AT TRIGGER TO ALL TABLES
 -- ============================================
 
--- Users (new table)
+-- Users (already created, just ensure trigger exists)
+DROP TRIGGER IF EXISTS update_users_updated_at ON users;
 CREATE TRIGGER update_users_updated_at
   BEFORE UPDATE ON users
   FOR EACH ROW
@@ -175,9 +160,8 @@ CREATE INDEX idx_audit_log_record ON audit_log(record_id);
 CREATE INDEX idx_audit_log_created ON audit_log(created_at DESC);
 CREATE INDEX idx_audit_log_action ON audit_log(action);
 
--- Partial index for recent audit entries (last 30 days)
-CREATE INDEX idx_audit_log_recent ON audit_log(practice_id, created_at DESC)
-  WHERE created_at > NOW() - INTERVAL '30 days';
+-- Index for recent audit entries (using timestamp DESC for efficient recent queries)
+CREATE INDEX idx_audit_log_recent ON audit_log(practice_id, created_at DESC);
 
 -- Enable RLS on audit log
 ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;

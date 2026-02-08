@@ -24,6 +24,9 @@ import {
   AlertTriangle,
 } from "lucide-react";
 import type { MFAStatus } from "@/src/lib/auth/mfa/types";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("MFASettings");
 
 export function MFASettings() {
   const router = useRouter();
@@ -43,7 +46,7 @@ export function MFASettings() {
       const response = await fetch("/api/auth/mfa/status");
       if (response.ok) setStatus(await response.json());
     } catch (err) {
-      console.error("Failed to fetch MFA status:", err);
+      log.error("Failed to fetch MFA status", err);
     } finally {
       setIsLoading(false);
     }

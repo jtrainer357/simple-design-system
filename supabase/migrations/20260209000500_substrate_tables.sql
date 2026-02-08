@@ -41,10 +41,8 @@ CREATE TABLE IF NOT EXISTS substrate_actions (
   -- Timestamps
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  expires_at TIMESTAMPTZ,
-
-  -- Prevent duplicates for same trigger
-  CONSTRAINT unique_action_trigger UNIQUE (practice_id, patient_id, trigger_type, DATE(created_at))
+  expires_at TIMESTAMPTZ
+  -- Note: Duplicate prevention handled at application layer
 );
 
 -- Indexes for efficient querying

@@ -4,6 +4,7 @@
  */
 
 import Anthropic from "@anthropic-ai/sdk";
+import { logger } from "@/src/lib/logger";
 
 const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
@@ -190,7 +191,10 @@ Prioritize actions by clinical urgency. Be specific and actionable.`;
       id: action.id || `action-${patient.id}-${i}`,
     }));
   } catch (error) {
-    console.error("Claude analysis error:", error);
+    logger.error("Claude analysis error", error, {
+      module: "ClaudeSubstrate",
+      patientId: patient.id,
+    });
 
     // Fallback to rule-based actions if Claude fails
     return generateFallbackActions(input);

@@ -11,6 +11,9 @@
 import { PushNotifications } from "@capacitor/push-notifications";
 import { isNative } from "./index";
 import type { NotificationOptions } from "./types";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("Notifications");
 
 /**
  * Request permission to send notifications
@@ -97,9 +100,7 @@ export async function scheduleLocalNotification(options: NotificationOptions): P
   if (isNative()) {
     // For full local notification support, use @capacitor/local-notifications
     // This is a stub that shows immediate notifications
-    console.warn(
-      "[Notifications] Local notifications on native require @capacitor/local-notifications"
-    );
+    log.warn("Local notifications on native require @capacitor/local-notifications");
     return id;
   }
 
@@ -149,15 +150,13 @@ function showWebNotification(options: NotificationOptions): void {
 export async function cancelNotification(id: string): Promise<void> {
   if (isNative()) {
     // For full support, use @capacitor/local-notifications
-    console.warn(
-      "[Notifications] Canceling notifications on native requires @capacitor/local-notifications"
-    );
+    log.warn("Canceling notifications on native requires @capacitor/local-notifications");
     return;
   }
 
   // Web doesn't support canceling scheduled notifications easily
   // Would need to track timeouts
-  console.warn("[Notifications] Web notification cancellation not fully implemented", id);
+  log.warn("Web notification cancellation not fully implemented", { notificationId: id });
 }
 
 /**

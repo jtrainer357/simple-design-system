@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createLogger } from "@/src/lib/logger";
+import { logSecurityEvent } from "@/src/lib/audit";
 
 const log = createLogger("api/auth/forgot-password");
 
@@ -35,6 +36,15 @@ export async function POST(request: NextRequest) {
       used: false,
       created_at: new Date().toISOString(),
     });
+
+    // Audit log for password reset request
+    await logSecurityEvent("password_change", {
+      userId: user.id,
+      userEmail: user.email,
+      userName: user.name,
+      details: { event: "password_reset_requested" },
+    });
+
     log.info("Reset link generated", { userId: user.id });
     return NextResponse.json({ success: true });
   } catch (error: unknown) {

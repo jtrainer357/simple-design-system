@@ -7,6 +7,9 @@ import { Upload, File, CheckCircle2Icon, AlertCircleIcon } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/design-system/lib/utils";
 import type { UploadedFile } from "../import-wizard";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("UploadStep");
 
 interface UploadStepProps {
   sourceSystem: string;
@@ -88,7 +91,7 @@ export function UploadStep({ sourceSystem, onComplete }: UploadStepProps) {
         );
         successCount++;
       } catch (err) {
-        console.error("Upload error", err);
+        log.error("Upload error", err, { fileName: f.file.name });
         setFiles((prev) =>
           prev.map((item, idx) => (idx === i ? { ...item, status: "error" } : item))
         );

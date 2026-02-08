@@ -8,6 +8,7 @@ import type { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { createClient } from "@supabase/supabase-js";
 import type { AuthUser, UserRole, AuthSession } from "./types";
+import { logSecurityEvent } from "@/src/lib/audit";
 
 // Supabase client for auth operations
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
@@ -75,16 +76,35 @@ export const authOptions: NextAuthOptions = {
           .single();
 
         if (userError || !user) {
+          // Log failed login attempt (user not found)
+          await logSecurityEvent("login_failed", {
+            userEmail: credentials.email.toLowerCase(),
+            details: { reason: "user_not_found" },
+          });
           throw new Error("Invalid email or password");
         }
 
         if (!user.is_active) {
+          // Log failed login attempt (account deactivated)
+          await logSecurityEvent("login_failed", {
+            userId: user.id,
+            userEmail: user.email,
+            userName: user.name,
+            details: { reason: "account_deactivated" },
+          });
           throw new Error("Account is deactivated");
         }
 
         // Verify password
         const isValidPassword = await verifyPassword(credentials.password, user.password_hash);
         if (!isValidPassword) {
+          // Log failed login attempt (invalid password)
+          await logSecurityEvent("login_failed", {
+            userId: user.id,
+            userEmail: user.email,
+            userName: user.name,
+            details: { reason: "invalid_password" },
+          });
           throw new Error("Invalid email or password");
         }
 
@@ -222,10 +242,14 @@ export const authOptions: NextAuthOptions = {
      * Log sign in events for security audit.
      */
     async signIn({ user }) {
-      console.info("[Auth] User signed in:", {
-        userId: user.id,
-        email: user.email,
-        timestamp: new Date().toISOString(),
+      const authUser = user as User & AuthUser;
+      await logSecurityEvent("login", {
+        userId: authUser.id,
+        userEmail: authUser.email,
+        userName: authUser.name,
+        practiceId: authUser.practiceId,
+        practiceName: authUser.practiceName,
+        details: { method: "credentials" },
       });
     },
 
@@ -233,10 +257,16 @@ export const authOptions: NextAuthOptions = {
      * Log sign out events for security audit.
      */
     async signOut({ token }) {
-      console.info("[Auth] User signed out:", {
-        userId: token?.sub,
-        timestamp: new Date().toISOString(),
-      });
+      if (token?.sub) {
+        await logSecurityEvent("logout", {
+          userId: token.sub,
+          userEmail: token.email as string | undefined,
+          userName: token.name as string | undefined,
+          practiceId: token.practiceId as string | undefined,
+          practiceName: token.practiceName as string | undefined,
+          details: { reason: "user_initiated" },
+        });
+      }
     },
   },
 

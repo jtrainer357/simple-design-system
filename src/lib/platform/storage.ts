@@ -10,6 +10,9 @@
  */
 
 import { isNative } from "./index";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("SecureStorage");
 
 /**
  * Storage keys that should be securely stored
@@ -39,9 +42,7 @@ export async function secureSet(key: SecureStorageKey, value: string): Promise<v
     // import { SecureStoragePlugin } from '@capacitor-community/secure-storage-plugin'
     // await SecureStoragePlugin.set({ key, value })
 
-    console.warn(
-      "[SecureStorage] Native secure storage requires @capacitor-community/secure-storage-plugin"
-    );
+    log.warn("Native secure storage requires @capacitor-community/secure-storage-plugin");
 
     // Fallback to localStorage for demo (NOT SECURE for production)
     if (typeof localStorage !== "undefined") {

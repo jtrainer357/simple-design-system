@@ -46,8 +46,8 @@ export default function HomePage() {
         router.push("/communications");
         break;
       default:
-        // Log for other action types (placeholder for now)
-        console.log("Action clicked:", action);
+        // Other action types - no navigation needed
+        break;
     }
   };
 

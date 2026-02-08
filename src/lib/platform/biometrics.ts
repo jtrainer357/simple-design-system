@@ -11,6 +11,9 @@
 
 import { isNative, isIOS, isAndroid } from "./index";
 import type { BiometricResult } from "./types";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("Biometrics");
 
 /**
  * Biometric type available on the device
@@ -93,9 +96,7 @@ export async function authenticateWithBiometrics(reason?: string): Promise<Biome
     // import { BiometricAuth } from '@capacitor-community/biometric-auth'
     // await BiometricAuth.authenticate({ reason: reason || 'Authenticate' })
 
-    console.warn(
-      "[Biometrics] Native biometric auth requires @capacitor-community/biometric-auth plugin"
-    );
+    log.warn("Native biometric auth requires @capacitor-community/biometric-auth plugin");
 
     // For demo purposes, simulate success
     // In production, this would call the native biometric API
@@ -107,7 +108,7 @@ export async function authenticateWithBiometrics(reason?: string): Promise<Biome
 
   // Web: WebAuthn stub
   // Full implementation would create/get credentials
-  console.warn("[Biometrics] WebAuthn authentication not fully implemented");
+  log.warn("WebAuthn authentication not fully implemented");
 
   // For demo purposes, simulate the user canceling
   // In production, this would use navigator.credentials.get()
@@ -138,10 +139,10 @@ export async function promptBiometricSetup(): Promise<void> {
   if (isNative()) {
     // This would open device settings
     // Full implementation would use native plugin
-    console.warn("[Biometrics] Native settings navigation not implemented");
+    log.warn("Native settings navigation not implemented");
     return;
   }
 
   // Web: Can't navigate to system settings
-  console.warn("[Biometrics] Cannot open system settings from web");
+  log.warn("Cannot open system settings from web");
 }

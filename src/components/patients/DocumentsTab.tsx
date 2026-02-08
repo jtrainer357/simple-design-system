@@ -13,7 +13,6 @@ import {
   Eye,
 } from "lucide-react";
 import { Button } from "@/design-system/components/ui/button";
-import { Input } from "@/design-system/components/ui/input";
 import { Text } from "@/design-system/components/ui/typography";
 import {
   DropdownMenu,
@@ -33,6 +32,9 @@ import {
 } from "@/design-system/components/ui/alert-dialog";
 import { cn } from "@/design-system/lib/utils";
 import { toast } from "sonner";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("DocumentsTab");
 
 export interface PatientDocument {
   id: string;
@@ -111,7 +113,7 @@ export function DocumentsTab({
       await onUpload(files);
       toast.success(`${files.length} file(s) uploaded successfully`);
     } catch (error) {
-      console.error("Upload failed:", error);
+      log.error("Upload failed", error);
       toast.error("Failed to upload files");
     } finally {
       setIsUploading(false);
@@ -132,7 +134,7 @@ export function DocumentsTab({
     try {
       await onDownload(doc);
     } catch (error) {
-      console.error("Download failed:", error);
+      log.error("Download failed", error);
       toast.error("Failed to download file");
     }
   };
@@ -146,7 +148,7 @@ export function DocumentsTab({
       toast.success("Document deleted");
       setDeleteTarget(null);
     } catch (error) {
-      console.error("Delete failed:", error);
+      log.error("Delete failed", error);
       toast.error("Failed to delete document");
     } finally {
       setIsDeleting(false);

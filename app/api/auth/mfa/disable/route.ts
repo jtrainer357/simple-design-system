@@ -7,6 +7,7 @@ import { getServerSession } from "next-auth";
 import { createClient } from "@supabase/supabase-js";
 import { authOptions } from "@/src/lib/auth/auth-options";
 import { createLogger } from "@/src/lib/logger";
+import { logSecurityEvent } from "@/src/lib/audit";
 
 const log = createLogger("api/auth/mfa/disable");
 import { verifyTOTPCode } from "@/src/lib/auth/mfa/totp";
@@ -70,6 +71,13 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
       ip_address: ip,
       user_agent: ua,
       success: true,
+    });
+
+    // General audit log for MFA disablement
+    await logSecurityEvent("mfa_disable", {
+      userId: user.id,
+      userEmail: user.email,
+      practiceId: user.practiceId,
     });
 
     return NextResponse.json({

@@ -281,7 +281,7 @@ CREATE TRIGGER update_practice_users_updated_at
 -- ============================================
 
 -- Function to get user's current practice ID from JWT
-CREATE OR REPLACE FUNCTION auth.practice_id()
+CREATE OR REPLACE FUNCTION public.practice_id()
 RETURNS UUID AS $$
 BEGIN
     RETURN NULLIF(current_setting('request.jwt.claims', true)::json->>'practiceId', '')::UUID;
@@ -292,7 +292,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Function to get user's role in current practice from JWT
-CREATE OR REPLACE FUNCTION auth.user_role()
+CREATE OR REPLACE FUNCTION public.user_role()
 RETURNS user_role AS $$
 BEGIN
     RETURN NULLIF(current_setting('request.jwt.claims', true)::json->>'role', '')::user_role;
@@ -303,20 +303,20 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Function to check if user has at least a certain role
-CREATE OR REPLACE FUNCTION auth.has_role(required_role user_role)
+CREATE OR REPLACE FUNCTION public.has_role(required_role user_role)
 RETURNS BOOLEAN AS $$
 DECLARE
-    current_role user_role;
+    v_current_role user_role;
     role_order INTEGER[];
 BEGIN
-    current_role := auth.user_role();
-    IF current_role IS NULL THEN
+    v_current_role := public.user_role();
+    IF v_current_role IS NULL THEN
         RETURN FALSE;
     END IF;
 
     -- Role hierarchy: readonly < staff < billing < provider < admin < owner
     role_order := ARRAY[
-        CASE current_role
+        CASE v_current_role
             WHEN 'readonly' THEN 1
             WHEN 'staff' THEN 2
             WHEN 'billing' THEN 3
@@ -338,6 +338,6 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-COMMENT ON FUNCTION auth.practice_id() IS 'Returns the practice_id from the current JWT claims';
-COMMENT ON FUNCTION auth.user_role() IS 'Returns the user role from the current JWT claims';
-COMMENT ON FUNCTION auth.has_role(user_role) IS 'Checks if user has at least the specified role';
+COMMENT ON FUNCTION public.practice_id() IS 'Returns the practice_id from the current JWT claims';
+COMMENT ON FUNCTION public.user_role() IS 'Returns the user role from the current JWT claims';
+COMMENT ON FUNCTION public.has_role(user_role) IS 'Checks if user has at least the specified role';

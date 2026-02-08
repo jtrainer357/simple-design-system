@@ -24,6 +24,9 @@ import {
 } from "lucide-react";
 import { MetricCardSkeleton } from "@/design-system/components/ui/skeleton";
 import { getBillingSummary, type BillingSummary } from "@/src/lib/queries/billing";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("BillingPage");
 
 interface MetricCardProps {
   title: string;
@@ -197,7 +200,7 @@ export default function BillingPage() {
       const data = await getBillingSummary();
       setSummary(data);
     } catch (err) {
-      console.error("Failed to load billing:", err);
+      log.error("Failed to load billing", err);
       setError("Unable to load billing data. Please try again.");
     } finally {
       setLoading(false);
