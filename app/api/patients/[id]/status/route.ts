@@ -6,6 +6,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { logAudit } from "@/src/lib/audit";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("PatientStatusAPI");
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -78,7 +81,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       .single();
 
     if (error) {
-      console.error("[API] Failed to update patient status:", error);
+      log.error("Failed to update patient status", error);
       return NextResponse.json({ error: "Failed to update patient status" }, { status: 500 });
     }
 
@@ -98,8 +101,8 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     });
 
     return NextResponse.json({ patient });
-  } catch (error) {
-    console.error("[API] Status update error:", error);
+  } catch (error: unknown) {
+    log.error("Status update error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

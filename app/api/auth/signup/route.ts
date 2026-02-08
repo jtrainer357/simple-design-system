@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/auth/signup");
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -75,7 +78,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (practiceError) {
-      console.error("[Signup] Practice creation failed:", practiceError);
+      log.error("Practice creation failed", practiceError);
       return NextResponse.json({ error: "Failed to create practice" }, { status: 500 });
     }
 
@@ -93,7 +96,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (userError) {
-      console.error("[Signup] User creation failed:", userError);
+      log.error("User creation failed", userError);
       await supabase.from("practices").delete().eq("id", practice.id);
       return NextResponse.json({ error: "Failed to create user account" }, { status: 500 });
     }
@@ -107,21 +110,15 @@ export async function POST(request: NextRequest) {
     });
 
     if (membershipError) {
-      console.error("[Signup] Membership creation failed:", membershipError);
+      log.error("Membership creation failed", membershipError);
       await supabase.from("users").delete().eq("id", user.id);
       await supabase.from("practices").delete().eq("id", practice.id);
-      return NextResponse.json(
-        { error: "Failed to set up practice membership" },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: "Failed to set up practice membership" }, { status: 500 });
     }
 
-    console.info("[Signup] Account created successfully:", {
+    log.info("Account created successfully", {
       userId: user.id,
-      email: user.email,
       practiceId: practice.id,
-      practiceName: practice.name,
-      timestamp: new Date().toISOString(),
     });
 
     return NextResponse.json(
@@ -133,8 +130,8 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error) {
-    console.error("[Signup] Unexpected error:", error);
-    return NextResponse.json({ error: "An unexpected error occurred" }, { status: 500 });
+  } catch (error: unknown) {
+    log.error("Signup error", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

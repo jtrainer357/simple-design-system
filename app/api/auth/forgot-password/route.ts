@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/auth/forgot-password");
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -25,23 +28,17 @@ export async function POST(request: NextRequest) {
     if (!user) return NextResponse.json({ success: true });
     const token = generateSecureToken();
     const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
-    await supabase
-      .from("password_reset_tokens")
-      .insert({
-        user_id: user.id,
-        token,
-        expires_at: expiresAt.toISOString(),
-        used: false,
-        created_at: new Date().toISOString(),
-      });
-    console.info("[ForgotPassword] Reset link generated:", {
-      userId: user.id,
-      email: user.email,
-      expiresAt: expiresAt.toISOString(),
+    await supabase.from("password_reset_tokens").insert({
+      user_id: user.id,
+      token,
+      expires_at: expiresAt.toISOString(),
+      used: false,
+      created_at: new Date().toISOString(),
     });
+    log.info("Reset link generated", { userId: user.id });
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("[ForgotPassword] Error:", error);
+  } catch (error: unknown) {
+    log.error("Forgot password error", error);
     return NextResponse.json({ success: true });
   }
 }

@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
 import { createHash } from "crypto";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/sessions/[id]/sign");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -81,7 +84,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .single();
 
     if (error) {
-      console.error("Error signing session:", error);
+      log.error("Error signing session", error);
       return NextResponse.json({ error: "Failed to sign session" }, { status: 500 });
     }
 
@@ -98,8 +101,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       lateEntryReason: data.late_entry_reason,
       updatedAt: data.updated_at,
     });
-  } catch (error) {
-    console.error("Session sign API error:", error);
+  } catch (error: unknown) {
+    log.error("Session sign API error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

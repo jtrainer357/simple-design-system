@@ -7,6 +7,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { logAudit } from "@/src/lib/audit";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("PatientsAPI");
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -109,7 +112,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error("[API] Failed to create patient:", error);
+      log.error("Failed to create patient", error);
       return NextResponse.json({ error: "Failed to create patient" }, { status: 500 });
     }
 
@@ -123,8 +126,8 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ patient }, { status: 201 });
-  } catch (error) {
-    console.error("[API] Patient creation error:", error);
+  } catch (error: unknown) {
+    log.error("Patient creation error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -188,7 +191,7 @@ export async function GET(request: NextRequest) {
     const { data: patients, error, count } = await query;
 
     if (error) {
-      console.error("[API] Failed to fetch patients:", error);
+      log.error("Failed to fetch patients", error);
       return NextResponse.json({ error: "Failed to fetch patients" }, { status: 500 });
     }
 
@@ -201,8 +204,8 @@ export async function GET(request: NextRequest) {
         totalPages: Math.ceil((count || 0) / limit),
       },
     });
-  } catch (error) {
-    console.error("[API] Patient list error:", error);
+  } catch (error: unknown) {
+    log.error("Patient list error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

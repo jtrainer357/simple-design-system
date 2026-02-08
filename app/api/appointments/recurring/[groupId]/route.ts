@@ -109,8 +109,8 @@ export async function PATCH(
       updates: Object.keys(updateData),
     });
     return NextResponse.json({ updated: appointments.length, groupId });
-  } catch (error) {
-    log.error("Failed to update recurring appointments", error as Error);
+  } catch (error: unknown) {
+    log.error("Failed to update recurring appointments", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -172,8 +172,8 @@ export async function DELETE(
 
     log.info("Recurring appointments cancelled", { groupId, count: appointmentIds.length, reason });
     return NextResponse.json({ cancelled: appointmentIds.length, groupId });
-  } catch (error) {
-    log.error("Failed to cancel recurring appointments", error as Error);
+  } catch (error: unknown) {
+    log.error("Failed to cancel recurring appointments", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

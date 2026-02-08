@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/sessions/unsigned-count");
 
 /**
  * GET /api/sessions/unsigned-count - Get count of unsigned notes for current user
@@ -24,13 +27,13 @@ export async function GET(request: NextRequest) {
       .eq("status", "draft");
 
     if (error) {
-      console.error("Error fetching unsigned count:", error);
+      log.error("Error fetching unsigned count", error);
       return NextResponse.json({ error: "Failed to fetch unsigned count" }, { status: 500 });
     }
 
     return NextResponse.json({ count: count || 0 });
-  } catch (error) {
-    console.error("Unsigned count API error:", error);
+  } catch (error: unknown) {
+    log.error("Unsigned count API error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

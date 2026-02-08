@@ -205,8 +205,8 @@ export async function POST(request: NextRequest) {
       allAppointments,
       count: allAppointments.length,
     });
-  } catch (error) {
-    log.error("Failed to create appointment", error as Error);
+  } catch (error: unknown) {
+    log.error("Failed to create appointment", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -244,8 +244,8 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ appointments: data || [] });
-  } catch (error) {
-    log.error("Failed to fetch appointments", error as Error);
+  } catch (error: unknown) {
+    log.error("Failed to fetch appointments", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

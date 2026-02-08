@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
       count: sorted.length,
       practiceId,
     });
-  } catch (error) {
+  } catch (error: unknown) {
     log.error("Unexpected error in actions API", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }

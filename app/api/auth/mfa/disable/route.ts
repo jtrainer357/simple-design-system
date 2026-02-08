@@ -6,6 +6,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { createClient } from "@supabase/supabase-js";
 import { authOptions } from "@/src/lib/auth/auth-options";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/auth/mfa/disable");
 import { verifyTOTPCode } from "@/src/lib/auth/mfa/totp";
 import type { AuthUser } from "@/src/lib/auth/types";
 
@@ -73,8 +76,8 @@ export async function DELETE(request: NextRequest): Promise<NextResponse> {
       success: true,
       message: "Two-factor authentication has been disabled",
     });
-  } catch (error) {
-    console.error("[MFA Disable] Error:", error);
+  } catch (error: unknown) {
+    log.error("MFA disable error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

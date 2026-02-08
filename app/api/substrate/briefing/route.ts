@@ -8,11 +8,14 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
+import { createLogger } from "@/src/lib/logger";
 import type {
   PreSessionBriefingData,
   OutcomeScore,
   Medication,
 } from "@/src/components/substrate/PreSessionBriefing";
+
+const log = createLogger("BriefingAPI");
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -133,8 +136,8 @@ export async function GET(request: NextRequest) {
     };
 
     return NextResponse.json({ data: briefingData, hasAppointmentToday: true });
-  } catch (error) {
-    console.error("Error generating briefing:", error);
+  } catch (error: unknown) {
+    log.error("Error generating briefing", error);
     return NextResponse.json({ error: "Failed to generate briefing" }, { status: 500 });
   }
 }

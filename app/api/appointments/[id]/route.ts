@@ -41,8 +41,8 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     }
 
     return NextResponse.json({ appointment: data });
-  } catch (error) {
-    log.error("Failed to fetch appointment", error as Error);
+  } catch (error: unknown) {
+    log.error("Failed to fetch appointment", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -135,8 +135,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     log.info("Appointment updated", { id, updates: Object.keys(updateData) });
     return NextResponse.json({ appointment: data });
-  } catch (error) {
-    log.error("Failed to update appointment", error as Error);
+  } catch (error: unknown) {
+    log.error("Failed to update appointment", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -177,8 +177,8 @@ export async function DELETE(
 
     log.info("Appointment cancelled", { id, reason });
     return NextResponse.json({ appointment: data });
-  } catch (error) {
-    log.error("Failed to cancel appointment", error as Error);
+  } catch (error: unknown) {
+    log.error("Failed to cancel appointment", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -100,8 +100,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     });
 
     return NextResponse.json({ appointment: data, previousStatus: currentStatus, newStatus });
-  } catch (error) {
-    log.error("Failed to update appointment status", error as Error);
+  } catch (error: unknown) {
+    log.error("Failed to update appointment status", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

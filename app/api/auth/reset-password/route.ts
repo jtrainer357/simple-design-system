@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/auth/reset-password");
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -41,8 +44,8 @@ export async function POST(request: NextRequest) {
       .eq("id", resetToken.user_id);
     await supabase.from("password_reset_tokens").update({ used: true }).eq("id", resetToken.id);
     return NextResponse.json({ success: true });
-  } catch (error) {
-    console.error("[ResetPassword] Error:", error);
-    return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
+  } catch (error: unknown) {
+    log.error("Reset password error", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

@@ -5,6 +5,9 @@
 
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/marketing-analyze");
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GEMINI_MODEL = "gemini-2.0-flash";
@@ -274,8 +277,8 @@ export async function POST(request: NextRequest) {
     const validated = validateAndFixScore(parsed, provider);
 
     return NextResponse.json(validated);
-  } catch (error) {
-    console.error("Marketing analysis error:", error);
-    return NextResponse.json({ error: (error as Error).message }, { status: 500 });
+  } catch (error: unknown) {
+    log.error("Marketing analysis failed", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

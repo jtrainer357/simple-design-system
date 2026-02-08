@@ -11,6 +11,9 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/substrate/scan");
 
 interface ScanResult {
   scanId: string;
@@ -57,15 +60,9 @@ export async function POST(request: NextRequest) {
     };
 
     return NextResponse.json(result);
-  } catch (error) {
-    console.error("Substrate scan failed:", error);
-    return NextResponse.json(
-      {
-        error: "Scan failed",
-        message: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    log.error("Substrate scan failed", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 

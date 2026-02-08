@@ -6,6 +6,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { createClient } from "@supabase/supabase-js";
 import { authOptions } from "@/src/lib/auth/auth-options";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/auth/mfa/setup");
 import {
   generateTOTPSecret,
   generateQRCode,
@@ -64,8 +67,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       secret,
       message: "Scan the QR code with your authenticator app",
     });
-  } catch (error) {
-    console.error("[MFA Setup] Error:", error);
+  } catch (error: unknown) {
+    log.error("MFA setup error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -142,8 +145,8 @@ export async function PUT(request: NextRequest): Promise<NextResponse> {
       backupCodes: formatBackupCodes(backupCodes),
       message: "MFA has been enabled",
     });
-  } catch (error) {
-    console.error("[MFA Setup Verify] Error:", error);
+  } catch (error: unknown) {
+    log.error("MFA setup verify error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

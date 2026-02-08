@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/sessions/[id]");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -30,7 +33,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       createdAt: data.created_at,
       updatedAt: data.updated_at,
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    log.error("Session API error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -79,7 +83,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       lastAutoSavedAt: data.last_auto_saved_at,
       updatedAt: data.updated_at,
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    log.error("Session API error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

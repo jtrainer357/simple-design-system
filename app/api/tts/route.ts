@@ -13,6 +13,9 @@
  */
 
 import { NextResponse } from "next/server";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/tts");
 
 // Validate and import OpenAI only if API key exists
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
@@ -60,8 +63,7 @@ export async function POST(request: Request) {
     });
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error("OpenAI TTS error:", errorText);
+      log.error("OpenAI TTS API error", undefined, { status: response.status });
       return NextResponse.json({ error: "TTS generation failed" }, { status: response.status });
     }
 
@@ -76,8 +78,8 @@ export async function POST(request: Request) {
         "Cache-Control": "public, max-age=86400", // Cache for 24 hours
       },
     });
-  } catch (error) {
-    console.error("TTS route error:", error);
+  } catch (error: unknown) {
+    log.error("TTS route error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

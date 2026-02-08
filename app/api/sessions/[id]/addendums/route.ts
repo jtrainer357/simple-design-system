@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
 import { createHash } from "crypto";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/sessions/[id]/addendums");
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -21,7 +24,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       .order("created_at", { ascending: true });
 
     if (error) {
-      console.error("Error fetching addendums:", error);
+      log.error("Error fetching addendums", error);
       return NextResponse.json({ error: "Failed to fetch addendums" }, { status: 500 });
     }
 
@@ -37,8 +40,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     }));
 
     return NextResponse.json(addendums);
-  } catch (error) {
-    console.error("Addendums GET API error:", error);
+  } catch (error: unknown) {
+    log.error("Addendums GET API error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -117,7 +120,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       .single();
 
     if (error) {
-      console.error("Error creating addendum:", error);
+      log.error("Error creating addendum", error);
       return NextResponse.json({ error: "Failed to create addendum" }, { status: 500 });
     }
 
@@ -134,8 +137,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       signatureHash: data.signature_hash,
       createdAt: data.created_at,
     });
-  } catch (error) {
-    console.error("Addendums POST API error:", error);
+  } catch (error: unknown) {
+    log.error("Addendums POST API error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

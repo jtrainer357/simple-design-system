@@ -6,6 +6,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { createClient } from "@supabase/supabase-js";
 import { authOptions } from "@/src/lib/auth/auth-options";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/auth/mfa/regenerate-backup");
 import {
   verifyTOTPCode,
   generateBackupCodes,
@@ -85,8 +88,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       backupCodes: formatBackupCodes(backupCodes),
       message: "Backup codes have been regenerated. Previous codes are now invalid.",
     });
-  } catch (error) {
-    console.error("[MFA Regenerate Backup] Error:", error);
+  } catch (error: unknown) {
+    log.error("MFA regenerate backup error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

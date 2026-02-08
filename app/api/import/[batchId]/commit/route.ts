@@ -11,7 +11,10 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { createLogger } from "@/src/lib/logger";
 import { importCommitSchema } from "@/src/lib/validation";
+
+const log = createLogger("api/import/commit");
 import { checkRateLimit } from "@/src/lib/rate-limit";
 import { logAudit } from "@/src/lib/audit";
 import {
@@ -62,7 +65,7 @@ export async function POST(
     // Validate input (mappings are optional for synthetic data flow)
     const parsed = importCommitSchema.safeParse(body);
     if (!parsed.success) {
-      console.warn("Validation warning:", parsed.error.flatten());
+      log.warn("Validation warning", { error: parsed.error.flatten() });
     }
 
     const supabase = createServiceClient();
@@ -81,7 +84,7 @@ export async function POST(
         .single();
 
       if (practiceError) {
-        console.error("Failed to create practice:", practiceError);
+        log.error("Failed to create practice", practiceError);
         throw new Error("Failed to create practice");
       }
       practice = newPractice;
@@ -102,7 +105,7 @@ export async function POST(
     await supabase.from("appointments").delete().eq("practice_id", practiceId);
     await supabase.from("patients").delete().eq("practice_id", practiceId);
 
-    console.warn(`[Import] Cleared existing data for practice ${practiceId}`);
+    log.info("Cleared existing data for practice", { practiceId });
 
     // ========================================
     // STEP 3: Insert Patients
@@ -141,7 +144,7 @@ export async function POST(
       .select("id, external_id");
 
     if (patientsError) {
-      console.error("Failed to insert patients:", patientsError);
+      log.error("Failed to insert patients", patientsError);
       throw new Error("Failed to insert patients");
     }
 
@@ -153,7 +156,7 @@ export async function POST(
       }
     });
 
-    console.warn(`[Import] Inserted ${insertedPatients?.length || 0} patients`);
+    log.info("Inserted patients", { count: insertedPatients?.length || 0 });
 
     // ========================================
     // STEP 4: Insert Appointments
@@ -181,7 +184,7 @@ export async function POST(
       .select("id, external_id");
 
     if (appointmentsError) {
-      console.error("Failed to insert appointments:", appointmentsError);
+      log.error("Failed to insert appointments", appointmentsError);
       throw new Error("Failed to insert appointments");
     }
 
@@ -193,7 +196,7 @@ export async function POST(
       }
     });
 
-    console.warn(`[Import] Inserted ${insertedAppointments?.length || 0} appointments`);
+    log.info("Inserted appointments", { count: insertedAppointments?.length || 0 });
 
     // ========================================
     // STEP 5: Insert Outcome Measures
@@ -213,11 +216,11 @@ export async function POST(
     const { error: measuresError } = await supabase.from("outcome_measures").insert(measureInserts);
 
     if (measuresError) {
-      console.error("Failed to insert outcome measures:", measuresError);
+      log.error("Failed to insert outcome measures", measuresError);
       throw new Error("Failed to insert outcome measures");
     }
 
-    console.warn(`[Import] Inserted ${measureInserts.length} outcome measures`);
+    log.info("Inserted outcome measures", { count: measureInserts.length });
 
     // ========================================
     // STEP 6: Insert Messages
@@ -237,11 +240,11 @@ export async function POST(
     const { error: messagesError } = await supabase.from("messages").insert(messageInserts);
 
     if (messagesError) {
-      console.error("Failed to insert messages:", messagesError);
+      log.error("Failed to insert messages", messagesError);
       throw new Error("Failed to insert messages");
     }
 
-    console.warn(`[Import] Inserted ${messageInserts.length} messages`);
+    log.info("Inserted messages", { count: messageInserts.length });
 
     // ========================================
     // STEP 7: Insert Invoices
@@ -266,16 +269,16 @@ export async function POST(
     const { error: invoicesError } = await supabase.from("invoices").insert(invoiceInserts);
 
     if (invoicesError) {
-      console.error("Failed to insert invoices:", invoicesError);
+      log.error("Failed to insert invoices", invoicesError);
       throw new Error("Failed to insert invoices");
     }
 
-    console.warn(`[Import] Inserted ${invoiceInserts.length} invoices`);
+    log.info("Inserted invoices", { count: invoiceInserts.length });
 
     // ========================================
     // STEP 8: Run Claude Substrate Analysis
     // ========================================
-    console.warn("[Import] Starting Claude substrate analysis...");
+    log.info("Starting Claude substrate analysis");
 
     const claudeActions: Array<{
       patient_id: string;
@@ -291,7 +294,7 @@ export async function POST(
         SYNTHETIC_APPOINTMENTS.some((a) => a.patient_id === p.id && a.date === today)
     ).slice(0, 12); // Limit to 12 for demo speed
 
-    console.warn(`[Import] Analyzing ${priorityPatients.length} priority patients with Claude...`);
+    log.info("Analyzing priority patients with Claude", { count: priorityPatients.length });
 
     for (const patient of priorityPatients) {
       const dbPatientId = patientIdMap.get(patient.id);
@@ -366,11 +369,12 @@ export async function POST(
           patient_name: `${patient.first_name} ${patient.last_name}`,
           actions,
         });
-        console.warn(
-          `[Import] Claude generated ${actions.length} actions for ${patient.first_name} ${patient.last_name}`
-        );
-      } catch (error) {
-        console.error(`[Import] Claude analysis failed for ${patient.id}:`, error);
+        log.info("Claude generated actions for patient", {
+          actionCount: actions.length,
+          patientName: `${patient.first_name} ${patient.last_name}`,
+        });
+      } catch (analysisError: unknown) {
+        log.error("Claude analysis failed for patient", analysisError, { patientId: patient.id });
       }
 
       // Small delay to avoid rate limits
@@ -412,11 +416,11 @@ export async function POST(
         .select("id, patient_id, suggested_actions");
 
       if (actionsError) {
-        console.error("Failed to insert priority actions:", actionsError);
+        log.error("Failed to insert priority actions", actionsError);
         // Don't throw - continue without actions
       } else {
         insertedActions = data || [];
-        console.warn(`[Import] Inserted ${insertedActions.length} priority actions`);
+        log.info("Inserted priority actions", { count: insertedActions.length });
 
         // Generate clinical tasks from actions
         for (const action of insertedActions) {
@@ -442,9 +446,9 @@ export async function POST(
       const { error: tasksError } = await supabase.from("clinical_tasks").insert(allTaskInserts);
 
       if (tasksError) {
-        console.error("Failed to insert clinical tasks:", tasksError);
+        log.error("Failed to insert clinical tasks", tasksError);
       } else {
-        console.warn(`[Import] Inserted ${allTaskInserts.length} clinical tasks`);
+        log.info("Inserted clinical tasks", { count: allTaskInserts.length });
       }
     }
 
@@ -526,18 +530,9 @@ export async function POST(
         status: a.status,
       })),
     });
-  } catch (error) {
-    // Log full error internally for debugging
-    console.error("Error in import commit:", error);
-
-    // Return generic error to client - don't leak internal details
-    return NextResponse.json(
-      {
-        error: "Failed to commit import",
-        message: "An unexpected error occurred. Please try again or contact support.",
-      },
-      { status: 500 }
-    );
+  } catch (error: unknown) {
+    log.error("Error in import commit", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
 

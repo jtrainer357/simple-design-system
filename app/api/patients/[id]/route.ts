@@ -8,6 +8,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { logAudit } from "@/src/lib/audit";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("PatientAPI");
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "";
@@ -54,8 +57,8 @@ export async function GET(request: NextRequest, context: RouteContext) {
     });
 
     return NextResponse.json({ patient });
-  } catch (error) {
-    console.error("[API] Get patient error:", error);
+  } catch (error: unknown) {
+    log.error("Get patient error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -136,7 +139,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       .single();
 
     if (error) {
-      console.error("[API] Failed to update patient:", error);
+      log.error("Failed to update patient", error);
       return NextResponse.json({ error: "Failed to update patient" }, { status: 500 });
     }
 
@@ -152,8 +155,8 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
     });
 
     return NextResponse.json({ patient });
-  } catch (error) {
-    console.error("[API] Update patient error:", error);
+  } catch (error: unknown) {
+    log.error("Update patient error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -201,7 +204,7 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
       .single();
 
     if (error) {
-      console.error("[API] Failed to archive patient:", error);
+      log.error("Failed to archive patient", error);
       return NextResponse.json({ error: "Failed to archive patient" }, { status: 500 });
     }
 
@@ -218,8 +221,8 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
     });
 
     return NextResponse.json({ success: true, patient });
-  } catch (error) {
-    console.error("[API] Archive patient error:", error);
+  } catch (error: unknown) {
+    log.error("Archive patient error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

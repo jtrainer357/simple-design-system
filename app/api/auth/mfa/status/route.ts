@@ -6,6 +6,9 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { createClient } from "@supabase/supabase-js";
 import { authOptions } from "@/src/lib/auth/auth-options";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/auth/mfa/status");
 import type { MFAStatus } from "@/src/lib/auth/mfa/types";
 import type { AuthUser } from "@/src/lib/auth/types";
 
@@ -42,8 +45,8 @@ export async function GET(): Promise<NextResponse> {
     };
 
     return NextResponse.json(status);
-  } catch (error) {
-    console.error("[MFA Status] Error:", error);
+  } catch (error: unknown) {
+    log.error("MFA status error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }

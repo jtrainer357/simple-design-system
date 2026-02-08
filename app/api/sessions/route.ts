@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/src/lib/supabase/server";
+import { createLogger } from "@/src/lib/logger";
+
+const log = createLogger("api/sessions");
 
 export async function GET(request: NextRequest) {
   try {
@@ -38,7 +41,8 @@ export async function GET(request: NextRequest) {
       updatedAt: s.updated_at,
     }));
     return NextResponse.json(sessions);
-  } catch (error) {
+  } catch (error: unknown) {
+    log.error("Sessions API error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
@@ -79,7 +83,8 @@ export async function POST(request: NextRequest) {
       status: data.status,
       createdAt: data.created_at,
     });
-  } catch (error) {
+  } catch (error: unknown) {
+    log.error("Sessions API error", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
