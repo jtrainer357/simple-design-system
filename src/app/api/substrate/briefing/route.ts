@@ -1,17 +1,18 @@
 /**
  * Pre-Session Briefing API Route
  * Generates AI-powered briefings for upcoming patient sessions.
+ *
+ * Note: This is a stub implementation. Full implementation requires
+ * clinical_sessions, medications, and patient_diagnoses tables.
  */
 
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import { createClinicalFallbackChain } from "@/lib/ai/providers";
-import { CLINICAL_THRESHOLDS } from "@/lib/triggers/trigger-types";
+import { createClient } from "@/src/lib/supabase/server";
 import type {
   PreSessionBriefingData,
   OutcomeScore,
   Medication,
-} from "@/components/substrate/PreSessionBriefing";
+} from "@/src/components/substrate/PreSessionBriefing";
 
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -32,12 +33,12 @@ export async function GET(request: NextRequest) {
 
     const { data: appointment } = await supabase
       .from("appointments")
-      .select("id, start_time, end_time, appointment_type, status")
+      .select("id, start_time, end_time, service_type, status")
       .eq("patient_id", patientId)
       .eq("practice_id", practiceId)
       .gte("start_time", startOfDay)
       .lte("start_time", endOfDay)
-      .neq("status", "cancelled")
+      .neq("status", "Cancelled")
       .order("start_time", { ascending: true })
       .limit(1)
       .single();
@@ -49,7 +50,9 @@ export async function GET(request: NextRequest) {
     // Fetch patient data
     const { data: patient } = await supabase
       .from("patients")
-      .select("id, first_name, last_name")
+      .select(
+        "id, first_name, last_name, primary_diagnosis_name, medications, treatment_start_date"
+      )
       .eq("id", patientId)
       .single();
 
@@ -57,109 +60,57 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Patient not found" }, { status: 404 });
     }
 
-    // Fetch diagnoses
-    const { data: diagnoses } = await supabase
-      .from("patient_diagnoses")
-      .select("diagnosis_name")
-      .eq("patient_id", patientId)
-      .eq("status", "active")
-      .limit(5);
-
-    // Fetch outcome measures
-    const { data: outcomeMeasures } = await supabase
-      .from("outcome_measures")
-      .select("measure_type, score, administered_at")
-      .eq("patient_id", patientId)
-      .order("administered_at", { ascending: false })
-      .limit(10);
-
-    // Fetch medications
-    const { data: medications } = await supabase
-      .from("medications")
-      .select("medication_name, dosage, frequency, prescribed_date, refill_due_date")
-      .eq("patient_id", patientId)
-      .eq("status", "active");
-
-    // Fetch session count
-    const { count: sessionCount } = await supabase
-      .from("clinical_sessions")
-      .select("id", { count: "exact", head: true })
-      .eq("patient_id", patientId)
-      .eq("status", "completed");
-
-    // Fetch last session
-    const { data: lastSession } = await supabase
-      .from("clinical_sessions")
-      .select("session_date")
-      .eq("patient_id", patientId)
-      .eq("status", "completed")
-      .order("session_date", { ascending: false })
-      .limit(1)
-      .single();
-
-    // Process outcome scores
+    // Fetch outcome measures if table exists
     const outcomeScores: OutcomeScore[] = [];
-    const measureTypes = ["PHQ-9", "GAD-7", "PCL-5"] as const;
+    try {
+      const { data: outcomeMeasures } = await supabase
+        .from("outcome_measures")
+        .select("measure_type, score, measurement_date")
+        .eq("patient_id", patientId)
+        .order("measurement_date", { ascending: false })
+        .limit(10);
 
-    for (const measureType of measureTypes) {
-      const measures = (outcomeMeasures || []).filter((m) => m.measure_type === measureType);
-
-      if (measures.length > 0) {
-        const current = measures[0];
-        const previous = measures[1] || null;
-        const threshold = CLINICAL_THRESHOLDS[measureType];
-
-        outcomeScores.push({
-          measureType,
-          currentScore: current.score,
-          previousScore: previous?.score || null,
-          maxScore: measureType === "PCL-5" ? 80 : 27,
-          severity: getSeverity(current.score, threshold),
-          dateAdministered: current.administered_at,
-        });
+      if (outcomeMeasures && outcomeMeasures.length > 0) {
+        const measureTypes = ["PHQ-9", "GAD-7", "PCL-5"] as const;
+        for (const measureType of measureTypes) {
+          const measures = outcomeMeasures.filter((m) => m.measure_type === measureType);
+          if (measures.length > 0) {
+            const current = measures[0]!;
+            const previous = measures[1] || null;
+            outcomeScores.push({
+              measureType,
+              currentScore: current.score,
+              previousScore: previous?.score ?? null,
+              maxScore: measureType === "PCL-5" ? 80 : 27,
+              severity: getSeverityFromScore(measureType, current.score),
+              dateAdministered: current.measurement_date,
+            });
+          }
+        }
       }
+    } catch {
+      // Table may not exist yet
     }
 
-    // Process medications
-    const activeMedications: Medication[] = (medications || []).map((med) => ({
-      name: med.medication_name,
-      dosage: med.dosage,
-      frequency: med.frequency,
-      prescribedDate: med.prescribed_date,
-      refillDue: med.refill_due_date,
+    // Use patient's medications array if available
+    const activeMedications: Medication[] = (patient.medications || []).map((med: string) => ({
+      name: med,
+      dosage: "",
+      frequency: "",
+      prescribedDate: "",
     }));
 
-    // Calculate treatment duration
-    const treatmentDuration = calculateTreatmentDuration(sessionCount || 0);
+    // Calculate treatment duration from treatment_start_date
+    const treatmentDuration = patient.treatment_start_date
+      ? calculateDuration(patient.treatment_start_date)
+      : "New patient";
 
-    // Generate insights
-    let keyInsights: string[] = [];
-    let suggestedTopics: string[] = [];
-    let riskFactors: string[] = [];
-
-    try {
-      const aiResponse = await generateBriefingInsights({
-        patientName: `${patient.first_name} ${patient.last_name}`,
-        diagnoses: diagnoses || [],
-        outcomeScores,
-        medications: activeMedications,
-        sessionCount: sessionCount || 0,
-      });
-
-      keyInsights = aiResponse.keyInsights;
-      suggestedTopics = aiResponse.suggestedTopics;
-      riskFactors = aiResponse.riskFactors;
-    } catch {
-      // Fallback to template insights
-      const template = generateTemplateInsights({
-        outcomeScores,
-        medications: activeMedications,
-        sessionCount: sessionCount || 0,
-      });
-      keyInsights = template.keyInsights;
-      suggestedTopics = template.suggestedTopics;
-      riskFactors = template.riskFactors;
-    }
+    // Generate template insights
+    const { keyInsights, suggestedTopics, riskFactors } = generateTemplateInsights({
+      outcomeScores,
+      medications: activeMedications,
+      primaryDiagnosis: patient.primary_diagnosis_name,
+    });
 
     const briefingData: PreSessionBriefingData = {
       patientId,
@@ -168,11 +119,11 @@ export async function GET(request: NextRequest) {
         hour: "numeric",
         minute: "2-digit",
       }),
-      appointmentType: appointment.appointment_type || "Session",
-      lastSessionDate: lastSession?.session_date || null,
-      sessionCount: sessionCount || 0,
+      appointmentType: appointment.service_type || "Session",
+      lastSessionDate: null,
+      sessionCount: 0,
       treatmentDuration,
-      primaryDiagnosis: (diagnoses || []).map((d) => d.diagnosis_name),
+      primaryDiagnosis: patient.primary_diagnosis_name ? [patient.primary_diagnosis_name] : [],
       outcomeScores,
       activeMedications,
       recentNotes: [],
@@ -188,54 +139,47 @@ export async function GET(request: NextRequest) {
   }
 }
 
-function getSeverity(
-  score: number,
-  threshold: { elevated: number; high: number; severe: number }
+function getSeverityFromScore(
+  measureType: "PHQ-9" | "GAD-7" | "PCL-5",
+  score: number
 ): OutcomeScore["severity"] {
-  if (score >= threshold.severe) return "severe";
-  if (score >= threshold.high) return "moderately_severe";
-  if (score >= threshold.elevated) return "moderate";
-  if (score >= threshold.elevated / 2) return "mild";
+  const thresholds: Record<
+    string,
+    { mild: number; moderate: number; moderately_severe: number; severe: number }
+  > = {
+    "PHQ-9": { mild: 5, moderate: 10, moderately_severe: 15, severe: 20 },
+    "GAD-7": { mild: 5, moderate: 10, moderately_severe: 15, severe: 21 },
+    "PCL-5": { mild: 20, moderate: 31, moderately_severe: 45, severe: 60 },
+  };
+
+  const t = thresholds[measureType]!;
+  if (score >= t.severe) return "severe";
+  if (score >= t.moderately_severe) return "moderately_severe";
+  if (score >= t.moderate) return "moderate";
+  if (score >= t.mild) return "mild";
   return "minimal";
 }
 
-function calculateTreatmentDuration(sessionCount: number): string {
-  if (sessionCount === 0) return "New patient";
-  const months = Math.ceil(sessionCount / 4);
+function calculateDuration(startDate: string): string {
+  const start = new Date(startDate);
+  const now = new Date();
+  const months = Math.floor((now.getTime() - start.getTime()) / (30 * 24 * 60 * 60 * 1000));
+  if (months < 1) return "< 1 month";
   if (months < 12) return `${months} month${months > 1 ? "s" : ""}`;
-  return `${Math.floor(months / 12)} year${Math.floor(months / 12) > 1 ? "s" : ""}`;
-}
-
-async function generateBriefingInsights(context: {
-  patientName: string;
-  diagnoses: Array<{ diagnosis_name: string }>;
-  outcomeScores: OutcomeScore[];
-  medications: Medication[];
-  sessionCount: number;
-}) {
-  const aiProvider = createClinicalFallbackChain();
-
-  const prompt = `Generate a brief pre-session clinical summary for ${context.patientName}.
-Sessions: ${context.sessionCount}
-Diagnoses: ${context.diagnoses.map((d) => d.diagnosis_name).join(", ") || "None"}
-Medications: ${context.medications.map((m) => m.name).join(", ") || "None"}
-Scores: ${context.outcomeScores.map((s) => `${s.measureType}: ${s.currentScore}`).join(", ") || "None"}
-
-Return JSON: {"keyInsights": ["..."], "suggestedTopics": ["..."], "riskFactors": [...]}`;
-
-  const response = await aiProvider.complete(prompt, { maxTokens: 300, temperature: 0.3 });
-  return JSON.parse(response.content);
+  const years = Math.floor(months / 12);
+  return `${years} year${years > 1 ? "s" : ""}`;
 }
 
 function generateTemplateInsights(context: {
   outcomeScores: OutcomeScore[];
   medications: Medication[];
-  sessionCount: number;
+  primaryDiagnosis?: string | null;
 }) {
   const keyInsights: string[] = [];
   const suggestedTopics: string[] = [];
   const riskFactors: string[] = [];
 
+  // Check outcome scores for insights
   for (const score of context.outcomeScores) {
     if (score.severity === "severe" || score.severity === "moderately_severe") {
       riskFactors.push(`Elevated ${score.measureType} (${score.currentScore})`);
@@ -250,13 +194,12 @@ function generateTemplateInsights(context: {
     }
   }
 
-  if (context.sessionCount <= 3) {
-    suggestedTopics.push("Treatment goals", "Therapeutic alliance");
-  } else {
-    suggestedTopics.push("Progress review");
-  }
+  // Default suggested topics
+  suggestedTopics.push("Progress review", "Treatment goals");
 
-  if (keyInsights.length === 0) keyInsights.push("Review current symptoms");
+  if (keyInsights.length === 0) {
+    keyInsights.push("Review current symptoms and treatment progress");
+  }
 
   return { keyInsights, suggestedTopics, riskFactors };
 }

@@ -24,9 +24,9 @@ import {
   Sparkles,
   Loader2,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/design-system/lib/utils";
+import { Button } from "@/design-system/components/ui/button";
+import { Badge } from "@/design-system/components/ui/badge";
 
 export interface OutcomeScore {
   measureType: "PHQ-9" | "GAD-7" | "PCL-5";

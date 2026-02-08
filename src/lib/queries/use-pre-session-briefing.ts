@@ -3,7 +3,7 @@
  */
 
 import { useQuery } from "@tanstack/react-query";
-import type { PreSessionBriefingData } from "@/components/substrate/PreSessionBriefing";
+import type { PreSessionBriefingData } from "@/src/components/substrate/PreSessionBriefing";
 
 export const preSessionBriefingKeys = {
   all: ["pre-session-briefings"] as const,
@@ -38,7 +38,7 @@ export function usePreSessionBriefing(
   patientId: string,
   options?: { date?: string; enabled?: boolean }
 ) {
-  const date = options?.date || new Date().toISOString().split("T")[0];
+  const date = options?.date ?? new Date().toISOString().split("T")[0]!;
 
   return useQuery({
     queryKey: preSessionBriefingKeys.patientWithDate(patientId, date),
@@ -60,7 +60,7 @@ export function useHasAppointmentToday(
   patientId: string,
   options?: { enabled?: boolean }
 ) {
-  const today = new Date().toISOString().split("T")[0];
+  const today = new Date().toISOString().split("T")[0]!;
 
   return useQuery({
     queryKey: ["appointment-check", patientId, today] as const,
