@@ -234,7 +234,8 @@ export async function GET(request: NextRequest) {
     if (startDate) query = query.gte("date", startDate);
     if (endDate) query = query.lte("date", endDate);
     if (patientId) query = query.eq("patient_id", patientId);
-    if (status) query = query.eq("status", status);
+    if (status)
+      query = query.eq("status", status as "Scheduled" | "Completed" | "No-Show" | "Cancelled");
 
     const { data, error } = await query;
     if (error) {

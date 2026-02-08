@@ -25,9 +25,9 @@ import {
   AppointmentModal,
   AppointmentDetailPanel,
   CalendarDayView,
+  CalendarWeekView,
   CalendarMonthView,
 } from "@/src/components/schedule";
-import { CalendarWeekView } from "@/app/home/_components/CalendarWeekView";
 import { appointmentKeys } from "@/src/lib/queries/keys";
 import { type AppointmentStatus } from "@/src/lib/supabase/scheduling-types";
 

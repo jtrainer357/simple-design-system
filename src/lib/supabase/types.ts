@@ -211,6 +211,57 @@ export type Database = {
           },
         ];
       };
+      appointment_reminders: {
+        Row: {
+          id: string;
+          practice_id: string;
+          appointment_id: string;
+          reminder_type: "24h" | "2h" | "custom";
+          scheduled_at: string;
+          sent_at: string | null;
+          channel: "email" | "sms" | "push";
+          status: "pending" | "sent" | "failed" | "cancelled";
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          practice_id: string;
+          appointment_id: string;
+          reminder_type: "24h" | "2h" | "custom";
+          scheduled_at: string;
+          sent_at?: string | null;
+          channel?: "email" | "sms" | "push";
+          status?: "pending" | "sent" | "failed" | "cancelled";
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          practice_id?: string;
+          appointment_id?: string;
+          reminder_type?: "24h" | "2h" | "custom";
+          scheduled_at?: string;
+          sent_at?: string | null;
+          channel?: "email" | "sms" | "push";
+          status?: "pending" | "sent" | "failed" | "cancelled";
+          created_at?: string;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "appointment_reminders_practice_id_fkey";
+            columns: ["practice_id"];
+            isOneToOne: false;
+            referencedRelation: "practices";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "appointment_reminders_appointment_id_fkey";
+            columns: ["appointment_id"];
+            isOneToOne: false;
+            referencedRelation: "appointments";
+            referencedColumns: ["id"];
+          },
+        ];
+      };
       outcome_measures: {
         Row: {
           id: string;

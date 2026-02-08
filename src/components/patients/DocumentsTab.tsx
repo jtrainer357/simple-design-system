@@ -163,7 +163,8 @@ export function DocumentsTab({
 
     documents.forEach((doc) => {
       const category = doc.category || "other";
-      categories[category].push(doc);
+      const targetCategory = categories[category] ?? categories["other"];
+      targetCategory!.push(doc);
     });
 
     return categories;
@@ -236,7 +237,7 @@ export function DocumentsTab({
                 <div className="space-y-2">
                   {docs.map((doc) => {
                     const ext = getFileExtension(doc.name);
-                    const IconComponent = FILE_ICONS[ext] || FILE_ICONS.default;
+                    const IconComponent = FILE_ICONS[ext] ?? FILE_ICONS["default"]!;
 
                     return (
                       <div
