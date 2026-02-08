@@ -1,248 +1,253 @@
--- Mental Health MVP - Tracking Fields (created_by, updated_by)
+-- Mental Health MVP - Audit Tracking Fields
 -- Created: 2026-02-07
--- This migration adds user tracking fields to key tables
+-- This migration adds created_by and updated_by tracking to key tables
 
 -- ============================================
--- ADD TRACKING COLUMNS TO TABLES
+-- USERS TABLE (if not exists)
+-- ============================================
+-- Note: In a production system, this would be linked to auth.users
+-- For the MVP, we create a simple users table for reference
+
+CREATE TABLE IF NOT EXISTS users (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  practice_id UUID REFERENCES practices(id) ON DELETE CASCADE,
+  email TEXT NOT NULL UNIQUE,
+  name TEXT NOT NULL,
+  role TEXT NOT NULL DEFAULT 'staff' CHECK (role IN ('admin', 'provider', 'staff', 'billing')),
+  is_active BOOLEAN DEFAULT TRUE,
+  avatar_url TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Users indexes
+CREATE INDEX IF NOT EXISTS idx_users_practice ON users(practice_id);
+CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+CREATE INDEX IF NOT EXISTS idx_users_active ON users(practice_id) WHERE is_active = TRUE;
+
+-- Enable RLS on users
+ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+
+-- Demo policy for users
+CREATE POLICY "demo_users_all" ON users FOR ALL USING (true) WITH CHECK (true);
+
+-- ============================================
+-- ADD TRACKING COLUMNS TO KEY TABLES
 -- ============================================
 
 -- Patients
-ALTER TABLE patients
-  ADD COLUMN IF NOT EXISTS created_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_by UUID;
+ALTER TABLE patients ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE patients ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(id) ON DELETE SET NULL;
 
 -- Appointments
-ALTER TABLE appointments
-  ADD COLUMN IF NOT EXISTS created_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_by UUID;
-
--- Outcome Measures
-ALTER TABLE outcome_measures
-  ADD COLUMN IF NOT EXISTS created_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(id) ON DELETE SET NULL;
 
 -- Messages
-ALTER TABLE messages
-  ADD COLUMN IF NOT EXISTS created_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE messages ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE messages ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(id) ON DELETE SET NULL;
 
 -- Invoices
-ALTER TABLE invoices
-  ADD COLUMN IF NOT EXISTS created_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_by UUID;
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(id) ON DELETE SET NULL;
 
 -- Priority Actions
-ALTER TABLE priority_actions
-  ADD COLUMN IF NOT EXISTS created_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_by UUID;
+ALTER TABLE priority_actions ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE priority_actions ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(id) ON DELETE SET NULL;
 
 -- Clinical Tasks
-ALTER TABLE clinical_tasks
-  ADD COLUMN IF NOT EXISTS created_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_by UUID;
+ALTER TABLE clinical_tasks ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE clinical_tasks ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(id) ON DELETE SET NULL;
+
+-- Outcome Measures
+ALTER TABLE outcome_measures ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE outcome_measures ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(id) ON DELETE SET NULL;
 
 -- Clinical Observations
-ALTER TABLE clinical_observations
-  ADD COLUMN IF NOT EXISTS created_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_by UUID;
+ALTER TABLE clinical_observations ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE clinical_observations ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(id) ON DELETE SET NULL;
 
 -- Reviews
-ALTER TABLE reviews
-  ADD COLUMN IF NOT EXISTS created_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
-
--- Practice Providers
--- (already has updated_at from previous migration)
-ALTER TABLE practice_providers
-  ADD COLUMN IF NOT EXISTS created_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_by UUID;
-
--- Practices
-ALTER TABLE practices
-  ADD COLUMN IF NOT EXISTS created_by UUID,
-  ADD COLUMN IF NOT EXISTS updated_by UUID;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS created_by UUID REFERENCES users(id) ON DELETE SET NULL;
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS updated_by UUID REFERENCES users(id) ON DELETE SET NULL;
 
 -- ============================================
--- TRIGGER TO AUTO-UPDATE updated_by
+-- INDEXES FOR TRACKING COLUMNS
 -- ============================================
 
--- Create function to update both updated_at and updated_by
--- Note: In production, this would get the user ID from the session context
-CREATE OR REPLACE FUNCTION update_tracking_columns()
+CREATE INDEX IF NOT EXISTS idx_patients_created_by ON patients(created_by);
+CREATE INDEX IF NOT EXISTS idx_patients_updated_by ON patients(updated_by);
+
+CREATE INDEX IF NOT EXISTS idx_appointments_created_by ON appointments(created_by);
+CREATE INDEX IF NOT EXISTS idx_appointments_updated_by ON appointments(updated_by);
+
+CREATE INDEX IF NOT EXISTS idx_messages_created_by ON messages(created_by);
+
+CREATE INDEX IF NOT EXISTS idx_invoices_created_by ON invoices(created_by);
+CREATE INDEX IF NOT EXISTS idx_invoices_updated_by ON invoices(updated_by);
+
+CREATE INDEX IF NOT EXISTS idx_priority_actions_created_by ON priority_actions(created_by);
+CREATE INDEX IF NOT EXISTS idx_clinical_tasks_created_by ON clinical_tasks(created_by);
+
+CREATE INDEX IF NOT EXISTS idx_clinical_observations_created_by ON clinical_observations(created_by);
+CREATE INDEX IF NOT EXISTS idx_outcome_measures_created_by ON outcome_measures(created_by);
+
+-- ============================================
+-- UPDATE_UPDATED_AT TRIGGER (Enhanced)
+-- ============================================
+
+-- Enhanced trigger function that also sets updated_by if available
+CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
   NEW.updated_at = NOW();
-  -- updated_by should be set by the application layer
-  -- If not set, keep the previous value
-  IF NEW.updated_by IS NULL THEN
-    NEW.updated_by = OLD.updated_by;
-  END IF;
+  -- Note: updated_by should be set by the application layer
+  -- since we don't have access to the current user in the trigger context
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
--- Replace existing update triggers to use new function
-DROP TRIGGER IF EXISTS update_patients_updated_at ON patients;
-CREATE TRIGGER update_patients_tracking
-  BEFORE UPDATE ON patients
-  FOR EACH ROW EXECUTE FUNCTION update_tracking_columns();
+-- ============================================
+-- APPLY UPDATED_AT TRIGGER TO ALL TABLES
+-- ============================================
 
-DROP TRIGGER IF EXISTS update_appointments_updated_at ON appointments;
-CREATE TRIGGER update_appointments_tracking
-  BEFORE UPDATE ON appointments
-  FOR EACH ROW EXECUTE FUNCTION update_tracking_columns();
+-- Users (new table)
+CREATE TRIGGER update_users_updated_at
+  BEFORE UPDATE ON users
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
 
-DROP TRIGGER IF EXISTS update_invoices_updated_at ON invoices;
-CREATE TRIGGER update_invoices_tracking
-  BEFORE UPDATE ON invoices
-  FOR EACH ROW EXECUTE FUNCTION update_tracking_columns();
+-- Outcome Measures (add updated_at and trigger)
+ALTER TABLE outcome_measures ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
-DROP TRIGGER IF EXISTS update_priority_actions_updated_at ON priority_actions;
-CREATE TRIGGER update_priority_actions_tracking
-  BEFORE UPDATE ON priority_actions
-  FOR EACH ROW EXECUTE FUNCTION update_tracking_columns();
-
-DROP TRIGGER IF EXISTS update_clinical_tasks_updated_at ON clinical_tasks;
-CREATE TRIGGER update_clinical_tasks_tracking
-  BEFORE UPDATE ON clinical_tasks
-  FOR EACH ROW EXECUTE FUNCTION update_tracking_columns();
-
-DROP TRIGGER IF EXISTS update_clinical_obs_updated_at ON clinical_observations;
-CREATE TRIGGER update_clinical_obs_tracking
-  BEFORE UPDATE ON clinical_observations
-  FOR EACH ROW EXECUTE FUNCTION update_tracking_columns();
-
-DROP TRIGGER IF EXISTS update_practice_providers_updated_at ON practice_providers;
-CREATE TRIGGER update_practice_providers_tracking
-  BEFORE UPDATE ON practice_providers
-  FOR EACH ROW EXECUTE FUNCTION update_tracking_columns();
-
-DROP TRIGGER IF EXISTS update_practices_updated_at ON practices;
-CREATE TRIGGER update_practices_tracking
-  BEFORE UPDATE ON practices
-  FOR EACH ROW EXECUTE FUNCTION update_tracking_columns();
-
--- Add triggers for tables that didn't have updated_at before
-CREATE TRIGGER update_outcome_measures_tracking
+DROP TRIGGER IF EXISTS update_outcome_measures_updated_at ON outcome_measures;
+CREATE TRIGGER update_outcome_measures_updated_at
   BEFORE UPDATE ON outcome_measures
-  FOR EACH ROW EXECUTE FUNCTION update_tracking_columns();
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_messages_tracking
+-- Messages (add updated_at and trigger)
+ALTER TABLE messages ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+DROP TRIGGER IF EXISTS update_messages_updated_at ON messages;
+CREATE TRIGGER update_messages_updated_at
   BEFORE UPDATE ON messages
-  FOR EACH ROW EXECUTE FUNCTION update_tracking_columns();
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
 
-CREATE TRIGGER update_reviews_tracking
+-- Reviews (add updated_at and trigger)
+ALTER TABLE reviews ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+
+DROP TRIGGER IF EXISTS update_reviews_updated_at ON reviews;
+CREATE TRIGGER update_reviews_updated_at
   BEFORE UPDATE ON reviews
-  FOR EACH ROW EXECUTE FUNCTION update_tracking_columns();
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at_column();
 
 -- ============================================
--- AUDIT LOG TABLE (Optional - for full audit trail)
+-- AUDIT LOG TABLE (Optional but Recommended)
 -- ============================================
 
 CREATE TABLE IF NOT EXISTS audit_log (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  -- What changed
+  practice_id UUID REFERENCES practices(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES users(id) ON DELETE SET NULL,
+  -- Action details
+  action TEXT NOT NULL CHECK (action IN ('create', 'update', 'delete', 'restore', 'login', 'logout', 'view')),
   table_name TEXT NOT NULL,
-  record_id UUID NOT NULL,
-  action TEXT NOT NULL CHECK (action IN ('INSERT', 'UPDATE', 'DELETE', 'SOFT_DELETE', 'RESTORE')),
-  -- Who changed it
-  user_id UUID,
-  user_email TEXT,
-  user_ip TEXT,
-  -- What was changed
+  record_id UUID,
+  -- Change tracking
   old_values JSONB,
   new_values JSONB,
   changed_fields TEXT[],
-  -- When
+  -- Context
+  ip_address INET,
+  user_agent TEXT,
+  -- Timestamp
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Indexes for audit log queries
+-- Audit log indexes
+CREATE INDEX idx_audit_log_practice ON audit_log(practice_id);
+CREATE INDEX idx_audit_log_user ON audit_log(user_id);
 CREATE INDEX idx_audit_log_table ON audit_log(table_name);
 CREATE INDEX idx_audit_log_record ON audit_log(record_id);
-CREATE INDEX idx_audit_log_user ON audit_log(user_id);
+CREATE INDEX idx_audit_log_created ON audit_log(created_at DESC);
 CREATE INDEX idx_audit_log_action ON audit_log(action);
-CREATE INDEX idx_audit_log_created ON audit_log(created_at);
 
--- Composite index for common query: "Show me all changes to this record"
-CREATE INDEX idx_audit_log_record_time ON audit_log(record_id, created_at DESC);
+-- Partial index for recent audit entries (last 30 days)
+CREATE INDEX idx_audit_log_recent ON audit_log(practice_id, created_at DESC)
+  WHERE created_at > NOW() - INTERVAL '30 days';
 
--- BRIN index for time-series queries on large audit tables
-CREATE INDEX idx_audit_log_created_brin ON audit_log USING BRIN (created_at);
-
--- RLS for audit log
+-- Enable RLS on audit log
 ALTER TABLE audit_log ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "demo_audit_log_all" ON audit_log FOR ALL USING (true) WITH CHECK (true);
+
+-- Audit log is read-only for most users, write from application layer
+CREATE POLICY "audit_log_read" ON audit_log
+  FOR SELECT
+  USING (true);
+
+CREATE POLICY "audit_log_write" ON audit_log
+  FOR INSERT
+  WITH CHECK (true);
 
 -- ============================================
--- FUNCTION TO LOG CHANGES (for application use)
+-- HELPER FUNCTION: Log Audit Event
 -- ============================================
 
 CREATE OR REPLACE FUNCTION log_audit_event(
-  p_table_name TEXT,
-  p_record_id UUID,
+  p_practice_id UUID,
+  p_user_id UUID,
   p_action TEXT,
-  p_user_id UUID DEFAULT NULL,
-  p_user_email TEXT DEFAULT NULL,
+  p_table_name TEXT,
+  p_record_id UUID DEFAULT NULL,
   p_old_values JSONB DEFAULT NULL,
   p_new_values JSONB DEFAULT NULL,
-  p_changed_fields TEXT[] DEFAULT NULL
-)
-RETURNS UUID AS $$
+  p_ip_address INET DEFAULT NULL,
+  p_user_agent TEXT DEFAULT NULL
+) RETURNS UUID AS $$
 DECLARE
   v_audit_id UUID;
+  v_changed_fields TEXT[];
 BEGIN
+  -- Calculate changed fields if both old and new values provided
+  IF p_old_values IS NOT NULL AND p_new_values IS NOT NULL THEN
+    SELECT array_agg(key)
+    INTO v_changed_fields
+    FROM (
+      SELECT key
+      FROM jsonb_each(p_new_values)
+      EXCEPT
+      SELECT key
+      FROM jsonb_each(p_old_values)
+      WHERE p_old_values->key = p_new_values->key
+    ) changed;
+  END IF;
+
   INSERT INTO audit_log (
-    table_name, record_id, action,
-    user_id, user_email,
-    old_values, new_values, changed_fields
+    practice_id,
+    user_id,
+    action,
+    table_name,
+    record_id,
+    old_values,
+    new_values,
+    changed_fields,
+    ip_address,
+    user_agent
   ) VALUES (
-    p_table_name, p_record_id, p_action,
-    p_user_id, p_user_email,
-    p_old_values, p_new_values, p_changed_fields
-  )
-  RETURNING id INTO v_audit_id;
+    p_practice_id,
+    p_user_id,
+    p_action,
+    p_table_name,
+    p_record_id,
+    p_old_values,
+    p_new_values,
+    v_changed_fields,
+    p_ip_address,
+    p_user_agent
+  ) RETURNING id INTO v_audit_id;
 
   RETURN v_audit_id;
 END;
-$$ LANGUAGE plpgsql;
-
--- ============================================
--- VIEW FOR RECENT ACTIVITY
--- ============================================
-
-CREATE OR REPLACE VIEW recent_activity AS
-SELECT
-  al.id,
-  al.table_name,
-  al.record_id,
-  al.action,
-  al.user_id,
-  al.user_email,
-  al.changed_fields,
-  al.created_at,
-  -- Join with practices for context
-  CASE al.table_name
-    WHEN 'patients' THEN (SELECT p.practice_id FROM patients p WHERE p.id = al.record_id)
-    WHEN 'appointments' THEN (SELECT a.practice_id FROM appointments a WHERE a.id = al.record_id)
-    ELSE NULL
-  END as practice_id
-FROM audit_log al
-ORDER BY al.created_at DESC;
-
--- ============================================
--- COMMENTS FOR DOCUMENTATION
--- ============================================
-
-COMMENT ON COLUMN patients.created_by IS 'UUID of the user who created this record';
-COMMENT ON COLUMN patients.updated_by IS 'UUID of the user who last updated this record';
-
-COMMENT ON TABLE audit_log IS 'Comprehensive audit trail for tracking all data changes';
-COMMENT ON COLUMN audit_log.old_values IS 'JSONB snapshot of record before change (for UPDATE/DELETE)';
-COMMENT ON COLUMN audit_log.new_values IS 'JSONB snapshot of record after change (for INSERT/UPDATE)';
-COMMENT ON COLUMN audit_log.changed_fields IS 'Array of field names that were modified';
-
-COMMENT ON FUNCTION log_audit_event IS 'Helper function to log audit events from application code';
+$$ LANGUAGE plpgsql SECURITY DEFINER;

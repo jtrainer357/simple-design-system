@@ -1,190 +1,197 @@
 -- Mental Health MVP - Performance Indexes
 -- Created: 2026-02-07
--- This migration adds advanced indexes for performance optimization
+-- This migration adds additional indexes for common query patterns
 
 -- ============================================
--- ENABLE EXTENSIONS
+-- ENABLE PG_TRGM EXTENSION FOR FUZZY SEARCH
 -- ============================================
 
--- pg_trgm for fuzzy text search (patient name search, etc.)
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
--- btree_gist for exclusion constraints and range queries
-CREATE EXTENSION IF NOT EXISTS btree_gist;
-
 -- ============================================
--- TRIGRAM INDEXES FOR FUZZY SEARCH
+-- TRIGRAM INDEXES FOR FUZZY PATIENT SEARCH
 -- ============================================
 
--- Patient name search (supports LIKE, ILIKE, and similarity)
+-- Trigram index on patient first_name for fuzzy/typo-tolerant search
 CREATE INDEX IF NOT EXISTS idx_patients_first_name_trgm
   ON patients USING GIN (first_name gin_trgm_ops);
 
+-- Trigram index on patient last_name for fuzzy/typo-tolerant search
 CREATE INDEX IF NOT EXISTS idx_patients_last_name_trgm
   ON patients USING GIN (last_name gin_trgm_ops);
 
--- Combined name search
-CREATE INDEX IF NOT EXISTS idx_patients_full_name_trgm
-  ON patients USING GIN ((first_name || ' ' || last_name) gin_trgm_ops);
+-- Combined trigram index on full name (generated column approach)
+-- First, add a generated column for full name if it doesn't exist
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_name = 'patients' AND column_name = 'full_name_search'
+  ) THEN
+    ALTER TABLE patients ADD COLUMN full_name_search TEXT
+      GENERATED ALWAYS AS (lower(first_name || ' ' || last_name)) STORED;
+  END IF;
+END $$;
 
--- Practice provider name search
-CREATE INDEX IF NOT EXISTS idx_practice_providers_name_trgm
-  ON practice_providers USING GIN ((first_name || ' ' || last_name) gin_trgm_ops);
+-- Create trigram index on the full name search column
+CREATE INDEX IF NOT EXISTS idx_patients_full_name_trgm
+  ON patients USING GIN (full_name_search gin_trgm_ops);
 
 -- ============================================
 -- COMPOSITE INDEXES FOR COMMON QUERY PATTERNS
 -- ============================================
 
--- Dashboard: Today's appointments with patient info
-CREATE INDEX IF NOT EXISTS idx_appointments_dashboard
-  ON appointments (practice_id, date, status)
+-- Appointments: Patient's appointments sorted by most recent
+DROP INDEX IF EXISTS idx_appointments_patient_start_desc;
+CREATE INDEX idx_appointments_patient_start_desc
+  ON appointments(patient_id, date DESC, start_time DESC)
   WHERE deleted_at IS NULL;
 
--- Patient list: Active patients sorted by name
-CREATE INDEX IF NOT EXISTS idx_patients_list
-  ON patients (practice_id, last_name, first_name)
-  WHERE deleted_at IS NULL AND status = 'Active';
+-- Messages: Conversation thread ordering
+DROP INDEX IF EXISTS idx_messages_conversation_created;
+CREATE INDEX idx_messages_conversation_created
+  ON messages(patient_id, created_at DESC)
+  WHERE deleted_at IS NULL;
 
--- Messages: Unread messages per patient
-CREATE INDEX IF NOT EXISTS idx_messages_unread_patient
-  ON messages (practice_id, patient_id, timestamp DESC)
-  WHERE read = FALSE AND deleted_at IS NULL;
+-- Priority Actions: Patient's pending actions by urgency
+DROP INDEX IF EXISTS idx_priority_actions_patient_urgency;
+CREATE INDEX idx_priority_actions_patient_urgency
+  ON priority_actions(patient_id, urgency, created_at DESC)
+  WHERE status = 'pending';
 
--- Invoices: Outstanding balances
-CREATE INDEX IF NOT EXISTS idx_invoices_outstanding_balance
-  ON invoices (practice_id, patient_id, balance DESC)
+-- Priority Actions: Practice-wide pending actions
+DROP INDEX IF EXISTS idx_priority_actions_practice_pending;
+CREATE INDEX idx_priority_actions_practice_pending
+  ON priority_actions(practice_id, urgency, created_at DESC)
+  WHERE status = 'pending';
+
+-- Outcome Measures: Patient's measures by type and date
+DROP INDEX IF EXISTS idx_outcome_measures_patient_type_date;
+CREATE INDEX idx_outcome_measures_patient_type_date
+  ON outcome_measures(patient_id, measure_type, measurement_date DESC);
+
+-- Invoices: Outstanding balances by patient
+DROP INDEX IF EXISTS idx_invoices_patient_outstanding;
+CREATE INDEX idx_invoices_patient_outstanding
+  ON invoices(patient_id, date_of_service DESC)
   WHERE balance > 0 AND deleted_at IS NULL;
 
--- Priority actions: Pending by urgency
-CREATE INDEX IF NOT EXISTS idx_priority_actions_pending_urgency
-  ON priority_actions (practice_id, urgency, created_at DESC)
-  WHERE status = 'pending' AND deleted_at IS NULL;
-
--- Outcome measures: Latest per patient per type
-CREATE INDEX IF NOT EXISTS idx_outcome_measures_latest
-  ON outcome_measures (patient_id, measure_type, measurement_date DESC)
-  WHERE deleted_at IS NULL;
-
--- Clinical observations: Recent per patient per type
-CREATE INDEX IF NOT EXISTS idx_clinical_obs_recent
-  ON clinical_observations (patient_id, observation_type, observation_date DESC)
-  WHERE deleted_at IS NULL AND status = 'final';
-
 -- ============================================
--- PARTIAL INDEXES FOR FILTERED QUERIES
+-- PARTIAL INDEXES FOR ACTIVE/UPCOMING RECORDS
 -- ============================================
 
--- High-risk patients
-CREATE INDEX IF NOT EXISTS idx_patients_high_risk
-  ON patients (practice_id, last_name, first_name)
-  WHERE risk_level = 'high' AND deleted_at IS NULL AND status = 'Active';
+-- Active patients only (most common query)
+DROP INDEX IF EXISTS idx_patients_active;
+CREATE INDEX idx_patients_active
+  ON patients(practice_id, last_name, first_name)
+  WHERE status = 'Active' AND deleted_at IS NULL;
 
--- Appointments needing attention (no-shows, cancellations)
-CREATE INDEX IF NOT EXISTS idx_appointments_attention
-  ON appointments (practice_id, date DESC)
-  WHERE status IN ('No-Show', 'Cancelled') AND deleted_at IS NULL;
+-- Upcoming appointments (next 30 days is common dashboard query)
+DROP INDEX IF EXISTS idx_appointments_upcoming;
+CREATE INDEX idx_appointments_upcoming
+  ON appointments(practice_id, date, start_time)
+  WHERE status = 'Scheduled' AND deleted_at IS NULL;
 
--- Urgent priority actions
-CREATE INDEX IF NOT EXISTS idx_priority_actions_urgent
-  ON priority_actions (practice_id, patient_id, created_at DESC)
-  WHERE urgency = 'urgent' AND status = 'pending' AND deleted_at IS NULL;
+-- Today's appointments (very common query for daily view)
+DROP INDEX IF EXISTS idx_appointments_today;
+CREATE INDEX idx_appointments_today
+  ON appointments(practice_id, patient_id, start_time)
+  WHERE status = 'Scheduled' AND deleted_at IS NULL;
 
--- Overdue clinical tasks
-CREATE INDEX IF NOT EXISTS idx_clinical_tasks_overdue
-  ON clinical_tasks (practice_id, due_date)
-  WHERE status = 'pending' AND due_date < CURRENT_DATE AND deleted_at IS NULL;
+-- Unread messages
+DROP INDEX IF EXISTS idx_messages_unread;
+CREATE INDEX idx_messages_unread_new
+  ON messages(practice_id, patient_id, created_at DESC)
+  WHERE read = FALSE AND deleted_at IS NULL;
+
+-- Pending clinical tasks
+DROP INDEX IF EXISTS idx_clinical_tasks_pending;
+CREATE INDEX idx_clinical_tasks_pending_new
+  ON clinical_tasks(practice_id, patient_id, due_date)
+  WHERE status = 'pending';
 
 -- ============================================
--- COVERING INDEXES (INCLUDE)
+-- COVERING INDEXES FOR COMMON SELECTS
 -- ============================================
 
--- Appointment list with commonly needed columns
-CREATE INDEX IF NOT EXISTS idx_appointments_list_covering
-  ON appointments (practice_id, date, start_time)
-  INCLUDE (patient_id, status, service_type, duration_minutes)
-  WHERE deleted_at IS NULL;
+-- Patient list view covering index (avoids heap access for common columns)
+DROP INDEX IF EXISTS idx_patients_list_covering;
+CREATE INDEX idx_patients_list_covering
+  ON patients(practice_id, last_name, first_name)
+  INCLUDE (id, email, phone_mobile, risk_level, status, avatar_url)
+  WHERE status = 'Active' AND deleted_at IS NULL;
 
--- Patient quick lookup with display info
-CREATE INDEX IF NOT EXISTS idx_patients_quick_lookup
-  ON patients (practice_id, id)
-  INCLUDE (first_name, last_name, status, risk_level, avatar_url)
+-- Appointment calendar covering index
+DROP INDEX IF EXISTS idx_appointments_calendar_covering;
+CREATE INDEX idx_appointments_calendar_covering
+  ON appointments(practice_id, date, start_time)
+  INCLUDE (id, patient_id, end_time, duration_minutes, service_type, status, location)
   WHERE deleted_at IS NULL;
 
 -- ============================================
 -- BRIN INDEXES FOR TIME-SERIES DATA
 -- ============================================
 
--- Messages timestamp (good for time-range queries on large tables)
-CREATE INDEX IF NOT EXISTS idx_messages_timestamp_brin
-  ON messages USING BRIN (timestamp)
+-- BRIN index for appointment dates (efficient for date range queries)
+DROP INDEX IF EXISTS idx_appointments_date_brin;
+CREATE INDEX idx_appointments_date_brin
+  ON appointments USING BRIN (date)
   WITH (pages_per_range = 32);
 
--- AI analysis runs (append-only table)
-CREATE INDEX IF NOT EXISTS idx_ai_runs_timestamp_brin
-  ON ai_analysis_runs USING BRIN (completed_at)
+-- BRIN index for message timestamps
+DROP INDEX IF EXISTS idx_messages_timestamp_brin;
+CREATE INDEX idx_messages_timestamp_brin
+  ON messages USING BRIN (created_at)
+  WITH (pages_per_range = 32);
+
+-- BRIN index for outcome measure dates
+DROP INDEX IF EXISTS idx_outcome_measures_date_brin;
+CREATE INDEX idx_outcome_measures_date_brin
+  ON outcome_measures USING BRIN (measurement_date)
   WITH (pages_per_range = 32);
 
 -- ============================================
--- EXCLUSION CONSTRAINT FOR APPOINTMENT CONFLICTS
+-- FUNCTION: Fuzzy Patient Search
 -- ============================================
 
--- Prevent overlapping appointments for the same patient
--- Note: Requires btree_gist extension
+-- Function to search patients with fuzzy matching
+CREATE OR REPLACE FUNCTION search_patients_fuzzy(
+  p_practice_id UUID,
+  p_query TEXT,
+  p_limit INTEGER DEFAULT 20
+) RETURNS TABLE (
+  id UUID,
+  first_name TEXT,
+  last_name TEXT,
+  full_name TEXT,
+  similarity_score REAL
+) AS $$
+BEGIN
+  RETURN QUERY
+  SELECT
+    pat.id,
+    pat.first_name,
+    pat.last_name,
+    pat.first_name || ' ' || pat.last_name AS full_name,
+    GREATEST(
+      similarity(pat.first_name, p_query),
+      similarity(pat.last_name, p_query),
+      similarity(pat.full_name_search, lower(p_query))
+    ) AS similarity_score
+  FROM patients pat
+  WHERE
+    pat.practice_id = p_practice_id
+    AND pat.status = 'Active'
+    AND pat.deleted_at IS NULL
+    AND (
+      pat.first_name % p_query
+      OR pat.last_name % p_query
+      OR pat.full_name_search % lower(p_query)
+    )
+  ORDER BY similarity_score DESC
+  LIMIT p_limit;
+END;
+$$ LANGUAGE plpgsql STABLE;
 
--- First, create a function to build time range
-CREATE OR REPLACE FUNCTION appointment_time_range(date DATE, start_time TIME, end_time TIME)
-RETURNS tstzrange AS $$
-  SELECT tstzrange(
-    (date + start_time)::TIMESTAMPTZ,
-    (date + end_time)::TIMESTAMPTZ,
-    '[)'
-  );
-$$ LANGUAGE SQL IMMUTABLE;
-
--- Add exclusion constraint (commented out - enable in production)
--- This prevents double-booking patients
--- ALTER TABLE appointments ADD CONSTRAINT no_overlapping_patient_appointments
---   EXCLUDE USING gist (
---     patient_id WITH =,
---     appointment_time_range(date, start_time, end_time) WITH &&
---   ) WHERE (status = 'Scheduled' AND deleted_at IS NULL);
-
--- ============================================
--- STATISTICS FOR QUERY OPTIMIZATION
--- ============================================
-
--- Extended statistics for correlated columns
-CREATE STATISTICS IF NOT EXISTS stat_patients_practice_status
-  ON practice_id, status FROM patients;
-
-CREATE STATISTICS IF NOT EXISTS stat_appointments_practice_date_status
-  ON practice_id, date, status FROM appointments;
-
-CREATE STATISTICS IF NOT EXISTS stat_outcome_measures_patient_type
-  ON patient_id, measure_type FROM outcome_measures;
-
--- ============================================
--- ANALYZE TABLES FOR STATISTICS
--- ============================================
-
--- Update table statistics after index creation
-ANALYZE patients;
-ANALYZE appointments;
-ANALYZE outcome_measures;
-ANALYZE messages;
-ANALYZE invoices;
-ANALYZE priority_actions;
-ANALYZE clinical_tasks;
-ANALYZE clinical_observations;
-
--- ============================================
--- COMMENTS FOR DOCUMENTATION
--- ============================================
-
-COMMENT ON EXTENSION pg_trgm IS 'Provides trigram-based text similarity and fuzzy search';
-COMMENT ON EXTENSION btree_gist IS 'Provides B-tree equivalent GiST operators for exclusion constraints';
-
-COMMENT ON INDEX idx_patients_full_name_trgm IS 'Trigram index for fuzzy patient name search (supports LIKE, ILIKE, similarity)';
-COMMENT ON INDEX idx_appointments_dashboard IS 'Optimized for calendar/dashboard appointment queries';
-COMMENT ON INDEX idx_patients_high_risk IS 'Partial index for quick high-risk patient lookups';
-COMMENT ON INDEX idx_messages_timestamp_brin IS 'BRIN index for efficient time-range queries on large message history';
+-- Set similarity threshold for fuzzy matching
+SELECT set_limit(0.3);

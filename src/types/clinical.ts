@@ -1,64 +1,19 @@
 /**
- * Clinical Types for Mental Health MVP
- * Corresponds to database schema in supabase/migrations/
+ * Clinical Types
+ * TypeScript interfaces for clinical observations and outcome measures
  */
 
 // ============================================
-// CLINICAL OBSERVATIONS
+// OBSERVATION TYPES
 // ============================================
 
 /**
- * Observation value types - flexible JSONB storage
+ * Types of clinical observations
  */
-export interface NumericValue {
-  numeric: number;
-  unit?: string;
-}
-
-export interface RangeValue {
-  systolic?: number;
-  diastolic?: number;
-  unit?: string;
-}
-
-export interface TextValue {
-  text: string;
-}
-
-export interface BooleanValue {
-  boolean: boolean;
-}
-
-export interface CodedValue {
-  code: string;
-  display: string;
-  system?: string;
-}
-
-export type ObservationValue =
-  | NumericValue
-  | RangeValue
-  | TextValue
-  | BooleanValue
-  | CodedValue
-  | Record<string, unknown>;
+export type ObservationType = "vital" | "lab" | "assessment" | "screening" | "other";
 
 /**
- * Reference range for observations (lab results, vitals)
- */
-export interface ReferenceRange {
-  low?: number;
-  high?: number;
-  unit?: string;
-  interpretation?: "normal" | "abnormal" | "critical";
-  text?: string;
-  // For values with sub-components (like blood pressure)
-  systolic?: { low: number; high: number };
-  diastolic?: { low: number; high: number };
-}
-
-/**
- * Observation status values
+ * Status of an observation
  */
 export type ObservationStatus =
   | "preliminary"
@@ -69,177 +24,252 @@ export type ObservationStatus =
   | "entered-in-error";
 
 /**
- * Observation types
+ * Interpretation of an observation result
  */
-export type ObservationType = "vital" | "lab" | "assessment" | "measurement" | "note";
+export type ObservationInterpretation =
+  | "normal"
+  | "abnormal"
+  | "low"
+  | "high"
+  | "critical"
+  | "positive"
+  | "negative"
+  | "inconclusive";
 
 /**
- * Clinical Observation record
+ * Code system for observation codes
+ */
+export type CodeSystem = "loinc" | "snomed" | "icd10" | "cpt" | "custom";
+
+// ============================================
+// OBSERVATION VALUE TYPES
+// ============================================
+
+/**
+ * Numeric observation value (e.g., blood pressure, weight)
+ */
+export interface NumericValue {
+  value: number;
+  unit: string;
+}
+
+/**
+ * Range observation value (e.g., blood pressure systolic/diastolic)
+ */
+export interface RangeValue {
+  low: number;
+  high: number;
+  unit: string;
+}
+
+/**
+ * Coded observation value (e.g., positive/negative test)
+ */
+export interface CodedValue {
+  value: string;
+  code?: string;
+  display?: string;
+}
+
+/**
+ * Text observation value (e.g., clinical notes)
+ */
+export interface TextValue {
+  value: string;
+}
+
+/**
+ * Union type for all possible observation values
+ */
+export type ObservationValue = NumericValue | RangeValue | CodedValue | TextValue;
+
+/**
+ * Reference range for an observation
+ */
+export interface ReferenceRange {
+  low?: number;
+  high?: number;
+  unit?: string;
+  text?: string;
+  interpretation?: ObservationInterpretation;
+}
+
+// ============================================
+// CLINICAL OBSERVATION
+// ============================================
+
+/**
+ * Clinical observation record
+ * Represents vitals, labs, assessments, and screenings
  */
 export interface ClinicalObservation {
   id: string;
   practice_id: string;
   patient_id: string;
 
-  // Identification
+  // Classification
   observation_type: ObservationType;
-  code?: string;
-  code_system?: "LOINC" | "SNOMED" | "ICD-10" | "internal" | string;
+
+  // Coding
+  code: string;
+  code_system: CodeSystem;
   name: string;
 
-  // Value (JSONB)
+  // Value
   value: ObservationValue;
   reference_range?: ReferenceRange;
+  interpretation?: ObservationInterpretation;
 
-  // Interpretation
-  interpretation?: string;
-  interpretation_code?: string;
-
-  // Context
-  observation_date: string; // ISO timestamp
-  effective_period_start?: string;
-  effective_period_end?: string;
-
-  // Source
-  performed_by?: string;
-  method?: "automated" | "manual" | "self-reported" | string;
-  device?: string;
-  body_site?: string;
-
-  // Related
-  parent_observation_id?: string;
-
-  // Notes
-  notes?: string;
-
-  // Status
+  // Status and timing
   status: ObservationStatus;
+  effective_date: string; // ISO date string
+  effective_time?: string; // ISO time string
 
-  // Tracking
+  // Recording details
+  recorded_by?: string;
+  recorded_by_name?: string;
+  method?: string;
+  body_site?: string;
+  device?: string;
+
+  // Additional context
+  notes?: string;
+  metadata?: Record<string, unknown>;
+
+  // Soft delete
   deleted_at?: string;
+
+  // Timestamps
   created_at: string;
   updated_at: string;
+
+  // Tracking
   created_by?: string;
   updated_by?: string;
 }
 
-/**
- * Observation Template (for common observations)
- */
-export interface ObservationTemplate {
-  id: string;
-  practice_id?: string; // null for system templates
-
-  name: string;
-  observation_type: ObservationType;
-  code?: string;
-  code_system?: string;
-
-  value_schema: Record<string, unknown>; // JSON Schema
-  default_reference_range?: ReferenceRange;
-
-  input_type?: "number" | "text" | "select" | "range" | "boolean";
-  unit?: string;
-  display_order?: number;
-
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
-
 // ============================================
-// OUTCOME MEASURE DEFINITIONS
+// OUTCOME MEASURE TYPES
 // ============================================
 
 /**
- * Score interpretation for outcome measures
+ * Direction of score interpretation
  */
-export interface ScoreInterpretation {
+export type ScoreDirection = "higher_worse" | "higher_better" | "neutral";
+
+/**
+ * Severity level
+ */
+export type SeverityLevel =
+  | "none"
+  | "subthreshold"
+  | "mild"
+  | "moderate"
+  | "moderate-severe"
+  | "severe"
+  | "at-risk";
+
+/**
+ * Severity range definition
+ */
+export interface SeverityRange {
   min: number;
   max: number;
-  severity: string;
   label: string;
-  gender?: "M" | "F"; // For gender-specific thresholds
+  severity: SeverityLevel;
+  color: string;
 }
 
 /**
- * Outcome measure item/question
+ * Action thresholds for clinical decision support
  */
-export interface OutcomeMeasureItem {
-  id: number;
-  text: string;
-  min?: number;
-  max?: number;
-  type?: "numeric" | "boolean" | "select";
-  labels?: string[];
+export interface ActionThresholds {
+  urgent_referral?: number;
+  follow_up_soon?: number;
+  monitor?: number;
+  positive_women?: number;
+  positive_men?: number;
+  high_risk?: number;
+  probable_ptsd?: number;
+  clinically_significant_change?: number;
+  reliable_change?: number;
+  suicidal_ideation_item?: number;
 }
 
 /**
- * Clinical guidance for outcome measure
+ * Practice specialty types
  */
-export interface ClinicalGuidance {
-  recommended_use?: string;
-  action_thresholds?: Record<string, string>;
-  clinical_cutoff?: number;
-  critical_items?: number[];
-  note?: string;
-}
+export type PracticeSpecialty =
+  | "mental_health"
+  | "primary_care"
+  | "pediatrics"
+  | "internal_medicine"
+  | "family_medicine"
+  | "psychiatry"
+  | "psychology"
+  | "social_work"
+  | "counseling"
+  | "substance_abuse"
+  | "neurology"
+  | "geriatrics"
+  | "womens_health"
+  | "other";
 
 /**
- * Outcome Measure category
+ * Outcome measure category
  */
-export type OutcomeMeasureCategory =
+export type OutcomeCategory =
   | "depression"
   | "anxiety"
   | "trauma"
   | "substance"
   | "general"
-  | "custom";
+  | "psychosis"
+  | "eating"
+  | "sleep"
+  | "cognitive";
+
+// ============================================
+// OUTCOME MEASURE DEFINITION
+// ============================================
 
 /**
- * Administration method
- */
-export type AdministrationMethod = "self-report" | "clinician-administered" | "interview";
-
-/**
- * Frequency recommendation
- */
-export type FrequencyRecommendation = "every-visit" | "weekly" | "monthly" | "initial-only";
-
-/**
- * Outcome Measure Definition record
+ * Definition of an outcome measure
+ * Describes the scoring criteria and interpretation
  */
 export interface OutcomeMeasureDefinition {
   id: string;
-  practice_id?: string; // null for system-wide measures
 
   // Identification
-  code: string; // 'PHQ-9', 'GAD-7', etc.
+  code: string;
   name: string;
   description?: string;
-  version?: string;
-
-  // Classification
-  category: OutcomeMeasureCategory;
-  subcategory?: string;
 
   // Scoring
   min_score: number;
   max_score: number;
-  score_interpretation: ScoreInterpretation[];
-  items?: OutcomeMeasureItem[];
+  score_direction: ScoreDirection;
 
-  // Clinical guidance
-  clinical_guidance?: ClinicalGuidance;
-  evidence_base?: string;
+  // Severity ranges
+  severity_ranges: SeverityRange[];
+
+  // Categorization
+  specialty: PracticeSpecialty[];
+  category?: OutcomeCategory;
+  loinc_code?: string;
 
   // Administration
-  typical_duration_minutes?: number;
-  administration_method?: AdministrationMethod;
-  frequency_recommendation?: FrequencyRecommendation;
+  question_count?: number;
+  time_to_complete?: string;
+  frequency_guidance?: string;
 
-  // Status
-  is_system_measure: boolean;
+  // Clinical guidance
+  clinical_notes?: string;
+  action_thresholds?: ActionThresholds;
+
+  // Metadata
+  source?: string;
+  version: string;
   is_active: boolean;
 
   // Timestamps
@@ -247,40 +277,29 @@ export interface OutcomeMeasureDefinition {
   updated_at: string;
 }
 
-/**
- * Item response for outcome measure
- */
-export interface ItemResponse {
-  item_id: number;
-  response: number | boolean | string;
-}
+// ============================================
+// OUTCOME MEASURE RECORD
+// ============================================
 
 /**
- * Outcome Measure record (administration)
+ * A recorded outcome measure for a patient
  */
-export interface OutcomeMeasure {
+export interface OutcomeMeasureRecord {
   id: string;
   practice_id: string;
   patient_id: string;
 
   // Measure data
-  definition_id?: string;
-  measure_type: "PHQ-9" | "GAD-7" | "PCL-5" | "Other" | string;
+  measure_type: string;
   score: number;
   max_score: number;
-  measurement_date: string; // ISO date
+  measurement_date: string;
 
-  // Detailed responses
-  item_responses?: ItemResponse[];
-  severity?: string;
-
-  // Administration
+  // Recording details
   administered_by?: string;
   notes?: string;
-  clinical_notes?: string;
 
   // Tracking
-  deleted_at?: string;
   created_at: string;
   updated_at?: string;
   created_by?: string;
@@ -288,285 +307,83 @@ export interface OutcomeMeasure {
 }
 
 // ============================================
-// PRACTICE SPECIALTIES & PROVIDER TYPES
+// HELPER TYPES
 // ============================================
 
 /**
- * Practice specialty category
+ * Paginated response wrapper
  */
-export type SpecialtyCategory = "mental_health" | "primary_care" | "specialty" | "allied_health";
-
-/**
- * Practice Specialty record
- */
-export interface PracticeSpecialty {
-  id: string;
-  code: string;
-  name: string;
-  description?: string;
-  category: SpecialtyCategory;
-  is_active: boolean;
-  display_order?: number;
-  created_at: string;
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  page_size: number;
+  total_pages: number;
+  has_next: boolean;
+  has_previous: boolean;
 }
 
 /**
- * Provider type category
+ * Pagination parameters
  */
-export type ProviderCategory = "physician" | "psychologist" | "therapist" | "nurse" | "other";
-
-/**
- * Provider Type record
- */
-export interface ProviderType {
-  id: string;
-  code: string;
-  name: string;
-  abbreviation: string;
-  description?: string;
-
-  // Capabilities
-  can_prescribe: boolean;
-  can_supervise: boolean;
-  requires_supervision: boolean;
-
-  category: ProviderCategory;
-  is_active: boolean;
-  display_order?: number;
-  created_at: string;
+export interface PaginationParams {
+  page?: number;
+  page_size?: number;
+  sort_by?: string;
+  sort_order?: "asc" | "desc";
 }
 
 /**
- * Practice Provider (link between practice and providers)
+ * Date range filter
  */
-export interface PracticeProvider {
-  id: string;
-  practice_id: string;
-  provider_type_id: string;
-
-  // Provider info
-  first_name: string;
-  last_name: string;
-  email?: string;
-  phone?: string;
-  npi?: string;
-
-  // Credentials
-  credentials?: string[];
-  license_number?: string;
-  license_state?: string;
-  license_expiration?: string;
-
-  // Supervision
-  supervisor_id?: string;
-
-  // Status
-  is_active: boolean;
+export interface DateRangeFilter {
   start_date?: string;
   end_date?: string;
-
-  // Settings
-  settings?: Record<string, unknown>;
-
-  // Tracking
-  deleted_at?: string;
-  created_at: string;
-  updated_at: string;
-  created_by?: string;
-  updated_by?: string;
-}
-
-// ============================================
-// PRACTICE SETTINGS
-// ============================================
-
-/**
- * Practice scheduling settings
- */
-export interface SchedulingSettings {
-  appointment_buffer_minutes?: number;
-  default_appointment_duration?: number;
-  allow_online_booking?: boolean;
-  reminder_settings?: {
-    sms?: boolean;
-    email?: boolean;
-    hours_before?: number[];
-  };
 }
 
 /**
- * Practice billing settings
+ * Clinical observation filters
  */
-export interface BillingSettings {
-  default_cpt_codes?: string[];
-  accept_insurance?: boolean;
-  insurance_payers?: string[];
-  sliding_scale_enabled?: boolean;
+export interface ClinicalObservationFilters extends PaginationParams, DateRangeFilter {
+  observation_type?: ObservationType;
+  code?: string;
+  status?: ObservationStatus;
+  interpretation?: ObservationInterpretation;
 }
 
 /**
- * Practice clinical settings
+ * Get severity info for a score
  */
-export interface ClinicalSettings {
-  required_measures?: string[];
-  measure_frequency?: FrequencyRecommendation;
-  documentation_template?: "soap" | "dap" | "birp" | "custom";
+export function getSeverityForScore(
+  score: number,
+  severityRanges: SeverityRange[]
+): SeverityRange | undefined {
+  return severityRanges.find((range) => score >= range.min && score <= range.max);
 }
 
 /**
- * Practice notification settings
+ * Common LOINC codes for mental health screenings
  */
-export interface NotificationSettings {
-  no_show_alerts?: boolean;
-  high_risk_alerts?: boolean;
-  outcome_deterioration_alerts?: boolean;
-}
+export const MENTAL_HEALTH_LOINC_CODES = {
+  PHQ9_TOTAL: "44249-1",
+  GAD7_TOTAL: "69737-5",
+  PCL5_TOTAL: "70221-7",
+  AUDITC_TOTAL: "75626-2",
+  COLUMBIA_SUICIDE: "72106-8",
+  PHQ9_ASSESSMENT: "44261-6",
+} as const;
 
 /**
- * Practice branding settings
+ * Common LOINC codes for vitals
  */
-export interface BrandingSettings {
-  logo_url?: string;
-  primary_color?: string;
-  portal_welcome_message?: string;
-}
-
-/**
- * Complete practice settings
- */
-export interface PracticeSettings {
-  scheduling?: SchedulingSettings;
-  billing?: BillingSettings;
-  clinical?: ClinicalSettings;
-  notifications?: NotificationSettings;
-  branding?: BrandingSettings;
-  integrations?: {
-    ehr_system?: string;
-    lab_system?: string;
-    pharmacy_system?: string;
-  };
-}
-
-/**
- * Business hours
- */
-export interface BusinessHours {
-  monday?: { open: string; close: string };
-  tuesday?: { open: string; close: string };
-  wednesday?: { open: string; close: string };
-  thursday?: { open: string; close: string };
-  friday?: { open: string; close: string };
-  saturday?: { open: string; close: string };
-  sunday?: { open: string; close: string };
-}
-
-/**
- * Enhanced Practice record
- */
-export interface Practice {
-  id: string;
-  name: string;
-  settings?: PracticeSettings;
-
-  // Specialty
-  specialty_id?: string;
-  primary_provider_type_id?: string;
-
-  // Contact
-  npi?: string;
-  tax_id?: string;
-  phone?: string;
-  fax?: string;
-  email?: string;
-  website?: string;
-
-  // Address
-  address_street?: string;
-  address_city?: string;
-  address_state?: string;
-  address_zip?: string;
-
-  // Operations
-  timezone?: string;
-  business_hours?: BusinessHours;
-  is_accepting_patients?: boolean;
-  telehealth_enabled?: boolean;
-  in_person_enabled?: boolean;
-
-  // Tracking
-  created_at: string;
-  updated_at: string;
-  created_by?: string;
-  updated_by?: string;
-}
-
-// ============================================
-// AUDIT LOG
-// ============================================
-
-/**
- * Audit action types
- */
-export type AuditAction = "INSERT" | "UPDATE" | "DELETE" | "SOFT_DELETE" | "RESTORE";
-
-/**
- * Audit log entry
- */
-export interface AuditLogEntry {
-  id: string;
-  table_name: string;
-  record_id: string;
-  action: AuditAction;
-
-  user_id?: string;
-  user_email?: string;
-  user_ip?: string;
-
-  old_values?: Record<string, unknown>;
-  new_values?: Record<string, unknown>;
-  changed_fields?: string[];
-
-  created_at: string;
-}
-
-// ============================================
-// SOFT DELETE MIXIN
-// ============================================
-
-/**
- * Fields added by soft delete support
- */
-export interface SoftDeletable {
-  deleted_at?: string;
-}
-
-/**
- * Fields added by tracking columns
- */
-export interface Trackable {
-  created_at: string;
-  updated_at: string;
-  created_by?: string;
-  updated_by?: string;
-}
-
-// ============================================
-// UTILITY TYPES
-// ============================================
-
-/**
- * Helper to make specific fields optional
- */
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
-
-/**
- * Create input type (without id and timestamps)
- */
-export type CreateInput<T> = Omit<T, "id" | "created_at" | "updated_at">;
-
-/**
- * Update input type (all fields optional except id)
- */
-export type UpdateInput<T> = Partial<Omit<T, "id" | "created_at">> & {
-  id: string;
-};
+export const VITAL_LOINC_CODES = {
+  HEART_RATE: "8867-4",
+  BODY_TEMPERATURE: "8310-5",
+  DIASTOLIC_BP: "8462-4",
+  SYSTOLIC_BP: "8480-6",
+  RESPIRATORY_RATE: "9279-1",
+  BODY_WEIGHT: "29463-7",
+  BODY_HEIGHT: "8302-2",
+  BMI: "39156-5",
+  OXYGEN_SATURATION: "2708-6",
+} as const;
