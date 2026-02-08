@@ -1,37 +1,88 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-// Simple password protection for hackathon demo
+// ================================================================
+// === DEMO PASSWORD PROTECTION (HACKATHON) ===
+// ================================================================
 const DEMO_PASSWORD = "TebeMHMVP2026!";
 const COOKIE_NAME = "mhmvp-auth";
 
+// ================================================================
+// === AUTH MIDDLEWARE (ALPHA) ===
+// ================================================================
+// Public routes that don't require authentication
+const PUBLIC_ROUTES = [
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+  "/terms",
+  "/privacy",
+  "/baa",
+];
+
+// Check if a path is a public route
+function isPublicRoute(pathname: string): boolean {
+  return PUBLIC_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(`${route}/`)
+  );
+}
+
+// Add security headers to response
+function addSecurityHeaders(response: NextResponse): NextResponse {
+  // Prevent MIME type sniffing
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  // Prevent clickjacking
+  response.headers.set("X-Frame-Options", "DENY");
+  // XSS protection (legacy but still useful)
+  response.headers.set("X-XSS-Protection", "1; mode=block");
+  // HSTS - force HTTPS
+  response.headers.set(
+    "Strict-Transport-Security",
+    "max-age=31536000; includeSubDomains"
+  );
+  // Referrer policy
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  return response;
+}
+// ================================================================
+
 export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
   // Skip auth for static files and API routes
   if (
-    request.nextUrl.pathname.startsWith("/_next") ||
-    request.nextUrl.pathname.startsWith("/api") ||
-    request.nextUrl.pathname.includes(".")
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".")
   ) {
     return NextResponse.next();
+  }
+
+  // === AUTH MIDDLEWARE (ALPHA): Skip demo password for public auth routes ===
+  if (isPublicRoute(pathname)) {
+    const response = NextResponse.next();
+    return addSecurityHeaders(response);
   }
 
   // Check for auth cookie
   const authCookie = request.cookies.get(COOKIE_NAME);
   if (authCookie?.value === "authenticated") {
-    return NextResponse.next();
+    const response = NextResponse.next();
+    return addSecurityHeaders(response);
   }
 
   // Check for password in query params (for initial auth)
   const password = request.nextUrl.searchParams.get("password");
   if (password === DEMO_PASSWORD) {
-    const response = NextResponse.redirect(new URL(request.nextUrl.pathname, request.url));
+    const response = NextResponse.redirect(new URL(pathname, request.url));
     response.cookies.set(COOKIE_NAME, "authenticated", {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
-    return response;
+    return addSecurityHeaders(response);
   }
 
   // Show login page
