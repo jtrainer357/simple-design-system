@@ -876,6 +876,127 @@ export type Database = {
           },
         ];
       };
+      // Clinical documentation tables
+      session_notes: {
+        Row: {
+          id: string;
+          patient_id: string;
+          provider_id: string;
+          session_date: string;
+          session_start_time: string | null;
+          session_end_time: string | null;
+          duration_minutes: number | null;
+          note_type: string;
+          status: string;
+          cpt_code: string | null;
+          cpt_description: string | null;
+          subjective: string | null;
+          objective: string | null;
+          assessment: string | null;
+          plan: string | null;
+          interventions: string[] | null;
+          risk_assessment: Json | null;
+          signed_at: string | null;
+          signed_by: string | null;
+          signature_hash: string | null;
+          is_late_entry: boolean;
+          late_entry_reason: string | null;
+          last_auto_saved_at: string | null;
+          auto_save_version: number;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          patient_id: string;
+          provider_id: string;
+          session_date?: string;
+          session_start_time?: string | null;
+          session_end_time?: string | null;
+          duration_minutes?: number | null;
+          note_type?: string;
+          status?: string;
+          cpt_code?: string | null;
+          cpt_description?: string | null;
+          subjective?: string | null;
+          objective?: string | null;
+          assessment?: string | null;
+          plan?: string | null;
+          interventions?: string[] | null;
+          risk_assessment?: Json | null;
+          signed_at?: string | null;
+          signed_by?: string | null;
+          signature_hash?: string | null;
+          is_late_entry?: boolean;
+          late_entry_reason?: string | null;
+          last_auto_saved_at?: string | null;
+          auto_save_version?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          patient_id?: string;
+          provider_id?: string;
+          session_date?: string;
+          session_start_time?: string | null;
+          session_end_time?: string | null;
+          duration_minutes?: number | null;
+          note_type?: string;
+          status?: string;
+          cpt_code?: string | null;
+          cpt_description?: string | null;
+          subjective?: string | null;
+          objective?: string | null;
+          assessment?: string | null;
+          plan?: string | null;
+          interventions?: string[] | null;
+          risk_assessment?: Json | null;
+          signed_at?: string | null;
+          signed_by?: string | null;
+          signature_hash?: string | null;
+          is_late_entry?: boolean;
+          late_entry_reason?: string | null;
+          last_auto_saved_at?: string | null;
+          auto_save_version?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      session_addendums: {
+        Row: {
+          id: string;
+          session_note_id: string;
+          author_id: string;
+          content: string;
+          reason: string;
+          signed_at: string;
+          signature_hash: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          session_note_id: string;
+          author_id: string;
+          content: string;
+          reason: string;
+          signed_at?: string;
+          signature_hash?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          session_note_id?: string;
+          author_id?: string;
+          content?: string;
+          reason?: string;
+          signed_at?: string;
+          signature_hash?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;

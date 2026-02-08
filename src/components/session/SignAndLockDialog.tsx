@@ -9,14 +9,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { cn } from "@/lib/utils";
-import { isLateEntry, getDaysSinceSession } from "@/lib/session";
+} from "@/design-system/components/ui/dialog";
+import { Button } from "@/design-system/components/ui/button";
+import { Textarea } from "@/design-system/components/ui/textarea";
+import { Checkbox } from "@/design-system/components/ui/checkbox";
+import { Label } from "@/design-system/components/ui/label";
+import { Alert, AlertDescription } from "@/design-system/components/ui/alert";
+import { cn } from "@/design-system/lib/utils";
+import { isLateEntry, getDaysSinceSession } from "@/src/lib/session";
 
 interface SignAndLockDialogProps {
   open: boolean;

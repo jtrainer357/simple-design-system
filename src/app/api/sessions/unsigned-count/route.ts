@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/src/lib/supabase/server";
 
 /**
  * GET /api/sessions/unsigned-count - Get count of unsigned notes for current user

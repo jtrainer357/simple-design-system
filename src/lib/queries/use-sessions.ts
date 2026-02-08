@@ -5,7 +5,7 @@
  */
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import type { SessionNote, SessionAddendum, NoteType, NoteStatus } from "@/lib/session";
+import type { SessionNote, SessionAddendum, NoteType, NoteStatus } from "@/src/lib/session";
 
 export const sessionKeys = {
   all: ["sessions"] as const,

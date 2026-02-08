@@ -2,15 +2,15 @@
 
 import { useState, useMemo } from "react";
 import { Plus, Star, StarOff, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { Button } from "@/design-system/components/ui/button";
+import { Badge } from "@/design-system/components/ui/badge";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
+} from "@/design-system/components/ui/select";
 import {
   Command,
   CommandEmpty,
@@ -18,12 +18,18 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
-} from "@/components/ui/command";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
-import type { PatientDiagnosis, DiagnosisStatus } from "@/lib/session";
-import icd10Data from "@/lib/data/icd10-mental-health.json";
+} from "@/design-system/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/design-system/components/ui/popover";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/design-system/components/ui/card";
+import { cn } from "@/design-system/lib/utils";
+import type { PatientDiagnosis, DiagnosisStatus } from "@/src/lib/session";
+import icd10Data from "@/src/lib/data/icd10-mental-health.json";
 
 interface ICD10Code {
   code: string;
@@ -81,7 +87,7 @@ export function DiagnosisSection({
     const groups: Record<string, ICD10Code[]> = {};
     filteredCodes.forEach((code) => {
       if (!groups[code.category]) groups[code.category] = [];
-      groups[code.category].push(code);
+      groups[code.category]!.push(code);
     });
     return groups;
   }, [filteredCodes]);

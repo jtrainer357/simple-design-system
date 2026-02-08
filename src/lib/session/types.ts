@@ -361,8 +361,8 @@ export function calculateTrend(scores: number[]): "improving" | "worsening" | "s
   if (scores.length < 2) return null;
 
   const recent = scores.slice(-3);
-  const first = recent[0];
-  const last = recent[recent.length - 1];
+  const first = recent[0]!;
+  const last = recent[recent.length - 1]!;
   const diff = last - first;
 
   const threshold = 3;

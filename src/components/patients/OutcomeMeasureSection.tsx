@@ -2,18 +2,29 @@
 
 import { useMemo } from "react";
 import { TrendingUp, TrendingDown, Minus, Plus, BarChart3, Calendar } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { cn } from "@/lib/utils";
+import { Button } from "@/design-system/components/ui/button";
+import { Badge } from "@/design-system/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/design-system/components/ui/card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/design-system/components/ui/tooltip";
+import { cn } from "@/design-system/lib/utils";
 import {
   type OutcomeMeasureScore,
   type OutcomeMeasureType,
   getSeverityBand,
   calculateTrend,
   SEVERITY_BANDS,
-} from "@/lib/session";
+} from "@/src/lib/session";
 
 interface OutcomeMeasureSectionProps {
   scores: OutcomeMeasureScore[];
@@ -65,10 +76,10 @@ export function OutcomeMeasureSection({
     const grouped: Record<string, OutcomeMeasureScore[]> = {};
     scores.forEach((score) => {
       if (!grouped[score.measureType]) grouped[score.measureType] = [];
-      grouped[score.measureType].push(score);
+      grouped[score.measureType]!.push(score);
     });
     Object.keys(grouped).forEach((key) => {
-      grouped[key].sort(
+      grouped[key]!.sort(
         (a, b) => new Date(a.administeredAt).getTime() - new Date(b.administeredAt).getTime()
       );
     });
@@ -87,7 +98,7 @@ export function OutcomeMeasureSection({
     (Object.keys(measureInfo) as OutcomeMeasureType[]).forEach((type) => {
       const typeScores = scoresByType[type] || [];
       if (typeScores.length > 0) {
-        const latest = typeScores[typeScores.length - 1];
+        const latest = typeScores[typeScores.length - 1]!;
         const allScoreValues = typeScores.map((s) => s.totalScore);
         summaries.push({
           type,

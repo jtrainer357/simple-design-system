@@ -2,11 +2,17 @@
 
 import { useState } from "react";
 import { Plus, Pill, AlertTriangle, MoreVertical, Archive, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/design-system/components/ui/button";
+import { Input } from "@/design-system/components/ui/input";
+import { Label } from "@/design-system/components/ui/label";
+import { Badge } from "@/design-system/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/design-system/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -15,15 +21,15 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "@/design-system/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { cn } from "@/lib/utils";
-import type { PatientMedication } from "@/lib/session";
+} from "@/design-system/components/ui/dropdown-menu";
+import { cn } from "@/design-system/lib/utils";
+import type { PatientMedication } from "@/src/lib/session";
 
 interface MedicationSectionProps {
   medications: PatientMedication[];

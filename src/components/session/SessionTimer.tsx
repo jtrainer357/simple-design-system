@@ -2,23 +2,23 @@
 
 import { useEffect, useState } from "react";
 import { Clock, Play, Pause, Square, DollarSign } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/design-system/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
+} from "@/design-system/components/ui/select";
+import { Badge } from "@/design-system/components/ui/badge";
+import { cn } from "@/design-system/lib/utils";
 import {
   useSessionTimer,
   getSuggestedCPTCode,
   getApplicableCPTCodes,
   type NoteType,
   type CPTCode,
-} from "@/lib/session";
+} from "@/src/lib/session";
 
 interface SessionTimerProps {
   initialSeconds?: number;

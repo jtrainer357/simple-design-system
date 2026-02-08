@@ -1,8 +1,8 @@
 "use client";
 
 import { Cloud, Check, AlertCircle, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { AutoSaveStatus } from "@/lib/session";
+import { cn } from "@/design-system/lib/utils";
+import type { AutoSaveStatus } from "@/src/lib/session";
 
 interface AutoSaveIndicatorProps {
   status: AutoSaveStatus;
