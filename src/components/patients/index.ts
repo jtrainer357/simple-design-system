@@ -39,3 +39,4 @@ export {
 // Patient Management Components
 export { AddPatientModal, type AddPatientModalProps } from "./AddPatientModal";
 export { EditPatientDemographics, type EditPatientDemographicsProps } from './EditPatientDemographics';
+export { PatientRosterEnhanced, type PatientRosterEnhancedProps, type SortField, type SortOrder } from './PatientRosterEnhanced';
