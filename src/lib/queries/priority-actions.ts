@@ -56,9 +56,10 @@ export async function getPriorityActions(
 
   if (error) {
     // Log but don't throw - gracefully degrade if table doesn't exist or RLS blocks
-    log.warn("Could not fetch priority actions", error, {
+    log.warn("Could not fetch priority actions", {
       action: "getPriorityActions",
       practiceId,
+      error: error.message,
     });
     return [];
   }
@@ -124,11 +125,13 @@ export async function getPatientPriorityActions(
     .order("created_at", { ascending: false });
 
   if (error) {
-    log.error("Failed to fetch patient priority actions", error, {
+    // Log but don't throw - gracefully degrade if table doesn't exist or RLS blocks
+    log.warn("Could not fetch patient priority actions", {
       action: "getPatientPriorityActions",
       patientId,
+      error: error.message,
     });
-    throw error;
+    return [];
   }
 
   // Map DB fields and sort by urgency priority
