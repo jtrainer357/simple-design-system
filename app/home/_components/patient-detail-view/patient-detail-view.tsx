@@ -114,27 +114,6 @@ export function PatientDetailView({
   const { selectedVisitId } = useSelectedIds();
   const reset = usePatientViewReset();
 
-  // Debug: Log render state
-  console.log("[PatientDetailView] Render:", {
-    viewState,
-    selectedVisitId,
-    hasPatient: !!patient,
-    patientId: patient?.id,
-    recentActivityCount: patient?.recentActivity?.length ?? 0,
-  });
-
-  // Reset state on mount if in an invalid state (stale sessionStorage)
-  React.useEffect(() => {
-    // If we're in summary/note but have no selected ID, reset to default
-    if (
-      (viewState === "summary" || viewState === "note" || viewState === "fullView") &&
-      !selectedVisitId
-    ) {
-      console.log("[PatientDetailView] Resetting stale state:", viewState);
-      reset();
-    }
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
   // Track patient ID to detect changes
   const previousPatientId = React.useRef<string | null>(null);
 
@@ -231,80 +210,71 @@ export function PatientDetailView({
 
       {/* Main Content Area */}
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <AnimatePresence mode="wait" custom={direction} initial={false}>
-          {/* Default View: Tabs */}
-          {viewState === "default" && (
-            <motion.div
-              key="default-view"
-              custom={direction}
-              variants={viewVariants}
-              initial="initial"
-              animate="animate"
-              exit="exit"
-              className="flex min-h-0 flex-1 flex-col overflow-hidden"
+        {/* Simplified: Always show default view when viewState is "default" */}
+        {viewState === "default" && (
+          <CardWrapper className="flex min-h-0 flex-1 flex-col overflow-hidden">
+            <Tabs
+              value={activeTab}
+              onValueChange={setActiveTab}
+              className="flex h-full w-full flex-col"
             >
-              <CardWrapper className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                <Tabs
-                  value={activeTab}
-                  onValueChange={setActiveTab}
-                  className="flex h-full w-full flex-col"
-                >
-                  <TabsList className="border-border/50 mb-4 h-auto w-full justify-start gap-0 overflow-x-auto border-b-2 bg-transparent p-0 sm:mb-6">
-                    <TabsTrigger value="overview" className={tabTriggerStyles}>
-                      Overview
-                    </TabsTrigger>
-                    <TabsTrigger value="appointments" className={tabTriggerStyles}>
-                      Appointments
-                    </TabsTrigger>
-                    <TabsTrigger value="medical-records" className={tabTriggerStyles}>
-                      Medical Records
-                    </TabsTrigger>
-                    <TabsTrigger value="messages" className={tabTriggerStyles}>
-                      Messages
-                    </TabsTrigger>
-                    <TabsTrigger value="billing" className={tabTriggerStyles}>
-                      Billing
-                    </TabsTrigger>
-                    <TabsTrigger value="reviews" className={tabTriggerStyles}>
-                      Reviews
-                    </TabsTrigger>
-                  </TabsList>
+              <TabsList className="border-border/50 mb-4 h-auto w-full justify-start gap-0 overflow-x-auto border-b-2 bg-transparent p-0 sm:mb-6">
+                <TabsTrigger value="overview" className={tabTriggerStyles}>
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="appointments" className={tabTriggerStyles}>
+                  Appointments
+                </TabsTrigger>
+                <TabsTrigger value="medical-records" className={tabTriggerStyles}>
+                  Medical Records
+                </TabsTrigger>
+                <TabsTrigger value="messages" className={tabTriggerStyles}>
+                  Messages
+                </TabsTrigger>
+                <TabsTrigger value="billing" className={tabTriggerStyles}>
+                  Billing
+                </TabsTrigger>
+                <TabsTrigger value="reviews" className={tabTriggerStyles}>
+                  Reviews
+                </TabsTrigger>
+              </TabsList>
 
-                  <TabsContent value="overview" className="mt-0 flex-1 overflow-y-auto">
-                    <OverviewTab patient={patient} onActivitySelect={handleActivitySelect} />
-                  </TabsContent>
+              <TabsContent value="overview" className="mt-0 flex-1 overflow-y-auto">
+                <OverviewTab patient={patient} onActivitySelect={handleActivitySelect} />
+              </TabsContent>
 
-                  <TabsContent value="appointments" className="mt-0 flex-1 overflow-y-auto pr-1">
-                    <AppointmentsTab patient={patient} />
-                  </TabsContent>
+              <TabsContent value="appointments" className="mt-0 flex-1 overflow-y-auto pr-1">
+                <AppointmentsTab patient={patient} />
+              </TabsContent>
 
-                  <TabsContent value="medical-records" className="mt-0 flex-1 overflow-y-auto pr-1">
-                    <MedicalRecordsTab patient={patient} />
-                  </TabsContent>
+              <TabsContent value="medical-records" className="mt-0 flex-1 overflow-y-auto pr-1">
+                <MedicalRecordsTab patient={patient} />
+              </TabsContent>
 
-                  <TabsContent value="messages" className="-mx-6 mt-0 -mb-6 flex-1 overflow-hidden">
-                    <MessagesTab patient={patient} />
-                  </TabsContent>
+              <TabsContent value="messages" className="-mx-6 mt-0 -mb-6 flex-1 overflow-hidden">
+                <MessagesTab patient={patient} />
+              </TabsContent>
 
-                  <TabsContent value="billing" className="mt-0 flex-1 overflow-y-auto pr-1">
-                    <BillingTab patient={patient} />
-                  </TabsContent>
+              <TabsContent value="billing" className="mt-0 flex-1 overflow-y-auto pr-1">
+                <BillingTab patient={patient} />
+              </TabsContent>
 
-                  <TabsContent value="reviews" className="mt-0 flex-1 overflow-y-auto pr-1">
-                    <ReviewsTab patient={patient} />
-                  </TabsContent>
-                </Tabs>
-              </CardWrapper>
-            </motion.div>
-          )}
+              <TabsContent value="reviews" className="mt-0 flex-1 overflow-y-auto pr-1">
+                <ReviewsTab patient={patient} />
+              </TabsContent>
+            </Tabs>
+          </CardWrapper>
+        )}
 
+        {/* AnimatePresence for other views */}
+        <AnimatePresence mode="wait" custom={direction} initial={false}>
           {/* Summary View: Visit Summary Panel */}
           {viewState === "summary" && selectedActivity && (
             <motion.div
               key="summary-view"
               custom={direction}
               variants={viewVariants}
-              initial="initial"
+              initial={false}
               animate="animate"
               exit="exit"
               className="flex min-h-0 flex-1 flex-col overflow-hidden"
@@ -325,7 +295,7 @@ export function PatientDetailView({
               key="note-view"
               custom={direction}
               variants={viewVariants}
-              initial="initial"
+              initial={false}
               animate="animate"
               exit="exit"
               className="flex min-h-0 flex-1 flex-col overflow-hidden"
@@ -346,7 +316,7 @@ export function PatientDetailView({
               key="fallback-view"
               custom={direction}
               variants={viewVariants}
-              initial="initial"
+              initial={false}
               animate="animate"
               exit="exit"
               className="flex min-h-0 flex-1 flex-col overflow-hidden"

@@ -128,10 +128,7 @@ export function OverviewTab({ patient, onActivitySelect }: OverviewTabProps) {
         <Heading level={5} className="mb-4 text-base font-semibold sm:text-lg">
           Recent Activity
         </Heading>
-        <motion.div
-          className="border-border/40 bg-card/30 overflow-hidden rounded-xl border"
-          variants={containerVariants}
-        >
+        <motion.div variants={containerVariants}>
           {patient.recentActivity.map((activity, index) => (
             <motion.div key={activity.id} variants={itemVariants} custom={index}>
               <ActivityRow

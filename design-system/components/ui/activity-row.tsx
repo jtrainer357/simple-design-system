@@ -45,7 +45,7 @@ export function ActivityRow({
   };
 
   return (
-    <motion.div
+    <div
       className={cn("flex items-stretch gap-4 pl-0.5", className)}
       onClick={onClick}
       onKeyDown={handleKeyDown}
@@ -53,9 +53,6 @@ export function ActivityRow({
       tabIndex={onClick ? 0 : undefined}
       aria-label={onClick ? `View ${title}` : undefined}
       aria-selected={selected}
-      whileHover={onClick ? { x: 4 } : undefined}
-      whileTap={onClick ? { scale: 0.995 } : undefined}
-      transition={springConfig}
     >
       {/* Timeline column with dot and connecting line */}
       <div className="relative flex flex-col items-center">
@@ -94,17 +91,11 @@ export function ActivityRow({
       <motion.div
         className={cn(
           "mb-3 flex-1 cursor-pointer rounded-lg p-4 shadow-sm transition-colors",
-          selected
-            ? "bg-primary/5 ring-primary/20 shadow-md ring-2"
-            : "border border-stone-100 bg-white hover:shadow-md"
+          selected ? "bg-primary/5 ring-primary/20 shadow-md ring-2" : "bg-white hover:shadow-md"
         )}
-        animate={{
-          backgroundColor: selected ? "rgba(var(--primary), 0.05)" : "rgb(255, 255, 255)",
-          boxShadow: selected
-            ? "0 4px 12px -2px rgba(var(--primary), 0.15)"
-            : "0 1px 3px rgba(0, 0, 0, 0.05)",
-        }}
-        transition={{ duration: 0.25, ease: smoothEase }}
+        whileHover={onClick ? { x: 4 } : undefined}
+        whileTap={onClick ? { scale: 0.98 } : undefined}
+        transition={springConfig}
       >
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -127,7 +118,7 @@ export function ActivityRow({
           </Text>
         </div>
       </motion.div>
-    </motion.div>
+    </div>
   );
 }
 

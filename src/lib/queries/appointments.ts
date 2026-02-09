@@ -1,6 +1,6 @@
 /**
  * Appointments Queries
- * Fetches appointment data from Supabase
+ * Fetches appointment data from Supabase with demo data fallback
  */
 
 import { createClient } from "@/src/lib/supabase/client";
@@ -12,6 +12,7 @@ import {
   getDemoDaysAgo,
   DEMO_PRACTICE_ID,
 } from "@/src/lib/utils/demo-date";
+import { getDemoTodayAppointments } from "@/src/lib/data/synthetic-adapter";
 
 const log = createLogger("queries/appointments");
 
@@ -24,7 +25,8 @@ export type AppointmentWithPatient = Appointment & {
 
 /**
  * Get today's appointments with patient details
- * Uses demo date (Feb 6, 2026) for consistent demo experience
+ * Uses demo date (Feb 9, 2026) for consistent demo experience
+ * Includes demo appointments for hackathon demonstration
  */
 export async function getTodayAppointments(
   practiceId: string = DEMO_PRACTICE_ID
@@ -32,34 +34,53 @@ export async function getTodayAppointments(
   const supabase = createClient();
   const today = getDemoToday();
 
-  const { data, error } = await supabase
-    .from("appointments")
-    .select(
+  // Get demo appointments (always available)
+  const demoAppointments = getDemoTodayAppointments();
+
+  try {
+    const { data, error } = await supabase
+      .from("appointments")
+      .select(
+        `
+        *,
+        patient:patients(
+          id,
+          first_name,
+          last_name,
+          avatar_url,
+          risk_level,
+          date_of_birth
+        )
       `
-      *,
-      patient:patients(
-        id,
-        first_name,
-        last_name,
-        avatar_url,
-        risk_level,
-        date_of_birth
       )
-    `
-    )
-    .eq("practice_id", practiceId)
-    .eq("date", today)
-    .order("start_time", { ascending: true });
+      .eq("practice_id", practiceId)
+      .eq("date", today)
+      .order("start_time", { ascending: true });
 
-  if (error) {
-    log.error("Failed to fetch today's appointments", error, {
-      action: "getTodayAppointments",
-      practiceId,
-    });
-    throw error;
+    if (error) {
+      log.warn("Failed to fetch appointments from DB, using demo data only", {
+        action: "getTodayAppointments",
+      });
+      // Return demo appointments on error
+      return demoAppointments;
+    }
+
+    // Merge database appointments with demo appointments
+    const dbAppointments = (data || []) as AppointmentWithPatient[];
+    const dbExternalIds = new Set(dbAppointments.map((a) => a.external_id));
+
+    // Add demo appointments that aren't already in the database
+    const uniqueDemoAppointments = demoAppointments.filter(
+      (da) => !dbExternalIds.has(da.external_id)
+    );
+
+    // Combine and sort by start_time
+    const allAppointments = [...uniqueDemoAppointments, ...dbAppointments];
+    return allAppointments.sort((a, b) => a.start_time.localeCompare(b.start_time));
+  } catch {
+    // Fallback to demo appointments on any error
+    return demoAppointments;
   }
-
-  return (data || []) as AppointmentWithPatient[];
 }
 
 /**

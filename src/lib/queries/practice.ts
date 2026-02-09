@@ -7,6 +7,7 @@ import { createClient } from "@/src/lib/supabase/client";
 import { createLogger } from "@/src/lib/logger";
 import type { Practice } from "@/src/lib/supabase/types";
 import { getDemoToday, DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
+import { getDemoTodayAppointments, getDemoPatients } from "@/src/lib/data/synthetic-adapter";
 
 const log = createLogger("queries/practice");
 
@@ -39,6 +40,7 @@ export async function getPracticeId(): Promise<string> {
 
 /**
  * Get dashboard statistics for a practice
+ * Includes demo data for hackathon demonstration
  */
 export async function getDashboardStats(practiceId: string = DEMO_PRACTICE_ID): Promise<{
   patientCount: number;
@@ -51,6 +53,10 @@ export async function getDashboardStats(practiceId: string = DEMO_PRACTICE_ID): 
 }> {
   const supabase = createClient();
   const today = getDemoToday();
+
+  // Get demo data (always available)
+  const demoPatients = getDemoPatients();
+  const demoTodayAppointments = getDemoTodayAppointments();
 
   // Run all queries in parallel
   const [patientsResult, todayApptsResult, messagesResult, actionsResult, invoicesResult] =
@@ -83,17 +89,29 @@ export async function getDashboardStats(practiceId: string = DEMO_PRACTICE_ID): 
   type PatientStatus = { status: string | null; risk_level: string | null };
   type InvoiceBalance = { balance: number | null };
 
-  const patients = (patientsResult.data || []) as PatientStatus[];
-  const todayAppts = todayApptsResult.data || [];
+  const dbPatients = (patientsResult.data || []) as PatientStatus[];
+  const dbTodayAppts = todayApptsResult.data || [];
   const messages = messagesResult.data || [];
   const actions = actionsResult.data || [];
   const invoices = (invoicesResult.data || []) as InvoiceBalance[];
 
+  // Combine DB + demo counts (avoid double-counting by using demo as base)
+  const totalPatients = Math.max(dbPatients.length, demoPatients.length);
+  const activePatients = Math.max(
+    dbPatients.filter((p: PatientStatus) => p.status === "Active").length,
+    demoPatients.filter((p) => p.status === "Active").length
+  );
+  const highRiskPatients = Math.max(
+    dbPatients.filter((p: PatientStatus) => p.risk_level === "high").length,
+    demoPatients.filter((p) => p.risk_level === "high").length
+  );
+  const todayApptCount = Math.max(dbTodayAppts.length, demoTodayAppointments.length);
+
   return {
-    patientCount: patients.length,
-    activePatientCount: patients.filter((p: PatientStatus) => p.status === "Active").length,
-    highRiskCount: patients.filter((p: PatientStatus) => p.risk_level === "high").length,
-    todayAppointmentCount: todayAppts.length,
+    patientCount: totalPatients,
+    activePatientCount: activePatients,
+    highRiskCount: highRiskPatients,
+    todayAppointmentCount: todayApptCount,
     unreadMessageCount: messages.length,
     pendingActionCount: actions.length,
     outstandingBalance: invoices.reduce(

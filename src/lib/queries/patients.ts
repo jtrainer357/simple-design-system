@@ -1,6 +1,6 @@
 /**
  * Patients Queries
- * Fetches patient data from Supabase
+ * Fetches patient data from Supabase with demo data fallback
  */
 
 import { createClient } from "@/src/lib/supabase/client";
@@ -18,6 +18,16 @@ import type {
 // Alias Message as Communication for backwards compatibility
 export type Communication = Message;
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
+import {
+  getDemoPatients,
+  getDemoPatientByUUID,
+  getDemoPatientAppointments,
+  getDemoPatientOutcomeMeasures,
+  getDemoPatientMessages,
+  getDemoPatientInvoices,
+  isDemoPatientUUID,
+  getExternalIdFromUUID,
+} from "@/src/lib/data/synthetic-adapter";
 
 const log = createLogger("queries/patients");
 
@@ -25,28 +35,61 @@ const log = createLogger("queries/patients");
 
 /**
  * Get all patients for a practice
+ * Includes demo patients for hackathon demonstration
  */
 export async function getPatients(practiceId: string = DEMO_PRACTICE_ID): Promise<Patient[]> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
-    .from("patients")
-    .select("*")
-    .eq("practice_id", practiceId)
-    .eq("status", "Active")
-    .order("last_name", { ascending: true })
-    .order("first_name", { ascending: true });
+  // Get demo patients (always available for demo)
+  const demoPatients = getDemoPatients();
 
-  if (error) {
-    log.error("Failed to fetch patients", error, { action: "getPatients" });
-    throw error;
+  try {
+    const { data, error } = await supabase
+      .from("patients")
+      .select("*")
+      .eq("practice_id", practiceId)
+      .eq("status", "Active")
+      .order("last_name", { ascending: true })
+      .order("first_name", { ascending: true });
+
+    if (error) {
+      log.warn("Failed to fetch patients from DB, using demo data only", { action: "getPatients" });
+      // Return demo patients on error
+      return demoPatients.sort((a, b) => {
+        const lastNameCompare = a.last_name.localeCompare(b.last_name);
+        if (lastNameCompare !== 0) return lastNameCompare;
+        return a.first_name.localeCompare(b.first_name);
+      });
+    }
+
+    // Merge database patients with demo patients (demo patients prioritized)
+    const dbPatients = data || [];
+    const dbExternalIds = new Set(dbPatients.map((p) => p.external_id));
+
+    // Add demo patients that aren't already in the database
+    const uniqueDemoPatients = demoPatients.filter((dp) => !dbExternalIds.has(dp.external_id));
+
+    // Combine: all unique patients
+    const allPatients = [...uniqueDemoPatients, ...dbPatients];
+
+    return allPatients.sort((a, b) => {
+      const lastNameCompare = a.last_name.localeCompare(b.last_name);
+      if (lastNameCompare !== 0) return lastNameCompare;
+      return a.first_name.localeCompare(b.first_name);
+    });
+  } catch {
+    // Fallback to demo patients on any error
+    return demoPatients.sort((a, b) => {
+      const lastNameCompare = a.last_name.localeCompare(b.last_name);
+      if (lastNameCompare !== 0) return lastNameCompare;
+      return a.first_name.localeCompare(b.first_name);
+    });
   }
-
-  return data || [];
 }
 
 /**
  * Get a single patient by ID
+ * Checks demo patients first, then database
  * @param patientId - The patient's UUID
  * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
@@ -54,6 +97,12 @@ export async function getPatientById(
   patientId: string,
   practiceId: string = DEMO_PRACTICE_ID
 ): Promise<Patient | null> {
+  // Check if it's a demo patient first
+  const demoPatient = getDemoPatientByUUID(patientId);
+  if (demoPatient) {
+    return demoPatient;
+  }
+
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -64,7 +113,7 @@ export async function getPatientById(
     .single();
 
   if (error) {
-    log.error("Failed to fetch patient", error, { action: "getPatientById", patientId });
+    log.warn("Failed to fetch patient from DB", { action: "getPatientById", patientId });
     return null;
   }
 
@@ -109,6 +158,14 @@ export async function getPatientAppointments(
   patientId: string,
   practiceId: string = DEMO_PRACTICE_ID
 ): Promise<Appointment[]> {
+  // Check if it's a demo patient - use synthetic data
+  if (isDemoPatientUUID(patientId)) {
+    const externalId = getExternalIdFromUUID(patientId);
+    if (externalId) {
+      return getDemoPatientAppointments(externalId);
+    }
+  }
+
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -124,7 +181,7 @@ export async function getPatientAppointments(
       action: "getPatientAppointments",
       patientId,
     });
-    throw error;
+    return [];
   }
 
   return data || [];
@@ -139,6 +196,14 @@ export async function getPatientOutcomeMeasures(
   patientId: string,
   practiceId: string = DEMO_PRACTICE_ID
 ): Promise<OutcomeMeasure[]> {
+  // Check if it's a demo patient - use synthetic data
+  if (isDemoPatientUUID(patientId)) {
+    const externalId = getExternalIdFromUUID(patientId);
+    if (externalId) {
+      return getDemoPatientOutcomeMeasures(externalId);
+    }
+  }
+
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -153,7 +218,7 @@ export async function getPatientOutcomeMeasures(
       action: "getPatientOutcomeMeasures",
       patientId,
     });
-    throw error;
+    return [];
   }
 
   return data || [];
@@ -168,6 +233,14 @@ export async function getPatientMessages(
   patientId: string,
   practiceId: string = DEMO_PRACTICE_ID
 ): Promise<Communication[]> {
+  // Check if it's a demo patient - use synthetic data
+  if (isDemoPatientUUID(patientId)) {
+    const externalId = getExternalIdFromUUID(patientId);
+    if (externalId) {
+      return getDemoPatientMessages(externalId) as Communication[];
+    }
+  }
+
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -179,7 +252,7 @@ export async function getPatientMessages(
     .limit(50);
 
   if (error) {
-    log.error("Failed to fetch patient messages", error, {
+    log.warn("Failed to fetch patient messages", {
       action: "getPatientMessages",
       patientId,
     });
@@ -199,6 +272,14 @@ export async function getPatientInvoices(
   patientId: string,
   practiceId: string = DEMO_PRACTICE_ID
 ): Promise<Invoice[]> {
+  // Check if it's a demo patient - use synthetic data
+  if (isDemoPatientUUID(patientId)) {
+    const externalId = getExternalIdFromUUID(patientId);
+    if (externalId) {
+      return getDemoPatientInvoices(externalId);
+    }
+  }
+
   const supabase = createClient();
 
   const { data, error } = await supabase
@@ -213,7 +294,7 @@ export async function getPatientInvoices(
       action: "getPatientInvoices",
       patientId,
     });
-    throw error;
+    return [];
   }
 
   return data || [];

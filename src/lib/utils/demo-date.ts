@@ -1,11 +1,11 @@
 /**
  * Demo Date Utility
- * Returns Feb 6, 2026 as the "current" date for demo purposes
+ * Returns Feb 9, 2026 as the "current" date for demo purposes
  */
 
-// Demo date: Friday, February 6, 2026
-export const DEMO_DATE = "2026-02-06";
-export const DEMO_DATE_OBJECT = new Date("2026-02-06T12:00:00");
+// Demo date: Monday, February 9, 2026
+export const DEMO_DATE = "2026-02-09";
+export const DEMO_DATE_OBJECT = new Date("2026-02-09T12:00:00");
 
 // Demo practice ID (used across all queries)
 export const DEMO_PRACTICE_ID = "550e8400-e29b-41d4-a716-446655440000";
@@ -41,7 +41,7 @@ export function getDemoDaysAgo(days: number): string {
 }
 
 /**
- * Format a date for display (e.g., "Friday, Feb 6")
+ * Format a date for display (e.g., "Monday, Feb 9")
  */
 export function formatDemoDate(format: "long" | "short" = "long"): string {
   if (format === "long") {
