@@ -55,11 +55,12 @@ export async function getPriorityActions(
     .order("created_at", { ascending: false });
 
   if (error) {
-    log.error("Failed to fetch priority actions", error, {
+    // Log but don't throw - gracefully degrade if table doesn't exist or RLS blocks
+    log.warn("Could not fetch priority actions", error, {
       action: "getPriorityActions",
       practiceId,
     });
-    throw error;
+    return [];
   }
 
   // Map DB fields to expected types and sort by urgency

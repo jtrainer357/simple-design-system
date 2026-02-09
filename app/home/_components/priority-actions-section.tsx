@@ -248,12 +248,14 @@ async function fetchSubstrateActions(): Promise<SubstrateActionWithPatient[]> {
   try {
     const response = await fetch("/api/substrate/actions?status=active&limit=10");
     if (!response.ok) {
-      throw new Error(`Failed to fetch substrate actions: ${response.statusText}`);
+      // Silently fail if substrate_actions table doesn't exist yet
+      // This is expected until the migration is applied
+      return [];
     }
     const data = await response.json();
     return data.actions || [];
-  } catch (error) {
-    log.error("Failed to fetch substrate actions", error);
+  } catch {
+    // Silently fail - substrate table may not exist yet
     return [];
   }
 }

@@ -88,9 +88,13 @@ export async function POST(request: NextRequest) {
       .from("practices")
       .insert({
         name: practiceName,
-        specialty,
-        state,
-        is_active: true,
+        settings: {
+          specialty,
+          state,
+          phone: phone || null,
+          npi: npi || null,
+          is_active: true,
+        },
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString(),
       })
@@ -126,7 +130,9 @@ export async function POST(request: NextRequest) {
       practice_id: practice.id,
       role: "owner",
       is_active: true,
-      joined_at: new Date().toISOString(),
+      accepted_at: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     });
 
     if (membershipError) {

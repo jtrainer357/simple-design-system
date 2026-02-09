@@ -122,10 +122,15 @@ export async function getDashboardStats(practiceId: string = DEMO_PRACTICE_ID): 
 }
 
 /**
- * Check if the database has been populated (import has run)
+ * Check if the database has been populated (import has run) or demo data is available
  * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
 export async function isDatabasePopulated(practiceId: string = DEMO_PRACTICE_ID): Promise<boolean> {
+  // For demo practice, always return true since synthetic demo data is available
+  if (practiceId === DEMO_PRACTICE_ID) {
+    return true;
+  }
+
   const supabase = createClient();
 
   const { count, error } = await supabase

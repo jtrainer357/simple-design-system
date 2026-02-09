@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Clinical Note Editor - John Doe</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#e77f4b",
+                        "secondary": "#3B7A7A",
+                        "background-light": "#fbf9f8",
+                        "background-dark": "#211611",
+                    },
+                    fontFamily: {
+                        "display": ["Lexend", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass {
+            background: rgba(33, 22, 17, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        body {
+            font-family: 'Lexend', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-[#1b120e] dark:text-[#fbf9f8] min-h-screen flex flex-col font-display">
+<header class="sticky top-0 z-50 px-6 py-3 glass border-b border-[#e6d8d0] dark:border-[#3d2b24]">
+<div class="max-w-[1440px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3">
+<div class="size-10 bg-primary/20 rounded-full flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">clinical_notes</span>
+</div>
+<h1 class="text-xl font-bold tracking-tight">ClinicalNote<span class="text-primary">AI</span></h1>
+</div>
+<div class="h-8 w-px bg-[#e6d8d0] dark:bg-[#3d2b24]"></div>
+<div class="flex items-center gap-4">
+<div class="size-10 rounded-full bg-cover bg-center border-2 border-white dark:border-[#3d2b24]" data-alt="Close up portrait of male patient John Doe" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDr_BcwQNNgJwLMC8JZjctBuHo-lAC8jxFM3a_jHPhwDD9Hf9qpvEPLJQmyfNeEk5rnKNmMhjFeWu77kx_bSwfwR-ExBzpoS27rybexSQ4dozFUT3DbkvPGUaDhbqBfcb5zlijVQOzLua0k5yCFMpflrPbC_zwSzGbailniJzMKFgymRHqQgDkCTuWMoesmjbc9diR3yCjbk6jN8j8XoKBRAriEoDIZMv9TiL4DR3YXekoroKoiSgPIi3j21NYheQ7t7CIszdvMobA')"></div>
+<div>
+<p class="text-sm font-bold leading-none">John Doe</p>
+<p class="text-xs text-[#96674f] mt-1">DOB: 05/12/1985 • Intake Assessment</p>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex bg-white/50 dark:bg-black/20 p-1 rounded-full border border-[#e6d8d0] dark:border-[#3d2b24]">
+<button class="px-4 py-1.5 rounded-full text-xs font-bold bg-white dark:bg-[#3d2b24] shadow-sm">Editor</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-medium text-[#96674f]">History</button>
+<button class="px-4 py-1.5 rounded-full text-xs font-medium text-[#96674f]">Files</button>
+</div>
+<button class="size-10 flex items-center justify-center rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+</div>
+</div>
+</header>
+<main class="flex-1 max-w-[1440px] mx-auto w-full flex gap-6 p-6 overflow-hidden">
+<section class="w-[65%] flex flex-col bg-white dark:bg-[#2a1d17] rounded-xl shadow-sm border border-[#e6d8d0] dark:border-[#3d2b24] overflow-hidden">
+<div class="flex items-center justify-between px-4 py-2 border-b border-[#e6d8d0] dark:border-[#3d2b24] bg-background-light/50 dark:bg-background-dark/50">
+<div class="flex gap-1">
+<button class="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors" title="Bold">
+<span class="material-symbols-outlined text-[20px]">format_bold</span>
+</button>
+<button class="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors" title="Italic">
+<span class="material-symbols-outlined text-[20px]">format_italic</span>
+</button>
+<button class="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors" title="Underline">
+<span class="material-symbols-outlined text-[20px]">format_underlined</span>
+</button>
+<div class="w-px h-6 bg-[#e6d8d0] dark:bg-[#3d2b24] mx-1 self-center"></div>
+<button class="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors" title="List">
+<span class="material-symbols-outlined text-[20px]">format_list_bulleted</span>
+</button>
+<button class="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors" title="Numbered List">
+<span class="material-symbols-outlined text-[20px]">format_list_numbered</span>
+</button>
+<div class="w-px h-6 bg-[#e6d8d0] dark:bg-[#3d2b24] mx-1 self-center"></div>
+<button class="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg transition-colors" title="Quote">
+<span class="material-symbols-outlined text-[20px]">format_quote</span>
+</button>
+</div>
+<div class="flex items-center gap-2 text-[10px] font-bold text-[#96674f] uppercase tracking-widest">
+<span class="size-2 bg-green-500 rounded-full animate-pulse"></span>
+                    Autosaved 12:45 PM
+                </div>
+</div>
+<div class="flex-1 p-8 overflow-y-auto">
+<div class="max-w-2xl mx-auto space-y-6">
+<div class="space-y-2">
+<h2 class="text-xs font-bold text-[#96674f] uppercase tracking-wider">Presenting Problem</h2>
+<textarea class="w-full border-none focus:ring-0 p-0 text-lg bg-transparent placeholder-[#d5bbaf] resize-none min-h-[100px]" placeholder="Describe the client's primary concerns..."></textarea>
+</div>
+<div class="space-y-2">
+<h2 class="text-xs font-bold text-[#96674f] uppercase tracking-wider">Clinical Observations</h2>
+<textarea class="w-full border-none focus:ring-0 p-0 text-base bg-transparent placeholder-[#d5bbaf] resize-none min-h-[300px]" placeholder="Start typing your session notes here. Use the AI sidebar to insert observations..."></textarea>
+</div>
+</div>
+</div>
+<div class="px-6 py-4 border-t border-[#e6d8d0] dark:border-[#3d2b24] flex items-center gap-4">
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-sm text-[#96674f]">
+<span class="material-symbols-outlined text-[18px]">attach_file</span>
+<span class="font-medium">Attach File</span>
+</button>
+<button class="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-sm text-[#96674f]">
+<span class="material-symbols-outlined text-[18px]">mic</span>
+<span class="font-medium">Dictate</span>
+</button>
+</div>
+</section>
+<aside class="w-[35%] flex flex-col bg-white dark:bg-[#2a1d17] rounded-xl shadow-sm border border-[#e6d8d0] dark:border-[#3d2b24] overflow-hidden">
+<div class="bg-secondary p-4 flex items-center justify-between text-white">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[20px]">auto_awesome</span>
+<h2 class="font-bold">AI Suggestions</h2>
+</div>
+<button class="size-8 flex items-center justify-center rounded-full hover:bg-white/10 transition-colors">
+<span class="material-symbols-outlined text-[18px]">refresh</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-4 space-y-4 bg-secondary/5">
+<div class="space-y-3">
+<p class="text-[10px] font-bold text-secondary uppercase tracking-widest px-1">Observed Patterns</p>
+<div class="glass p-4 rounded-xl cursor-pointer hover:border-secondary transition-all group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold bg-secondary/10 text-secondary px-2 py-0.5 rounded-full uppercase">Affect</span>
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity text-[16px]">add_circle</span>
+</div>
+<p class="text-sm leading-relaxed">Patient exhibited a restricted affect throughout the session, showing limited emotional range when discussing family dynamics.</p>
+</div>
+<div class="glass p-4 rounded-xl cursor-pointer hover:border-secondary transition-all group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold bg-secondary/10 text-secondary px-2 py-0.5 rounded-full uppercase">Cognitive</span>
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity text-[16px]">add_circle</span>
+</div>
+<p class="text-sm leading-relaxed">Evidence of cognitive reframing; client successfully identified two negative thought loops regarding workplace performance.</p>
+</div>
+<div class="glass p-4 rounded-xl cursor-pointer hover:border-secondary transition-all group">
+<div class="flex justify-between items-start mb-2">
+<span class="text-[10px] font-bold bg-[#e77f4b]/10 text-primary px-2 py-0.5 rounded-full uppercase">Risk</span>
+<span class="material-symbols-outlined text-secondary opacity-0 group-hover:opacity-100 transition-opacity text-[16px]">add_circle</span>
+</div>
+<p class="text-sm leading-relaxed">Increased frequency of sleep disturbances (3x per week). Recommendation: Monitor fatigue levels in subsequent session.</p>
+</div>
+</div>
+<div class="pt-4 space-y-3">
+<p class="text-[10px] font-bold text-secondary uppercase tracking-widest px-1">Coding Suggestions</p>
+<div class="flex flex-wrap gap-2">
+<button class="px-3 py-1.5 rounded-full border border-secondary/20 bg-white text-secondary text-xs font-bold flex items-center gap-1 hover:bg-secondary hover:text-white transition-colors">
+                            F43.22 (AD with Anxiety)
+                        </button>
+<button class="px-3 py-1.5 rounded-full border border-secondary/20 bg-white text-secondary text-xs font-bold flex items-center gap-1 hover:bg-secondary hover:text-white transition-colors">
+                            90837 (60 min therapy)
+                        </button>
+</div>
+</div>
+</div>
+<div class="p-4 border-t border-[#e6d8d0] dark:border-[#3d2b24]">
+<div class="relative">
+<input class="w-full bg-background-light dark:bg-background-dark border-none rounded-full py-3 px-10 text-xs placeholder-[#96674f] focus:ring-1 focus:ring-secondary" placeholder="Ask AI to refine or summarize..." type="text"/>
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-[#96674f]">search_spark</span>
+</div>
+</div>
+</aside>
+</main>
+<footer class="sticky bottom-0 z-50 px-6 py-4 glass border-t border-[#e6d8d0] dark:border-[#3d2b24] mt-auto">
+<div class="max-w-[1440px] mx-auto flex items-center justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-green-600">verified</span>
+<span class="text-sm font-medium text-[#96674f]">HIPAA Compliant Session Workspace</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="px-8 py-2.5 rounded-full border border-[#e6d8d0] dark:border-[#3d2b24] text-sm font-bold hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                    Save Draft
+                </button>
+<button class="bg-primary hover:bg-primary/90 text-white px-8 py-2.5 rounded-full text-sm font-bold shadow-lg shadow-primary/20 transition-all flex items-center gap-2">
+                    Complete &amp; Sign Note
+                    <span class="material-symbols-outlined text-[18px]">draw</span>
+</button>
+</div>
+</div>
+</footer>
+</body></html>

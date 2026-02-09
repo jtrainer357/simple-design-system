@@ -1,5 +1,11 @@
 {
   "permissions": {
-    "allow": ["Bash(npx tsx:*)"]
+    "allow": ["Bash(npx tsx:*)", "Read(//Users/jaytrainer/**)", "mcp__stitch__list_projects"]
+  },
+  "mcpServers": {
+    "stitch": {
+      "command": "/bin/bash",
+      "args": ["/Users/jaytrainer/.stitch-mcp/run-proxy.sh"]
+    }
   }
 }
