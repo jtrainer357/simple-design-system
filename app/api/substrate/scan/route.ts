@@ -3,29 +3,15 @@
  * Triggers a full substrate scan for a practice, detecting triggers
  * and generating priority actions.
  *
- * Note: This is a stub implementation. Full implementation requires
- * substrate_scan_log and substrate_actions tables.
- *
  * POST /api/substrate/scan - Run a full scan
- * GET /api/substrate/scan - Get scan status
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { runSubstrateScan, type SubstrateScanResult } from "@/src/lib/substrate/service";
+import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
 import { createLogger } from "@/src/lib/logger";
 
 const log = createLogger("api/substrate/scan");
-
-interface ScanResult {
-  scanId: string;
-  practiceId: string;
-  status: "pending" | "running" | "completed" | "failed";
-  triggersDetected: number;
-  actionsGenerated: number;
-  startedAt: string;
-  completedAt: string | null;
-  duration: number | null;
-  errors: string[];
-}
 
 /**
  * POST /api/substrate/scan
@@ -35,50 +21,51 @@ export async function POST(request: NextRequest) {
   const startTime = Date.now();
 
   try {
-    const body = await request.json();
-    const { practiceId } = body;
+    // Parse optional body for practice_id and triggered_by
+    let practiceId = DEMO_PRACTICE_ID;
+    let triggeredBy: "system" | "manual" | "scheduled" = "manual";
 
-    if (!practiceId) {
-      return NextResponse.json({ error: "Missing practiceId" }, { status: 400 });
+    try {
+      const body = await request.json();
+      if (body.practice_id || body.practiceId) {
+        practiceId = body.practice_id || body.practiceId;
+      }
+      if (body.triggered_by) triggeredBy = body.triggered_by;
+    } catch {
+      // Empty body is fine, use defaults
     }
 
-    const scanId = crypto.randomUUID();
-    const endTime = Date.now();
-    const duration = endTime - startTime;
+    log.info("Starting substrate scan via API", { practiceId, triggeredBy });
 
-    // Stub response - in production this would trigger actual scanning
-    const result: ScanResult = {
-      scanId,
-      practiceId,
-      status: "completed",
-      triggersDetected: 0,
-      actionsGenerated: 0,
-      startedAt: new Date(startTime).toISOString(),
-      completedAt: new Date(endTime).toISOString(),
-      duration,
-      errors: [],
-    };
+    const result: SubstrateScanResult = await runSubstrateScan(practiceId, triggeredBy);
 
-    return NextResponse.json(result);
+    log.info("Substrate scan completed via API", {
+      scanId: result.scan_id,
+      triggersDetected: result.triggers_detected,
+      actionsCreated: result.actions_created,
+      duration: result.duration_ms,
+    });
+
+    return NextResponse.json({
+      success: true,
+      scan_id: result.scan_id,
+      triggers_detected: result.triggers_detected,
+      actions_created: result.actions_created,
+      duration_ms: result.duration_ms,
+      trigger_counts: result.trigger_counts,
+      errors: result.errors.length > 0 ? result.errors : undefined,
+    });
   } catch (error: unknown) {
-    log.error("Substrate scan failed", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    log.error("Substrate scan API failed", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: errorMessage,
+        duration_ms: Date.now() - startTime,
+      },
+      { status: 500 }
+    );
   }
-}
-
-/**
- * GET /api/substrate/scan
- * Get recent scan status for a practice
- */
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
-  const practiceId = searchParams.get("practiceId");
-  const scanId = searchParams.get("scanId");
-
-  if (!practiceId && !scanId) {
-    return NextResponse.json({ error: "Missing practiceId or scanId" }, { status: 400 });
-  }
-
-  // Stub response - returns empty scan history
-  return NextResponse.json({ scans: [] });
 }
