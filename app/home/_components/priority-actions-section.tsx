@@ -6,7 +6,7 @@ import Link from "next/link";
 import { PriorityAction } from "@/design-system/components/ui/priority-action";
 import { AIActionCard } from "@/design-system/components/ui/ai-action-card";
 import { Heading, Text } from "@/design-system/components/ui/typography";
-import { AlertTriangle, Database } from "lucide-react";
+import { AlertTriangle, Database, RefreshCw, Sparkles } from "lucide-react";
 import { PriorityActionCardSkeleton, Skeleton } from "@/design-system/components/ui/skeleton";
 import { Button } from "@/design-system/components/ui/button";
 import { getPriorityActions } from "@/src/lib/queries/priority-actions";
@@ -16,10 +16,41 @@ import { formatDemoDate } from "@/src/lib/utils/demo-date";
 import type { PriorityActionWithPatient } from "@/src/lib/supabase/types";
 import type { AppointmentWithPatient } from "@/src/lib/queries/appointments";
 import type { OrchestrationContext } from "@/src/lib/orchestration/types";
+import type { SubstrateActionWithPatient } from "@/src/lib/substrate/service";
 import { useCompletedPatients } from "@/src/components/orchestration";
 import { createLogger } from "@/src/lib/logger";
 
 const log = createLogger("PriorityActionsSection");
+
+/**
+ * Unified action type that combines both substrate and priority actions
+ */
+interface UnifiedAction {
+  id: string;
+  source: "substrate" | "priority";
+  patient: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    date_of_birth: string;
+    risk_level: string | null;
+    avatar_url: string | null;
+  };
+  title: string;
+  urgency: "urgent" | "high" | "medium" | "low";
+  confidence: number;
+  timeframe: string | null;
+  context: string | null;
+  reasoning?: string | null;
+  trigger_type?: string;
+  suggested_actions: SuggestedActionItem[];
+}
+
+interface SuggestedActionItem {
+  label: string;
+  type: string;
+  completed?: boolean;
+}
 
 interface PriorityActionsSectionProps {
   className?: string;
@@ -94,8 +125,43 @@ function getBadgeText(urgency: string, timeframe: string | null): string {
   return "ACTION NEEDED";
 }
 
-// Convert database action to OrchestrationContext for the detail view
-function actionToContext(action: PriorityActionWithPatient): OrchestrationContext {
+// Map trigger type to orchestration trigger type
+function mapTriggerType(
+  triggerType?: string
+): "lab_result" | "refill" | "screening" | "appointment" {
+  switch (triggerType) {
+    case "OUTCOME_SCORE_ELEVATED":
+    case "OUTCOME_MEASURE_SCORED":
+      return "screening";
+    case "MEDICATION_REFILL_APPROACHING":
+      return "refill";
+    case "APPOINTMENT_MISSED":
+    case "PATIENT_NOT_SEEN":
+      return "appointment";
+    default:
+      return "screening";
+  }
+}
+
+// Map action type to orchestration action type
+function mapActionType(
+  actionType: string
+): "message" | "order" | "medication" | "task" | "document" {
+  switch (actionType) {
+    case "message_send":
+      return "message";
+    case "medication_action":
+      return "medication";
+    case "note_sign":
+    case "note_create":
+      return "document";
+    default:
+      return "task";
+  }
+}
+
+// Convert unified action to OrchestrationContext for the detail view
+function unifiedActionToContext(action: UnifiedAction): OrchestrationContext {
   const patient = action.patient;
   return {
     patient: {
@@ -106,23 +172,120 @@ function actionToContext(action: PriorityActionWithPatient): OrchestrationContex
       age: Math.floor(
         (Date.now() - new Date(patient.date_of_birth).getTime()) / (365.25 * 24 * 60 * 60 * 1000)
       ),
-      primaryDiagnosis: action.clinical_context || "Mental Health",
+      primaryDiagnosis: action.context || "Mental Health",
       avatar: patient.avatar_url || `https://i.pravatar.cc/150?u=${patient.id}`,
     },
     trigger: {
-      type: "screening",
+      type: mapTriggerType(action.trigger_type),
       title: action.title,
       urgency:
         action.urgency === "urgent" ? "urgent" : action.urgency === "high" ? "high" : "medium",
     },
     clinicalData: {},
-    suggestedActions: ((action.suggested_actions as string[]) || []).map((suggestion, i) => ({
+    suggestedActions: action.suggested_actions.map((suggestion, i) => ({
       id: String(i + 1),
-      label: suggestion,
-      type: "task",
-      checked: true,
+      label: suggestion.label,
+      type: mapActionType(suggestion.type),
+      checked: suggestion.completed ?? false,
     })),
   };
+}
+
+// Convert priority_actions row to unified action format
+function priorityActionToUnified(action: PriorityActionWithPatient): UnifiedAction {
+  const suggestedActions = Array.isArray(action.suggested_actions)
+    ? (action.suggested_actions as string[]).map((s) => ({
+        label: s,
+        type: "task",
+        completed: false,
+      }))
+    : [];
+
+  return {
+    id: action.id,
+    source: "priority",
+    patient: action.patient,
+    title: action.title,
+    urgency: action.urgency as "urgent" | "high" | "medium" | "low",
+    confidence: action.confidence_score || 85,
+    timeframe: action.timeframe,
+    context: action.clinical_context,
+    suggested_actions: suggestedActions,
+  };
+}
+
+// Convert substrate_actions row to unified action format
+function substrateActionToUnified(action: SubstrateActionWithPatient): UnifiedAction | null {
+  if (!action.patient) return null;
+
+  const suggestedActions = Array.isArray(action.suggested_actions)
+    ? action.suggested_actions.map((s) => ({
+        label: (s as { label?: string }).label || String(s),
+        type: (s as { type?: string }).type || "task",
+        completed: (s as { completed?: boolean }).completed ?? false,
+      }))
+    : [];
+
+  return {
+    id: action.id,
+    source: "substrate",
+    patient: action.patient,
+    title: action.title,
+    urgency: action.urgency as "urgent" | "high" | "medium" | "low",
+    confidence: action.ai_confidence,
+    timeframe: action.time_frame,
+    context: action.context,
+    reasoning: action.ai_reasoning,
+    trigger_type: action.trigger_type,
+    suggested_actions: suggestedActions,
+  };
+}
+
+/**
+ * Fetch substrate actions from API
+ */
+async function fetchSubstrateActions(): Promise<SubstrateActionWithPatient[]> {
+  try {
+    const response = await fetch("/api/substrate/actions?status=active&limit=10");
+    if (!response.ok) {
+      throw new Error(`Failed to fetch substrate actions: ${response.statusText}`);
+    }
+    const data = await response.json();
+    return data.actions || [];
+  } catch (error) {
+    log.error("Failed to fetch substrate actions", error);
+    return [];
+  }
+}
+
+/**
+ * Run substrate scan and return results
+ */
+async function runSubstrateScan(): Promise<{
+  success: boolean;
+  actions_created: number;
+  triggers_detected: number;
+  error?: string;
+}> {
+  try {
+    const response = await fetch("/api/substrate/scan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ triggered_by: "manual" }),
+    });
+    if (!response.ok) {
+      throw new Error(`Scan failed: ${response.statusText}`);
+    }
+    return await response.json();
+  } catch (error) {
+    log.error("Substrate scan failed", error);
+    return {
+      success: false,
+      actions_created: 0,
+      triggers_detected: 0,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
+  }
 }
 
 // Convert appointment to OrchestrationContext for the detail view
@@ -155,46 +318,115 @@ export function PriorityActionsSection({
   onSelectPatient,
   hideHeader = false,
 }: PriorityActionsSectionProps) {
-  const [actions, setActions] = React.useState<PriorityActionWithPatient[]>([]);
+  const [actions, setActions] = React.useState<UnifiedAction[]>([]);
   const [todayAppts, setTodayAppts] = React.useState<AppointmentWithPatient[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [scanning, setScanning] = React.useState(false);
+  const [scanResult, setScanResult] = React.useState<string | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [dbReady, setDbReady] = React.useState<boolean | null>(null);
   const completedPatientIds = useCompletedPatients();
 
-  React.useEffect(() => {
-    async function loadData() {
-      try {
-        setLoading(true);
-        setError(null);
+  const loadData = React.useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        // Check if database is populated
-        const populated = await isDatabasePopulated();
-        setDbReady(populated);
+      // Check if database is populated
+      const populated = await isDatabasePopulated();
+      setDbReady(populated);
 
-        if (!populated) {
-          setLoading(false);
-          return;
-        }
-
-        // Fetch priority actions and today's appointments in parallel
-        const [actionsData, apptsData] = await Promise.all([
-          getPriorityActions(),
-          getTodayAppointments(),
-        ]);
-
-        setActions(actionsData.slice(0, 3)); // Show top 3
-        setTodayAppts(apptsData);
-      } catch (err) {
-        log.error("Failed to load priority actions", err);
-        setError("Failed to load data. Please try again.");
-      } finally {
+      if (!populated) {
         setLoading(false);
+        return;
       }
+
+      // Fetch both substrate actions and priority actions in parallel
+      const [substrateActions, priorityActions, apptsData] = await Promise.all([
+        fetchSubstrateActions(),
+        getPriorityActions(),
+        getTodayAppointments(),
+      ]);
+
+      // Convert to unified format and merge
+      const substrateUnified = substrateActions
+        .map(substrateActionToUnified)
+        .filter((a): a is UnifiedAction => a !== null);
+
+      const priorityUnified = priorityActions.map(priorityActionToUnified);
+
+      // Merge: substrate actions first (they're real intelligence), then priority as fallback
+      // Deduplicate by patient_id + similar title
+      const seenPatientTitles = new Set<string>();
+      const merged: UnifiedAction[] = [];
+
+      // Add substrate actions first
+      for (const action of substrateUnified) {
+        const key = `${action.patient.id}-${action.title.toLowerCase().substring(0, 30)}`;
+        if (!seenPatientTitles.has(key)) {
+          seenPatientTitles.add(key);
+          merged.push(action);
+        }
+      }
+
+      // Add priority actions that don't overlap
+      for (const action of priorityUnified) {
+        const key = `${action.patient.id}-${action.title.toLowerCase().substring(0, 30)}`;
+        if (!seenPatientTitles.has(key)) {
+          seenPatientTitles.add(key);
+          merged.push(action);
+        }
+      }
+
+      // Sort by urgency priority
+      const urgencyOrder: Record<string, number> = {
+        urgent: 0,
+        high: 1,
+        medium: 2,
+        low: 3,
+      };
+      merged.sort((a, b) => {
+        const aOrder = urgencyOrder[a.urgency] ?? 4;
+        const bOrder = urgencyOrder[b.urgency] ?? 4;
+        return aOrder - bOrder;
+      });
+
+      setActions(merged.slice(0, 5)); // Show top 5
+      setTodayAppts(apptsData);
+    } catch (err) {
+      log.error("Failed to load priority actions", err);
+      setError("Failed to load data. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Handle substrate scan refresh
+  const handleRunAnalysis = React.useCallback(async () => {
+    setScanning(true);
+    setScanResult(null);
+
+    const result = await runSubstrateScan();
+
+    if (result.success) {
+      setScanResult(
+        `Analysis complete: ${result.triggers_detected} triggers detected, ${result.actions_created} new actions`
+      );
+      // Reload data after scan
+      await loadData();
+    } else {
+      setScanResult(`Analysis failed: ${result.error || "Unknown error"}`);
     }
 
+    setScanning(false);
+
+    // Clear message after 5 seconds
+    setTimeout(() => setScanResult(null), 5000);
+  }, [loadData]);
+
+  React.useEffect(() => {
     loadData();
-  }, []);
+  }, [loadData]);
 
   // Listen for voice command to open patient actions
   React.useEffect(() => {
@@ -208,7 +440,7 @@ export function PriorityActionsSection({
       });
 
       if (matchingAction) {
-        onSelectPatient?.(actionToContext(matchingAction));
+        onSelectPatient?.(unifiedActionToContext(matchingAction));
         return;
       }
 
@@ -430,9 +662,32 @@ export function PriorityActionsSection({
               </Text>
             </div>
           </div>
-          <Button variant="outline" className="w-full shrink-0 sm:ml-auto sm:w-auto">
-            Complete All Actions
-          </Button>
+          <div className="flex w-full flex-col gap-2 sm:ml-auto sm:w-auto sm:flex-row">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRunAnalysis}
+              disabled={scanning}
+              className="flex items-center gap-2"
+            >
+              {scanning ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Sparkles className="h-4 w-4" />
+              )}
+              {scanning ? "Analyzing..." : "Run AI Analysis"}
+            </Button>
+            <Button variant="outline" className="shrink-0">
+              Complete All Actions
+            </Button>
+          </div>
+        </div>
+      )}
+
+      {/* Scan result notification */}
+      {scanResult && (
+        <div className="bg-growth-1/20 text-growth-4 mb-4 rounded-lg px-4 py-3 text-sm">
+          {scanResult}
         </div>
       )}
 
@@ -467,20 +722,24 @@ export function PriorityActionsSection({
         <div className="space-y-2">
           {actions.map((action) => {
             const patientName = `${action.patient.first_name} ${action.patient.last_name}`;
-            const suggestedCount = Array.isArray(action.suggested_actions)
-              ? (action.suggested_actions as string[]).length
-              : 0;
+            const suggestedCount = action.suggested_actions.length;
+
+            // Show trigger type badge for substrate actions
+            const statusIndicator =
+              action.source === "substrate" && action.trigger_type
+                ? `${action.trigger_type.replace(/_/g, " ")} • ${action.context || ""}`
+                : action.context || "";
 
             return (
               <div
                 key={action.id}
-                onClick={() => onSelectPatient?.(actionToContext(action))}
+                onClick={() => onSelectPatient?.(unifiedActionToContext(action))}
                 className="block cursor-pointer"
                 role="button"
                 tabIndex={0}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
-                    onSelectPatient?.(actionToContext(action));
+                    onSelectPatient?.(unifiedActionToContext(action));
                   }
                 }}
               >
@@ -488,8 +747,8 @@ export function PriorityActionsSection({
                   patientName={patientName}
                   avatarSrc={action.patient.avatar_url || undefined}
                   mainAction={action.title}
-                  statusIndicators={action.clinical_context || ""}
-                  readyStatus={`Confidence: ${action.confidence_score || 85}%`}
+                  statusIndicators={statusIndicator}
+                  readyStatus={`Confidence: ${action.confidence}%`}
                   suggestedActions={suggestedCount}
                   badgeText={getBadgeText(action.urgency, action.timeframe)}
                   badgeVariant={getBadgeVariant(action.urgency)}
