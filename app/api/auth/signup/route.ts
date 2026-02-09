@@ -17,18 +17,37 @@ async function hashPassword(password: string): Promise<string> {
 }
 
 interface SignupRequest {
-  fullName: string;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
   email: string;
   password: string;
   practiceName: string;
   specialty: string;
   state: string;
+  phone?: string;
+  npi?: string;
 }
 
 export async function POST(request: NextRequest) {
   try {
     const body = (await request.json()) as SignupRequest;
-    const { fullName, email, password, practiceName, specialty, state } = body;
+    const {
+      firstName,
+      lastName,
+      fullName: providedFullName,
+      email,
+      password,
+      practiceName,
+      specialty,
+      state,
+      phone,
+      npi,
+    } = body;
+
+    // Support both fullName OR firstName+lastName
+    const fullName =
+      providedFullName || (firstName && lastName ? `${firstName} ${lastName}` : null);
 
     if (!fullName || !email || !password || !practiceName || !specialty || !state) {
       return NextResponse.json({ error: "All fields are required" }, { status: 400 });
