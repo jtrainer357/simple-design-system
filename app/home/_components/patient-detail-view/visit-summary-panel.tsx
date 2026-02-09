@@ -21,6 +21,104 @@ import type { PatientDetail } from "./types";
 // Type for selected activity with full details
 type SelectedActivity = PatientDetail["recentActivity"][number];
 
+// Elegant easing curves (typed as tuple for framer-motion)
+const smoothEase: [number, number, number, number] = [0.25, 0.1, 0.25, 1.0];
+
+// Container variants for staggered children
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+  exit: {
+    opacity: 0,
+    transition: {
+      staggerChildren: 0.04,
+      staggerDirection: -1,
+    },
+  },
+};
+
+// Item variants for individual sections
+const itemVariants = {
+  hidden: {
+    opacity: 0,
+    y: 20,
+    scale: 0.98,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.4,
+      ease: smoothEase,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: -10,
+    scale: 0.98,
+    transition: {
+      duration: 0.2,
+      ease: smoothEase,
+    },
+  },
+};
+
+// Header animation with slide-in effect
+const headerVariants = {
+  hidden: {
+    opacity: 0,
+    x: -20,
+  },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.35,
+      ease: smoothEase,
+    },
+  },
+  exit: {
+    opacity: 0,
+    x: -10,
+    transition: {
+      duration: 0.2,
+      ease: smoothEase,
+    },
+  },
+};
+
+// Footer slide-up animation
+const footerVariants = {
+  hidden: {
+    opacity: 0,
+    y: 20,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: smoothEase,
+      delay: 0.3,
+    },
+  },
+  exit: {
+    opacity: 0,
+    y: 10,
+    transition: {
+      duration: 0.2,
+      ease: smoothEase,
+    },
+  },
+};
+
 interface VisitSummaryPanelProps {
   activity: SelectedActivity;
   patientName: string;
@@ -31,7 +129,7 @@ interface VisitSummaryPanelProps {
 
 export function VisitSummaryPanel({
   activity,
-  patientName,
+  patientName: _patientName,
   onBack,
   className,
 }: VisitSummaryPanelProps) {
@@ -54,20 +152,21 @@ export function VisitSummaryPanel({
   return (
     <motion.div
       className={cn("flex h-full flex-col", className)}
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -20 }}
-      transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+      initial="hidden"
+      animate="visible"
+      exit="exit"
     >
       {/* Header with back button */}
-      <div className="mb-6 flex items-center gap-4">
-        <button
+      <motion.div variants={headerVariants} className="mb-6 flex items-center gap-4">
+        <motion.button
           onClick={handleBack}
           aria-label="Go back to overview"
           className="bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground flex h-10 w-10 items-center justify-center rounded-xl transition-all"
+          whileHover={{ scale: 1.05, backgroundColor: "rgba(var(--primary), 0.1)" }}
+          whileTap={{ scale: 0.95 }}
         >
           <ArrowLeft className="h-5 w-5" />
-        </button>
+        </motion.button>
         <div>
           <Heading level={4} className="text-lg font-semibold sm:text-xl">
             {activity.title}
@@ -76,66 +175,68 @@ export function VisitSummaryPanel({
             {activity.date}
           </Text>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Visit details */}
-      <div className="flex-1 space-y-6 overflow-y-auto pr-2">
+      {/* Visit details - staggered sections */}
+      <motion.div variants={containerVariants} className="flex-1 space-y-6 overflow-y-auto pr-2">
         {/* Session Info Card */}
-        <Card className="border-border/40 from-muted/30 to-muted/10 overflow-hidden bg-gradient-to-br p-0 shadow-sm">
-          <div className="divide-border/30 grid grid-cols-2 divide-x sm:grid-cols-4">
-            <div className="p-4">
-              <Text
-                size="xs"
-                muted
-                className="mb-1 text-[10px] font-semibold tracking-wider uppercase"
-              >
-                Duration
-              </Text>
-              <Text size="sm" className="font-semibold">
-                {activity.duration || "30 minutes"}
-              </Text>
+        <motion.div variants={itemVariants}>
+          <Card className="border-border/40 from-muted/30 to-muted/10 overflow-hidden bg-gradient-to-br p-0 shadow-sm">
+            <div className="divide-border/30 grid grid-cols-2 divide-x sm:grid-cols-4">
+              <div className="p-4">
+                <Text
+                  size="xs"
+                  muted
+                  className="mb-1 text-[10px] font-semibold tracking-wider uppercase"
+                >
+                  Duration
+                </Text>
+                <Text size="sm" className="font-semibold">
+                  {activity.duration || "30 minutes"}
+                </Text>
+              </div>
+              <div className="p-4">
+                <Text
+                  size="xs"
+                  muted
+                  className="mb-1 text-[10px] font-semibold tracking-wider uppercase"
+                >
+                  Provider
+                </Text>
+                <Text size="sm" className="font-semibold">
+                  {activity.provider || "Dr. Demo"}
+                </Text>
+              </div>
+              <div className="p-4">
+                <Text
+                  size="xs"
+                  muted
+                  className="mb-1 text-[10px] font-semibold tracking-wider uppercase"
+                >
+                  Type
+                </Text>
+                <Text size="sm" className="font-semibold">
+                  {activity.appointmentType || activity.title}
+                </Text>
+              </div>
+              <div className="p-4">
+                <Text
+                  size="xs"
+                  muted
+                  className="mb-1 text-[10px] font-semibold tracking-wider uppercase"
+                >
+                  Location
+                </Text>
+                <Text size="sm" className="font-semibold">
+                  In-office
+                </Text>
+              </div>
             </div>
-            <div className="p-4">
-              <Text
-                size="xs"
-                muted
-                className="mb-1 text-[10px] font-semibold tracking-wider uppercase"
-              >
-                Provider
-              </Text>
-              <Text size="sm" className="font-semibold">
-                {activity.provider || "Dr. Demo"}
-              </Text>
-            </div>
-            <div className="p-4">
-              <Text
-                size="xs"
-                muted
-                className="mb-1 text-[10px] font-semibold tracking-wider uppercase"
-              >
-                Type
-              </Text>
-              <Text size="sm" className="font-semibold">
-                {activity.appointmentType || activity.title}
-              </Text>
-            </div>
-            <div className="p-4">
-              <Text
-                size="xs"
-                muted
-                className="mb-1 text-[10px] font-semibold tracking-wider uppercase"
-              >
-                Location
-              </Text>
-              <Text size="sm" className="font-semibold">
-                In-office
-              </Text>
-            </div>
-          </div>
-        </Card>
+          </Card>
+        </motion.div>
 
         {/* Visit Summary */}
-        <section>
+        <motion.section variants={itemVariants}>
           <div className="mb-3 flex items-center gap-2.5">
             <div className="bg-primary/10 flex h-7 w-7 items-center justify-center rounded-lg">
               <FileText className="text-primary h-3.5 w-3.5" />
@@ -144,16 +245,16 @@ export function VisitSummaryPanel({
               Session Summary
             </Text>
           </div>
-          <Card className="border-border/40 bg-white/60 p-4 shadow-sm">
+          <Card className="border-border/40 bg-card/60 p-4 shadow-sm">
             <Text size="sm" className="text-foreground/80 leading-relaxed">
               {activity.visitSummary || activity.description}
             </Text>
           </Card>
-        </section>
+        </motion.section>
 
         {/* Diagnosis/Focus Areas */}
         {activity.diagnosisCodes && activity.diagnosisCodes.length > 0 && (
-          <section>
+          <motion.section variants={itemVariants}>
             <div className="mb-3 flex items-center gap-2.5">
               <div className="bg-primary/10 flex h-7 w-7 items-center justify-center rounded-lg">
                 <Stethoscope className="text-primary h-3.5 w-3.5" />
@@ -164,21 +265,27 @@ export function VisitSummaryPanel({
             </div>
             <div className="flex flex-wrap gap-2">
               {activity.diagnosisCodes.map((code, i) => (
-                <Badge
+                <motion.div
                   key={i}
-                  variant="secondary"
-                  className="bg-primary/10 text-primary hover:bg-primary/15 rounded-lg px-3 py-1.5 text-xs font-medium"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.1 * i, duration: 0.3 }}
                 >
-                  {code}
-                </Badge>
+                  <Badge
+                    variant="secondary"
+                    className="bg-primary/10 text-primary hover:bg-primary/15 rounded-lg px-3 py-1.5 text-xs font-medium transition-all hover:scale-105"
+                  >
+                    {code}
+                  </Badge>
+                </motion.div>
               ))}
             </div>
-          </section>
+          </motion.section>
         )}
 
         {/* Treatment Notes */}
         {activity.treatmentNotes && (
-          <section>
+          <motion.section variants={itemVariants}>
             <div className="mb-3 flex items-center gap-2.5">
               <div className="bg-primary/10 flex h-7 w-7 items-center justify-center rounded-lg">
                 <ClipboardList className="text-primary h-3.5 w-3.5" />
@@ -187,44 +294,44 @@ export function VisitSummaryPanel({
                 Treatment Notes
               </Text>
             </div>
-            <Card className="border-border/40 bg-white/60 p-4 shadow-sm">
+            <Card className="border-border/40 bg-card/60 p-4 shadow-sm">
               <Text size="sm" className="text-foreground/80 leading-relaxed">
                 {activity.treatmentNotes}
               </Text>
             </Card>
-          </section>
+          </motion.section>
         )}
 
         {/* Next Steps */}
         {activity.nextSteps && (
-          <section>
+          <motion.section variants={itemVariants}>
             <div className="mb-3 flex items-center gap-2.5">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/10">
-                <Sparkles className="h-3.5 w-3.5 text-amber-600" />
+              <div className="bg-warning/10 flex h-7 w-7 items-center justify-center rounded-lg">
+                <Sparkles className="text-warning h-3.5 w-3.5" />
               </div>
               <Text size="sm" className="font-semibold">
                 Next Steps
               </Text>
             </div>
-            <Card className="border-amber-200/50 bg-gradient-to-br from-amber-50/80 to-amber-50/40 p-4 shadow-sm">
-              <Text size="sm" className="leading-relaxed text-amber-900/80">
+            <Card className="border-warning/20 from-warning-bg to-warning-bg/40 bg-gradient-to-br p-4 shadow-sm">
+              <Text size="sm" className="text-foreground/80 leading-relaxed">
                 {activity.nextSteps}
               </Text>
             </Card>
-          </section>
+          </motion.section>
         )}
 
         {/* Billing Summary */}
-        <section>
+        <motion.section variants={itemVariants}>
           <div className="mb-3 flex items-center gap-2.5">
-            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-500/10">
-              <DollarSign className="h-3.5 w-3.5 text-emerald-600" />
+            <div className="bg-success/10 flex h-7 w-7 items-center justify-center rounded-lg">
+              <DollarSign className="text-success h-3.5 w-3.5" />
             </div>
             <Text size="sm" className="font-semibold">
               Billing Summary
             </Text>
           </div>
-          <Card className="border-border/40 overflow-hidden bg-white/60 p-0 shadow-sm">
+          <Card className="border-border/40 bg-card/60 overflow-hidden p-0 shadow-sm">
             <div className="divide-border/30 grid grid-cols-1 divide-y sm:grid-cols-3 sm:divide-x sm:divide-y-0">
               <div className="p-4">
                 <Text
@@ -234,7 +341,7 @@ export function VisitSummaryPanel({
                 >
                   Copay Collected
                 </Text>
-                <Text size="sm" className="font-semibold text-emerald-600">
+                <Text size="sm" className="text-success font-semibold">
                   $25.00
                 </Text>
               </div>
@@ -264,19 +371,24 @@ export function VisitSummaryPanel({
               </div>
             </div>
           </Card>
-        </section>
-      </div>
+        </motion.section>
+      </motion.div>
 
-      {/* Footer with View Note button */}
-      <div className="border-border/30 mt-6 flex justify-end border-t pt-4">
-        <Button
-          className="gap-2 shadow-sm transition-all hover:shadow-md"
-          onClick={handleViewFullNote}
-        >
-          <FileText className="h-4 w-4" />
-          View Full Note
-        </Button>
-      </div>
+      {/* Footer with View Note button - slides up elegantly */}
+      <motion.div
+        variants={footerVariants}
+        className="border-border/30 mt-6 flex justify-end border-t pt-4"
+      >
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+          <Button
+            className="gap-2 shadow-sm transition-all hover:shadow-md"
+            onClick={handleViewFullNote}
+          >
+            <FileText className="h-4 w-4" />
+            View Full Note
+          </Button>
+        </motion.div>
+      </motion.div>
     </motion.div>
   );
 }

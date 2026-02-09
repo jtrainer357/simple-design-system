@@ -28,20 +28,76 @@ import { ClinicalNoteView } from "./clinical-note-view";
 const tabTriggerStyles =
   "rounded-none border-b-2 border-transparent bg-transparent shadow-none px-3 py-2 text-xl font-light text-foreground-strong whitespace-nowrap hover:text-primary data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none sm:px-4";
 
-// Animation variants for content transitions
-const contentVariants = {
-  enter: (direction: number) => ({
-    x: direction > 0 ? 100 : -100,
+// Smooth easing curve for entrance/exit (typed as tuple for framer-motion)
+const smoothEase: [number, number, number, number] = [0.25, 0.1, 0.25, 1.0];
+
+// Animation variants for view transitions
+const viewVariants = {
+  initial: (direction: number) => ({
     opacity: 0,
+    x: direction > 0 ? 40 : -40,
   }),
-  center: {
-    x: 0,
+  animate: {
     opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.35,
+      ease: smoothEase,
+    },
   },
   exit: (direction: number) => ({
-    x: direction < 0 ? 100 : -100,
     opacity: 0,
+    x: direction < 0 ? 40 : -40,
+    transition: {
+      duration: 0.25,
+      ease: smoothEase,
+    },
   }),
+};
+
+// Full view backdrop animation
+const backdropVariants = {
+  initial: { opacity: 0 },
+  animate: {
+    opacity: 1,
+    transition: { duration: 0.4, ease: smoothEase },
+  },
+  exit: {
+    opacity: 0,
+    transition: { duration: 0.3, ease: smoothEase },
+  },
+};
+
+// Custom expo-out curve for full view
+const expoOut: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const subtleOvershoot: [number, number, number, number] = [0.34, 1.56, 0.64, 1];
+
+// Full view container animation - elegant scale and fade
+const fullViewVariants = {
+  initial: {
+    opacity: 0,
+    scale: 0.95,
+    y: 20,
+  },
+  animate: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: expoOut,
+      scale: { duration: 0.5, ease: subtleOvershoot },
+    },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0.97,
+    y: 10,
+    transition: {
+      duration: 0.3,
+      ease: smoothEase,
+    },
+  },
 };
 
 // Type for selected activity with full details
@@ -88,9 +144,15 @@ export function PatientDetailView({
   // Track direction for animations
   const [direction, setDirection] = React.useState(0);
   const previousViewState = React.useRef(viewState);
+  const isFirstRender = React.useRef(true);
 
   // Update direction based on view state changes
   React.useEffect(() => {
+    // Skip direction update on first render
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     const states = ["default", "summary", "note", "fullView"];
     const prevIndex = states.indexOf(previousViewState.current);
     const currentIndex = states.indexOf(viewState);
@@ -160,9 +222,6 @@ export function PatientDetailView({
     );
   }
 
-  // Determine if we're in full view mode (no header visible)
-  const isFullView = viewState === "fullView";
-
   return (
     <div className={cn("flex flex-col gap-2", className)} style={{ height: "100%" }}>
       {/* Adaptive Patient Header - shrinks based on view state */}
@@ -172,91 +231,166 @@ export function PatientDetailView({
 
       {/* Main Content Area */}
       <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        {/* Default View: Tabs */}
-        {viewState === "default" && (
-          <CardWrapper className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="flex h-full w-full flex-col"
+        <AnimatePresence mode="wait" custom={direction} initial={false}>
+          {/* Default View: Tabs */}
+          {viewState === "default" && (
+            <motion.div
+              key="default-view"
+              custom={direction}
+              variants={viewVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="flex min-h-0 flex-1 flex-col overflow-hidden"
             >
-              <TabsList className="border-border/50 mb-4 h-auto w-full justify-start gap-0 overflow-x-auto border-b-2 bg-transparent p-0 sm:mb-6">
-                <TabsTrigger value="overview" className={tabTriggerStyles}>
-                  Overview
-                </TabsTrigger>
-                <TabsTrigger value="appointments" className={tabTriggerStyles}>
-                  Appointments
-                </TabsTrigger>
-                <TabsTrigger value="medical-records" className={tabTriggerStyles}>
-                  Medical Records
-                </TabsTrigger>
-                <TabsTrigger value="messages" className={tabTriggerStyles}>
-                  Messages
-                </TabsTrigger>
-                <TabsTrigger value="billing" className={tabTriggerStyles}>
-                  Billing
-                </TabsTrigger>
-                <TabsTrigger value="reviews" className={tabTriggerStyles}>
-                  Reviews
-                </TabsTrigger>
-              </TabsList>
+              <CardWrapper className="flex min-h-0 flex-1 flex-col overflow-hidden">
+                <Tabs
+                  value={activeTab}
+                  onValueChange={setActiveTab}
+                  className="flex h-full w-full flex-col"
+                >
+                  <TabsList className="border-border/50 mb-4 h-auto w-full justify-start gap-0 overflow-x-auto border-b-2 bg-transparent p-0 sm:mb-6">
+                    <TabsTrigger value="overview" className={tabTriggerStyles}>
+                      Overview
+                    </TabsTrigger>
+                    <TabsTrigger value="appointments" className={tabTriggerStyles}>
+                      Appointments
+                    </TabsTrigger>
+                    <TabsTrigger value="medical-records" className={tabTriggerStyles}>
+                      Medical Records
+                    </TabsTrigger>
+                    <TabsTrigger value="messages" className={tabTriggerStyles}>
+                      Messages
+                    </TabsTrigger>
+                    <TabsTrigger value="billing" className={tabTriggerStyles}>
+                      Billing
+                    </TabsTrigger>
+                    <TabsTrigger value="reviews" className={tabTriggerStyles}>
+                      Reviews
+                    </TabsTrigger>
+                  </TabsList>
 
-              <TabsContent value="overview" className="mt-0 flex-1 overflow-y-auto">
-                <OverviewTab patient={patient} onActivitySelect={handleActivitySelect} />
-              </TabsContent>
+                  <TabsContent value="overview" className="mt-0 flex-1 overflow-y-auto">
+                    <OverviewTab patient={patient} onActivitySelect={handleActivitySelect} />
+                  </TabsContent>
 
-              <TabsContent value="appointments" className="mt-0 flex-1 overflow-y-auto pr-1">
-                <AppointmentsTab patient={patient} />
-              </TabsContent>
+                  <TabsContent value="appointments" className="mt-0 flex-1 overflow-y-auto pr-1">
+                    <AppointmentsTab patient={patient} />
+                  </TabsContent>
 
-              <TabsContent value="medical-records" className="mt-0 flex-1 overflow-y-auto pr-1">
-                <MedicalRecordsTab patient={patient} />
-              </TabsContent>
+                  <TabsContent value="medical-records" className="mt-0 flex-1 overflow-y-auto pr-1">
+                    <MedicalRecordsTab patient={patient} />
+                  </TabsContent>
 
-              <TabsContent value="messages" className="-mx-6 mt-0 -mb-6 flex-1 overflow-hidden">
-                <MessagesTab patient={patient} />
-              </TabsContent>
+                  <TabsContent value="messages" className="-mx-6 mt-0 -mb-6 flex-1 overflow-hidden">
+                    <MessagesTab patient={patient} />
+                  </TabsContent>
 
-              <TabsContent value="billing" className="mt-0 flex-1 overflow-y-auto pr-1">
-                <BillingTab patient={patient} />
-              </TabsContent>
+                  <TabsContent value="billing" className="mt-0 flex-1 overflow-y-auto pr-1">
+                    <BillingTab patient={patient} />
+                  </TabsContent>
 
-              <TabsContent value="reviews" className="mt-0 flex-1 overflow-y-auto pr-1">
-                <ReviewsTab patient={patient} />
-              </TabsContent>
-            </Tabs>
-          </CardWrapper>
-        )}
+                  <TabsContent value="reviews" className="mt-0 flex-1 overflow-y-auto pr-1">
+                    <ReviewsTab patient={patient} />
+                  </TabsContent>
+                </Tabs>
+              </CardWrapper>
+            </motion.div>
+          )}
 
-        {/* Summary View: Visit Summary Panel */}
-        {viewState === "summary" && selectedActivity && (
-          <CardWrapper className="h-full overflow-hidden">
-            <VisitSummaryPanel
-              activity={selectedActivity}
-              patientName={patient.name}
-              onBack={handleBackFromSummary}
-            />
-          </CardWrapper>
-        )}
+          {/* Summary View: Visit Summary Panel */}
+          {viewState === "summary" && selectedActivity && (
+            <motion.div
+              key="summary-view"
+              custom={direction}
+              variants={viewVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="flex min-h-0 flex-1 flex-col overflow-hidden"
+            >
+              <CardWrapper className="h-full overflow-hidden">
+                <VisitSummaryPanel
+                  activity={selectedActivity}
+                  patientName={patient.name}
+                  onBack={handleBackFromSummary}
+                />
+              </CardWrapper>
+            </motion.div>
+          )}
 
-        {/* Note View: Clinical Note with optional Full View */}
-        {(viewState === "note" || viewState === "fullView") && selectedActivity && (
-          <CardWrapper
-            className={cn(
-              "h-full overflow-hidden",
-              isFullView && "bg-background fixed inset-0 z-50 rounded-none border-0 shadow-none"
-            )}
-          >
-            <ClinicalNoteView activity={selectedActivity} patientName={patient.name} />
-          </CardWrapper>
-        )}
+          {/* Note View: Clinical Note (not full view) */}
+          {viewState === "note" && selectedActivity && (
+            <motion.div
+              key="note-view"
+              custom={direction}
+              variants={viewVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="flex min-h-0 flex-1 flex-col overflow-hidden"
+            >
+              <CardWrapper className="h-full overflow-hidden">
+                <ClinicalNoteView
+                  activity={selectedActivity}
+                  patientName={patient.name}
+                  patient={patient}
+                />
+              </CardWrapper>
+            </motion.div>
+          )}
 
-        {/* Fallback when no activity is selected but we're in summary/note state */}
-        {(viewState === "summary" || viewState === "note") && !selectedActivity && (
-          <CardWrapper className="flex h-full items-center justify-center">
-            <Text muted>Select an activity to view details</Text>
-          </CardWrapper>
-        )}
+          {/* Fallback when no activity is selected but we're in summary/note state */}
+          {(viewState === "summary" || viewState === "note") && !selectedActivity && (
+            <motion.div
+              key="fallback-view"
+              custom={direction}
+              variants={viewVariants}
+              initial="initial"
+              animate="animate"
+              exit="exit"
+              className="flex min-h-0 flex-1 flex-col overflow-hidden"
+            >
+              <CardWrapper className="flex h-full items-center justify-center">
+                <Text muted>Select an activity to view details</Text>
+              </CardWrapper>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Full View: Clinical Note - Rendered outside AnimatePresence for overlay effect */}
+        <AnimatePresence>
+          {viewState === "fullView" && selectedActivity && (
+            <>
+              {/* Blurred backdrop with elegant fade */}
+              <motion.div
+                key="fullview-backdrop"
+                variants={backdropVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="bg-background/80 fixed inset-0 z-40 backdrop-blur-xl"
+              />
+              {/* Full view container with elegant scale animation */}
+              <motion.div
+                key="fullview-content"
+                variants={fullViewVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="fixed inset-0 z-50"
+              >
+                <CardWrapper className="bg-background/95 h-full overflow-hidden rounded-none border-0 shadow-none">
+                  <ClinicalNoteView
+                    activity={selectedActivity}
+                    patientName={patient.name}
+                    patient={patient}
+                  />
+                </CardWrapper>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

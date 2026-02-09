@@ -77,7 +77,7 @@ export function AdaptivePatientHeader({ patient, className }: AdaptivePatientHea
   // Calculate effective header height
   const effectiveHeight = React.useMemo(() => {
     if (isMobile && viewState === "default") {
-      return 90; // Use minimal header height on mobile
+      return 110; // Use minimal header height on mobile
     }
     return layout.headerHeight;
   }, [isMobile, viewState, layout.headerHeight]);

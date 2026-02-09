@@ -23,25 +23,30 @@ interface MinimalDemographicsProps {
   className?: string;
 }
 
+// Elegant easing (typed as tuple for framer-motion)
+const smoothEase: [number, number, number, number] = [0.25, 0.1, 0.25, 1.0];
+
 /**
  * Animation variants for content fade
  */
 const contentVariants: Variants = {
-  hidden: { opacity: 0, y: 5 },
+  hidden: { opacity: 0, y: 8, scale: 0.98 },
   visible: {
     opacity: 1,
     y: 0,
+    scale: 1,
     transition: {
-      duration: 0.2,
-      ease: "easeOut",
+      duration: 0.35,
+      ease: smoothEase,
     },
   },
   exit: {
     opacity: 0,
-    y: -5,
+    y: -6,
+    scale: 0.98,
     transition: {
-      duration: 0.15,
-      ease: "easeIn",
+      duration: 0.2,
+      ease: smoothEase,
     },
   },
 };
@@ -75,7 +80,7 @@ export function MinimalDemographics({ patient, onExpand, className }: MinimalDem
       initial="hidden"
       animate="visible"
       exit="exit"
-      className={cn("flex flex-col gap-2 p-4", className)}
+      className={cn("flex flex-col gap-2 p-4 pb-6", className)}
     >
       {/* Main Row: Avatar, Name + Badge, Actions */}
       <div className="flex items-center justify-between gap-3">

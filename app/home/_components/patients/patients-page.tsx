@@ -215,6 +215,7 @@ export function PatientsPage({
               selectedPatientId={selectedPatient?.id}
               onPatientSelect={handlePatientSelect}
               activeFilter={activeFilter}
+              compact={isRosterCompact}
               className="min-h-0 flex-1"
             />
           </motion.div>

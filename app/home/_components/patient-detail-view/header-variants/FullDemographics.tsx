@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/design-system/components/
 import { Badge } from "@/design-system/components/ui/badge";
 import { Button } from "@/design-system/components/ui/button";
 import { Heading, Text } from "@/design-system/components/ui/typography";
+import { Card } from "@/design-system/components/ui/card";
 import { cn } from "@/design-system/lib/utils";
 import type { PatientDetail } from "../types";
 
@@ -24,25 +25,49 @@ interface FullDemographicsProps {
   className?: string;
 }
 
+// Elegant easing (typed as tuple for framer-motion)
+const smoothEase: [number, number, number, number] = [0.25, 0.1, 0.25, 1.0];
+
 /**
  * Animation variants for content fade
  */
 const contentVariants: Variants = {
-  hidden: { opacity: 0, y: 10 },
+  hidden: { opacity: 0, y: 12 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.2,
-      ease: "easeOut",
+      duration: 0.35,
+      ease: smoothEase,
+      staggerChildren: 0.08,
     },
   },
   exit: {
     opacity: 0,
-    y: -10,
+    y: -8,
     transition: {
-      duration: 0.15,
-      ease: "easeIn",
+      duration: 0.2,
+      ease: smoothEase,
+    },
+  },
+};
+
+/**
+ * Animation variants for metric cards
+ */
+const metricVariants: Variants = {
+  hidden: {
+    opacity: 0,
+    y: 15,
+    scale: 0.95,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.35,
+      ease: smoothEase,
     },
   },
 };
@@ -165,67 +190,78 @@ export function FullDemographics({ patient, className }: FullDemographicsProps) 
       </div>
 
       {/* Metrics Row */}
-      <div className="border-border/30 flex items-center gap-6 border-t pt-4">
+      <motion.div
+        className="flex items-center gap-4 pt-2"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.1, delayChildren: 0.15 },
+          },
+        }}
+      >
         {/* Last Visit */}
-        <div className="group hover:bg-muted/50 flex cursor-default items-center gap-3 rounded-lg px-2 py-1.5 transition-colors">
-          <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-xl">
-            <Calendar className="text-primary h-4 w-4" />
-          </div>
-          <div className="min-w-0">
-            <Text size="xs" muted className="text-[10px] font-semibold tracking-wider uppercase">
-              Last Visit
-            </Text>
-            <Text size="sm" className="font-semibold">
-              {patient.lastVisit.date}
-            </Text>
-            <Text size="xs" muted className="truncate">
-              {patient.lastVisit.type}
-            </Text>
-          </div>
-        </div>
-
-        {/* Separator */}
-        <div className="bg-border/30 h-10 w-px" />
+        <motion.div variants={metricVariants} className="flex-1">
+          <Card className="border-border/40 flex cursor-default items-center gap-3 px-4 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+            <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+              <Calendar className="text-primary h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <Text size="xs" muted className="text-[10px] font-semibold tracking-wider uppercase">
+                Last Visit
+              </Text>
+              <Text size="sm" className="font-semibold">
+                {patient.lastVisit.date}
+              </Text>
+              <Text size="xs" muted className="truncate">
+                {patient.lastVisit.type}
+              </Text>
+            </div>
+          </Card>
+        </motion.div>
 
         {/* Appointments */}
-        <div className="group hover:bg-muted/50 flex cursor-default items-center gap-3 rounded-lg px-2 py-1.5 transition-colors">
-          <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-xl">
-            <CalendarClock className="text-primary h-4 w-4" />
-          </div>
-          <div className="min-w-0">
-            <Text size="xs" muted className="text-[10px] font-semibold tracking-wider uppercase">
-              Appointments
-            </Text>
-            <Text size="sm" className="font-semibold">
-              {patient.appointments.total} Total
-            </Text>
-            <Text size="xs" muted>
-              {patient.appointments.dateRange}
-            </Text>
-          </div>
-        </div>
-
-        {/* Separator */}
-        <div className="bg-border/30 h-10 w-px" />
+        <motion.div variants={metricVariants} className="flex-1">
+          <Card className="border-border/40 flex cursor-default items-center gap-3 px-4 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+            <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+              <CalendarClock className="text-primary h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <Text size="xs" muted className="text-[10px] font-semibold tracking-wider uppercase">
+                Appointments
+              </Text>
+              <Text size="sm" className="font-semibold">
+                {patient.appointments.total} Total
+              </Text>
+              <Text size="xs" muted>
+                {patient.appointments.dateRange}
+              </Text>
+            </div>
+          </Card>
+        </motion.div>
 
         {/* Balance */}
-        <div className="group hover:bg-muted/50 flex cursor-default items-center gap-3 rounded-lg px-2 py-1.5 transition-colors">
-          <div className="bg-primary/10 flex h-10 w-10 items-center justify-center rounded-xl">
-            <DollarSign className="text-primary h-4 w-4" />
-          </div>
-          <div className="min-w-0">
-            <Text size="xs" muted className="text-[10px] font-semibold tracking-wider uppercase">
-              Balance
-            </Text>
-            <Text size="sm" className="font-semibold">
-              {patient.balance.amount}
-            </Text>
-            <Text size="xs" muted>
-              {patient.balance.type}
-            </Text>
-          </div>
-        </div>
-      </div>
+        <motion.div variants={metricVariants} className="flex-1">
+          <Card className="border-border/40 flex cursor-default items-center gap-3 px-4 py-3 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md">
+            <div className="bg-primary/10 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
+              <DollarSign className="text-primary h-4 w-4" />
+            </div>
+            <div className="min-w-0">
+              <Text size="xs" muted className="text-[10px] font-semibold tracking-wider uppercase">
+                Balance
+              </Text>
+              <Text size="sm" className="font-semibold">
+                {patient.balance.amount}
+              </Text>
+              <Text size="xs" muted>
+                {patient.balance.type}
+              </Text>
+            </div>
+          </Card>
+        </motion.div>
+      </motion.div>
     </motion.div>
   );
 }

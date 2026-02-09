@@ -43,13 +43,13 @@ export const LAYOUT_DIMENSIONS: LayoutConfig = {
   },
   summary: {
     rosterWidth: 140,
-    headerHeight: 90,
+    headerHeight: 110,
     rosterVisible: true,
     headerCompact: true,
   },
   note: {
     rosterWidth: 140,
-    headerHeight: 90,
+    headerHeight: 110,
     rosterVisible: true,
     headerCompact: true,
   },

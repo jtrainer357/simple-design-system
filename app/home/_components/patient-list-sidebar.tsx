@@ -24,6 +24,7 @@ interface PatientListSidebarProps {
   selectedPatientId?: string;
   onPatientSelect?: (patient: Patient) => void;
   activeFilter?: string;
+  compact?: boolean;
   className?: string;
 }
 
@@ -32,6 +33,7 @@ export function PatientListSidebar({
   selectedPatientId,
   onPatientSelect,
   activeFilter = "all",
+  compact = false,
   className,
 }: PatientListSidebarProps) {
   const [searchQuery, setSearchQuery] = React.useState("");
@@ -74,7 +76,12 @@ export function PatientListSidebar({
       </div>
 
       {/* Patient List */}
-      <div className="-mx-3 flex-1 space-y-2 overflow-y-auto px-3 pb-2">
+      <div
+        className={cn(
+          "-mx-3 flex-1 overflow-y-auto px-3 pb-2",
+          compact ? "space-y-1" : "space-y-2"
+        )}
+      >
         {filteredPatients.map((patient) => (
           <PatientListCard
             key={patient.id}
@@ -86,6 +93,7 @@ export function PatientListSidebar({
             status={patient.status}
             avatarSrc={patient.avatarSrc}
             selected={selectedPatientId === patient.id}
+            compact={compact}
             onSelect={() => onPatientSelect?.(patient)}
           />
         ))}
