@@ -36,7 +36,7 @@ const HOURS = Array.from({ length: 11 }, (_, i) => i + 8);
 
 const STATUS_COLORS: Record<AppointmentStatus, string> = {
   Scheduled:
-    "bg-blue-100 border-blue-300 text-blue-800 dark:bg-blue-900/30 dark:border-blue-700 dark:text-blue-300",
+    "bg-growth-4 border-growth-3 text-growth-1 dark:bg-growth-1/30 dark:border-growth-2 dark:text-growth-4",
   Confirmed:
     "bg-green-100 border-green-300 text-green-800 dark:bg-green-900/30 dark:border-green-700 dark:text-green-300",
   "Checked-In":

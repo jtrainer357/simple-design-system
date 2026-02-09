@@ -88,8 +88,8 @@ const STATUS_STYLES: Record<
   { bg: string; text: string; icon: React.ReactNode }
 > = {
   Scheduled: {
-    bg: "bg-blue-100 dark:bg-blue-900/30",
-    text: "text-blue-700 dark:text-blue-300",
+    bg: "bg-growth-4 dark:bg-growth-1/30",
+    text: "text-growth-1 dark:text-growth-4",
     icon: <Calendar className="h-4 w-4" />,
   },
   Confirmed: {
@@ -293,7 +293,7 @@ export function AppointmentDetailPanel({
               <div className="flex items-center gap-2">
                 {appointment.format === "telehealth" ? (
                   <>
-                    <Video className="h-4 w-4 text-blue-500" />
+                    <Video className="text-growth-2 h-4 w-4" />
                     <span>Telehealth</span>
                   </>
                 ) : (
