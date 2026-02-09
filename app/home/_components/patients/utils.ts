@@ -221,7 +221,11 @@ export function createPatientDetail(
           };
         })
       : sortedAppts
-          .filter((a) => a.status === "Completed")
+          .filter((a) => {
+            // Include completed appointments and any past appointments
+            const isPast = new Date(a.date) < now;
+            return a.status === "Completed" || isPast;
+          })
           .slice(0, 5)
           .map((a) => {
             const details = getVisitSummaryDetails(
@@ -267,10 +271,10 @@ export function createPatientDetail(
     id: m.id,
     channel: m.channel,
     direction: m.direction,
-    sender: m.sender,
-    messageBody: m.message_body,
-    isRead: m.is_read,
-    sentAt: m.sent_at,
+    sender: m.direction === "inbound" ? "Patient" : "Practice",
+    messageBody: m.content,
+    isRead: m.read,
+    sentAt: m.timestamp,
   }));
 
   // Map invoices

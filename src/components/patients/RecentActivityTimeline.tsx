@@ -1,8 +1,10 @@
 "use client";
 
 import * as React from "react";
+import { motion } from "framer-motion";
 import { Text } from "@/design-system/components/ui/typography";
 import { cn } from "@/design-system/lib/utils";
+import { usePatientViewNavigation } from "@/src/lib/stores/patient-view-store";
 
 export interface ActivityItem {
   id: string;
@@ -14,15 +16,32 @@ export interface ActivityItem {
 interface RecentActivityTimelineProps {
   activities: ActivityItem[];
   className?: string;
+  /** Optional custom click handler - if not provided, uses store navigation */
   onActivityClick?: (activity: ActivityItem) => void;
+  /** Currently selected activity ID for highlighting */
+  selectedActivityId?: string;
 }
 
 export function RecentActivityTimeline({
   activities,
   className,
   onActivityClick,
+  selectedActivityId,
 }: RecentActivityTimelineProps) {
+  const { transitionTo } = usePatientViewNavigation();
   const displayActivities = activities.slice(0, 5);
+
+  // Handle activity click - use custom handler or default to store transition
+  const handleActivityClick = React.useCallback(
+    (activity: ActivityItem) => {
+      if (onActivityClick) {
+        onActivityClick(activity);
+      } else {
+        transitionTo("summary", activity.id);
+      }
+    },
+    [onActivityClick, transitionTo]
+  );
 
   return (
     <div className={cn("", className)}>
@@ -41,49 +60,83 @@ export function RecentActivityTimeline({
 
           {/* Activities */}
           <div className="space-y-4">
-            {displayActivities.map((activity, index) => (
-              <div
-                key={activity.id}
-                className={cn(
-                  "relative flex gap-4 pl-6",
-                  onActivityClick && "cursor-pointer hover:opacity-80"
-                )}
-                onClick={() => onActivityClick?.(activity)}
-                role={onActivityClick ? "button" : undefined}
-                tabIndex={onActivityClick ? 0 : undefined}
-                onKeyDown={(e) => {
-                  if (onActivityClick && (e.key === "Enter" || e.key === " ")) {
-                    e.preventDefault();
-                    onActivityClick(activity);
-                  }
-                }}
-              >
-                {/* Timeline dot */}
-                <div
-                  className={cn(
-                    "absolute top-1.5 left-0 h-4 w-4 rounded-full border-2 border-white",
-                    index === 0 ? "bg-primary" : "bg-muted-foreground/40"
-                  )}
-                />
+            {displayActivities.map((activity, index) => {
+              const isSelected = selectedActivityId === activity.id;
 
-                {/* Content */}
-                <div className="min-w-0 flex-1 rounded-lg bg-white/50 p-3 shadow-sm">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1">
-                      <h4 className="text-foreground-strong text-sm font-semibold">
-                        {activity.title}
-                      </h4>
-                      <Text size="sm" muted className="mt-1 line-clamp-2">
-                        {activity.description}
+              return (
+                <motion.div
+                  key={activity.id}
+                  className={cn("relative flex gap-4 pl-6", "cursor-pointer")}
+                  onClick={() => handleActivityClick(activity)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      handleActivityClick(activity);
+                    }
+                  }}
+                  whileHover={{ scale: 1.01 }}
+                  whileTap={{ scale: 0.99 }}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    delay: index * 0.05,
+                    duration: 0.2,
+                  }}
+                  aria-pressed={isSelected}
+                >
+                  {/* Timeline dot */}
+                  <motion.div
+                    className={cn(
+                      "absolute top-1.5 left-0 h-4 w-4 rounded-full border-2 transition-colors",
+                      isSelected
+                        ? "bg-primary border-primary/30"
+                        : index === 0
+                          ? "bg-primary border-white"
+                          : "bg-muted-foreground/40 border-white"
+                    )}
+                    animate={
+                      isSelected
+                        ? {
+                            scale: [1, 1.2, 1],
+                            transition: { duration: 0.3 },
+                          }
+                        : {}
+                    }
+                  />
+
+                  {/* Content */}
+                  <div
+                    className={cn(
+                      "min-w-0 flex-1 rounded-lg p-3 shadow-sm transition-all",
+                      isSelected
+                        ? "bg-primary/5 ring-primary/20 ring-2"
+                        : "bg-white/50 hover:bg-white/80 hover:shadow-md"
+                    )}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <h4
+                          className={cn(
+                            "text-sm font-semibold",
+                            isSelected ? "text-primary" : "text-foreground-strong"
+                          )}
+                        >
+                          {activity.title}
+                        </h4>
+                        <Text size="sm" muted className="mt-1 line-clamp-2">
+                          {activity.description}
+                        </Text>
+                      </div>
+                      <Text size="xs" muted className="shrink-0 whitespace-nowrap">
+                        {activity.date}
                       </Text>
                     </div>
-                    <Text size="xs" muted className="shrink-0 whitespace-nowrap">
-                      {activity.date}
-                    </Text>
                   </div>
-                </div>
-              </div>
-            ))}
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       )}

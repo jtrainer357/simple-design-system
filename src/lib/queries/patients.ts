@@ -11,15 +11,17 @@ import type {
   OutcomeMeasure,
   Invoice,
   Review,
-  Communication,
+  Message,
   VisitSummary,
 } from "@/src/lib/supabase/types";
+
+// Alias Message as Communication for backwards compatibility
+export type Communication = Message;
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
 
 const log = createLogger("queries/patients");
 
-// Re-export Communication type for backwards compatibility
-export type { Communication };
+// Communication type is aliased above for backwards compatibility
 
 /**
  * Get all patients for a practice
@@ -169,11 +171,11 @@ export async function getPatientMessages(
   const supabase = createClient();
 
   const { data, error } = await supabase
-    .from("communications")
+    .from("messages")
     .select("*")
     .eq("patient_id", patientId)
     .eq("practice_id", practiceId)
-    .order("sent_at", { ascending: false })
+    .order("timestamp", { ascending: false })
     .limit(50);
 
   if (error) {
@@ -181,7 +183,8 @@ export async function getPatientMessages(
       action: "getPatientMessages",
       patientId,
     });
-    throw error;
+    // Return empty array instead of throwing - graceful degradation
+    return [];
   }
 
   return (data || []) as Communication[];
@@ -341,30 +344,16 @@ export type { VisitSummary };
 
 /**
  * Get patient visit summaries for recent activity
+ * NOTE: visit_summaries table doesn't exist yet - returns empty array
+ * TODO: Create visit_summaries table or derive from appointments/session_notes
  * @param patientId - The patient's UUID
  * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
 export async function getPatientVisitSummaries(
-  patientId: string,
-  practiceId: string = DEMO_PRACTICE_ID
+  _patientId: string,
+  _practiceId: string = DEMO_PRACTICE_ID
 ): Promise<VisitSummary[]> {
-  const supabase = createClient();
-
-  const { data, error } = await supabase
-    .from("visit_summaries")
-    .select("*")
-    .eq("patient_id", patientId)
-    .eq("practice_id", practiceId)
-    .order("visit_date", { ascending: false })
-    .limit(10);
-
-  if (error) {
-    log.error("Failed to fetch patient visit summaries", error, {
-      action: "getPatientVisitSummaries",
-      patientId,
-    });
-    return [];
-  }
-
-  return (data || []) as VisitSummary[];
+  // visit_summaries table doesn't exist yet - return empty array
+  // Future: derive from appointments or create the table
+  return [];
 }

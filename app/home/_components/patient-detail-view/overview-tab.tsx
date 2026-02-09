@@ -5,6 +5,7 @@ import { Button } from "@/design-system/components/ui/button";
 import { ActivityRow } from "@/design-system/components/ui/activity-row";
 import { Heading, Text } from "@/design-system/components/ui/typography";
 import { PriorityActionCard } from "@/design-system/components/ui/priority-action-card";
+import { useSelectedIds } from "@/src/lib/stores/patient-view-store";
 import type { PatientDetail } from "./types";
 
 interface OverviewTabProps {
@@ -13,21 +14,26 @@ interface OverviewTabProps {
 }
 
 export function OverviewTab({ patient, onActivitySelect }: OverviewTabProps) {
+  const { selectedVisitId } = useSelectedIds();
+
   return (
-    <>
+    <div className="flex flex-col gap-8">
       {/* Prioritized Actions - AI Surfaced */}
-      <div className="mb-4 sm:mb-6">
-        <div className="mb-3 flex items-center justify-between sm:mb-4">
-          <div className="flex items-center gap-2">
-            <Heading level={5} className="text-base sm:text-lg">
+      <section>
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Heading level={5} className="text-base font-semibold sm:text-lg">
               Prioritized Actions
             </Heading>
-            <span className="text-primary flex items-center gap-1 text-[10px] font-medium sm:text-xs">
+            <span className="bg-primary/10 text-primary inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold sm:text-xs">
               <Sparkles className="h-3 w-3" />
               AI Surfaced
             </span>
           </div>
-          <Button variant="link" className="h-auto p-0 text-xs sm:text-sm">
+          <Button
+            variant="link"
+            className="text-primary hover:text-primary/80 h-auto p-0 text-xs font-medium sm:text-sm"
+          >
             View All
           </Button>
         </div>
@@ -44,21 +50,21 @@ export function OverviewTab({ patient, onActivitySelect }: OverviewTabProps) {
             />
           ))}
           {(!patient.prioritizedActions || patient.prioritizedActions.length === 0) && (
-            <div className="border-muted-foreground/30 rounded-lg border-2 border-dashed py-8">
+            <div className="border-border/60 bg-muted/20 rounded-xl border border-dashed py-10">
               <Text size="sm" muted className="text-center">
                 No prioritized actions at this time
               </Text>
             </div>
           )}
         </div>
-      </div>
+      </section>
 
       {/* Recent Activity */}
-      <div>
-        <Heading level={5} className="mb-3 text-base sm:mb-4 sm:text-lg">
+      <section>
+        <Heading level={5} className="mb-4 text-base font-semibold sm:text-lg">
           Recent Activity
         </Heading>
-        <div>
+        <div className="border-border/40 overflow-hidden rounded-xl border bg-white/30">
           {patient.recentActivity.map((activity, index) => (
             <ActivityRow
               key={activity.id}
@@ -67,16 +73,19 @@ export function OverviewTab({ patient, onActivitySelect }: OverviewTabProps) {
               date={activity.date}
               isRecent={index === 0}
               isLast={index === patient.recentActivity.length - 1}
+              selected={selectedVisitId === activity.id}
               onClick={() => onActivitySelect(activity)}
             />
           ))}
           {patient.recentActivity.length === 0 && (
-            <Text size="sm" muted className="py-4 text-center">
-              No recent activity
-            </Text>
+            <div className="py-10">
+              <Text size="sm" muted className="text-center">
+                No recent activity
+              </Text>
+            </div>
           )}
         </div>
-      </div>
-    </>
+      </section>
+    </div>
   );
 }

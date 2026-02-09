@@ -1,12 +1,14 @@
 "use client";
 
 import * as React from "react";
+import { motion } from "framer-motion";
 import { Plus } from "lucide-react";
 import { Button } from "@/design-system/components/ui/button";
 import { FilterTabs } from "@/design-system/components/ui/filter-tabs";
 import { PatientListSidebar } from "../patient-list-sidebar";
 import { PatientDetailView } from "../patient-detail-view";
 import { AddPatientModal } from "@/src/components/patients/AddPatientModal";
+import { usePatientViewState } from "@/src/hooks/usePatientViewState";
 import {
   getPatients,
   getPatientDetails as getPatientDetailsQuery,
@@ -34,6 +36,9 @@ export function PatientsPage({
   const [detailLoading, setDetailLoading] = React.useState(false);
   const [activeFilter, setActiveFilter] = React.useState("all");
   const [addPatientOpen, setAddPatientOpen] = React.useState(false);
+
+  // Get progressive disclosure state for dynamic layout
+  const { layout, transition, isRosterCompact } = usePatientViewState();
 
   // Stabilize props for useEffect dependencies
   const patientIdKey = initialPatientId ?? "";
@@ -180,18 +185,31 @@ export function PatientsPage({
   return (
     <>
       <div className="flex h-full flex-col">
-        {/* Main Content */}
-        <div className="grid min-h-0 flex-1 grid-cols-1 gap-2 lg:grid-cols-12">
-          {/* Patient List Column */}
-          <div className="flex min-h-0 flex-col lg:col-span-5 xl:col-span-4">
-            {/* Filter Tabs - aligned with patient list column */}
-            <div className="mb-4 flex items-center justify-between">
-              <FilterTabs
-                tabs={patientFilterTabs}
-                activeTab={activeFilter}
-                onTabChange={setActiveFilter}
-              />
-            </div>
+        {/* Main Content - Flex layout with animated widths */}
+        <div className="flex min-h-0 flex-1 gap-2">
+          {/* Patient List Column - Animated width */}
+          <motion.div
+            className="flex min-h-0 flex-col overflow-hidden"
+            animate={{
+              width: layout.rosterVisible ? layout.rosterWidth : 0,
+              opacity: layout.rosterVisible ? 1 : 0,
+            }}
+            transition={{
+              duration: transition.duration,
+              ease: transition.ease as [number, number, number, number],
+            }}
+            style={{ minWidth: layout.rosterVisible ? layout.rosterWidth : 0 }}
+          >
+            {/* Filter Tabs - hidden when compact */}
+            {!isRosterCompact && (
+              <div className="mb-4 flex items-center justify-between">
+                <FilterTabs
+                  tabs={patientFilterTabs}
+                  activeTab={activeFilter}
+                  onTabChange={setActiveFilter}
+                />
+              </div>
+            )}
             <PatientListSidebar
               patients={patientListItems}
               selectedPatientId={selectedPatient?.id}
@@ -199,20 +217,22 @@ export function PatientsPage({
               activeFilter={activeFilter}
               className="min-h-0 flex-1"
             />
-          </div>
+          </motion.div>
 
-          {/* Patient Detail Column */}
-          <div className="flex min-h-0 flex-col lg:col-span-7 xl:col-span-8">
-            {/* Add Patient Button - aligned with detail view */}
-            <div className="mb-4 flex items-center justify-end">
-              <Button
-                onClick={() => setAddPatientOpen(true)}
-                className="gap-1.5 text-sm sm:gap-2 sm:text-base"
-              >
-                <Plus className="h-4 w-4" />
-                Add Patient
-              </Button>
-            </div>
+          {/* Patient Detail Column - Takes remaining space */}
+          <div className="flex min-h-0 flex-1 flex-col">
+            {/* Add Patient Button - hidden when compact */}
+            {!isRosterCompact && (
+              <div className="mb-4 flex items-center justify-end">
+                <Button
+                  onClick={() => setAddPatientOpen(true)}
+                  className="gap-1.5 text-sm sm:gap-2 sm:text-base"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add Patient
+                </Button>
+              </div>
+            )}
             {detailLoading ? (
               <PatientDetailSkeleton />
             ) : (

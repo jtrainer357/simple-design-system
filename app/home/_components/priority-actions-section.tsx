@@ -13,7 +13,7 @@ import { getPriorityActions } from "@/src/lib/queries/priority-actions";
 import { getTodayAppointments } from "@/src/lib/queries/appointments";
 import { isDatabasePopulated } from "@/src/lib/queries/practice";
 import { formatDemoDate } from "@/src/lib/utils/demo-date";
-import type { PrioritizedActionWithPatient } from "@/src/lib/supabase/types";
+import type { PriorityActionWithPatient } from "@/src/lib/supabase/types";
 import type { AppointmentWithPatient } from "@/src/lib/queries/appointments";
 import type { OrchestrationContext } from "@/src/lib/orchestration/types";
 import { useCompletedPatients } from "@/src/components/orchestration";
@@ -95,7 +95,7 @@ function getBadgeText(urgency: string, timeframe: string | null): string {
 }
 
 // Convert database action to OrchestrationContext for the detail view
-function actionToContext(action: PrioritizedActionWithPatient): OrchestrationContext {
+function actionToContext(action: PriorityActionWithPatient): OrchestrationContext {
   const patient = action.patient;
   return {
     patient: {
@@ -155,7 +155,7 @@ export function PriorityActionsSection({
   onSelectPatient,
   hideHeader = false,
 }: PriorityActionsSectionProps) {
-  const [actions, setActions] = React.useState<PrioritizedActionWithPatient[]>([]);
+  const [actions, setActions] = React.useState<PriorityActionWithPatient[]>([]);
   const [todayAppts, setTodayAppts] = React.useState<AppointmentWithPatient[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [error, setError] = React.useState<string | null>(null);
