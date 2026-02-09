@@ -12,7 +12,10 @@ import {
   getDemoDaysAgo,
   DEMO_PRACTICE_ID,
 } from "@/src/lib/utils/demo-date";
-import { getDemoTodayAppointments } from "@/src/lib/data/synthetic-adapter";
+import {
+  getDemoTodayAppointments,
+  getDemoUpcomingAppointments,
+} from "@/src/lib/data/synthetic-adapter";
 
 const log = createLogger("queries/appointments");
 
@@ -99,44 +102,79 @@ export async function getUpcomingAppointments(
   const today = getDemoToday();
   const endDate = getDemoDaysFromNow(days);
 
-  let query = supabase
-    .from("appointments")
-    .select(
+  // Get demo appointments (always available)
+  const demoAppointments = getDemoUpcomingAppointments(days);
+
+  try {
+    let query = supabase
+      .from("appointments")
+      .select(
+        `
+        *,
+        patient:patients(
+          id,
+          first_name,
+          last_name,
+          avatar_url,
+          risk_level,
+          date_of_birth
+        )
       `
-      *,
-      patient:patients(
-        id,
-        first_name,
-        last_name,
-        avatar_url,
-        risk_level,
-        date_of_birth
       )
-    `
-    )
-    .eq("practice_id", practiceId)
-    .gte("date", today)
-    .lte("date", endDate);
+      .eq("practice_id", practiceId)
+      .gte("date", today)
+      .lte("date", endDate);
 
-  // Only filter by status if not "all"
-  if (statusFilter !== "all") {
-    query = query.eq("status", statusFilter);
-  }
+    // Only filter by status if not "all"
+    if (statusFilter !== "all") {
+      query = query.eq("status", statusFilter);
+    }
 
-  const { data, error } = await query
-    .order("date", { ascending: true })
-    .order("start_time", { ascending: true });
+    const { data, error } = await query
+      .order("date", { ascending: true })
+      .order("start_time", { ascending: true });
 
-  if (error) {
-    log.error("Failed to fetch upcoming appointments", error, {
-      action: "getUpcomingAppointments",
-      practiceId,
-      days,
+    if (error) {
+      log.warn("Failed to fetch appointments from DB, using demo data only", {
+        action: "getUpcomingAppointments",
+      });
+      // Filter demo appointments by status if needed
+      const filteredDemo =
+        statusFilter === "all"
+          ? demoAppointments
+          : demoAppointments.filter((a) => a.status === statusFilter);
+      return filteredDemo;
+    }
+
+    // Merge database appointments with demo appointments
+    const dbAppointments = (data || []) as AppointmentWithPatient[];
+    const dbExternalIds = new Set(dbAppointments.map((a) => a.external_id));
+
+    // Add demo appointments that aren't already in the database
+    let uniqueDemoAppointments = demoAppointments.filter(
+      (da) => !dbExternalIds.has(da.external_id)
+    );
+
+    // Filter by status if needed
+    if (statusFilter !== "all") {
+      uniqueDemoAppointments = uniqueDemoAppointments.filter((a) => a.status === statusFilter);
+    }
+
+    // Combine and sort
+    const allAppointments = [...uniqueDemoAppointments, ...dbAppointments];
+    return allAppointments.sort((a, b) => {
+      const dateCompare = a.date.localeCompare(b.date);
+      if (dateCompare !== 0) return dateCompare;
+      return a.start_time.localeCompare(b.start_time);
     });
-    throw error;
+  } catch {
+    // Fallback to demo appointments on any error
+    const filteredDemo =
+      statusFilter === "all"
+        ? demoAppointments
+        : demoAppointments.filter((a) => a.status === statusFilter);
+    return filteredDemo;
   }
-
-  return (data || []) as AppointmentWithPatient[];
 }
 
 /**

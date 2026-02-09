@@ -29,14 +29,17 @@ function normalizeUrgency(urgency: string): "urgent" | "high" | "medium" | "low"
 
 /**
  * Get all pending priority actions for a practice with patient details
+ * Queries substrate_actions table (created by substrate intelligence engine)
  */
 export async function getPriorityActions(
   practiceId: string = DEMO_PRACTICE_ID
 ): Promise<PriorityActionWithPatient[]> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
-    .from("priority_actions")
+  // First try substrate_actions (new substrate engine table)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from("substrate_actions")
     .select(
       `
       *,
@@ -51,7 +54,7 @@ export async function getPriorityActions(
     `
     )
     .eq("practice_id", practiceId)
-    .or("status.eq.pending,status.is.null")
+    .eq("status", "active")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -64,24 +67,18 @@ export async function getPriorityActions(
     return [];
   }
 
-  // Map DB fields to expected types and sort by urgency
+  // Map substrate_actions fields to expected types and sort by urgency
   const urgencyOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
-  const actions = (data || []) as unknown as PriorityActionWithPatientRow[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const actions = (data || []) as any[];
   return actions
-    .filter((action) => {
-      // Filter out Emily Chen's card
-      const patient = action.patient;
-      if (patient?.first_name === "Emily" && patient?.last_name === "Chen") {
-        return false;
-      }
-      return true;
-    })
     .map((action) => ({
       ...action,
       urgency: normalizeUrgency(action.urgency || "medium"),
-      confidence_score: action.confidence_score || 85,
-      timeframe: action.timeframe || "This week",
-      status: action.status || "pending",
+      confidence_score: action.ai_confidence || 85, // substrate_actions uses ai_confidence
+      timeframe: action.time_frame || "This week", // substrate_actions uses time_frame
+      clinical_context: action.context || action.ai_reasoning,
+      status: action.status || "active",
     }))
     .sort((a, b) => {
       const aOrder = urgencyOrder[a.urgency as keyof typeof urgencyOrder] ?? 4;
@@ -107,6 +104,7 @@ export interface PatientPriorityAction {
 
 /**
  * Get priority actions for a specific patient
+ * Queries substrate_actions table (created by substrate intelligence engine)
  * @param patientId - The patient's UUID
  * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
@@ -116,12 +114,14 @@ export async function getPatientPriorityActions(
 ): Promise<PatientPriorityAction[]> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
-    .from("priority_actions")
+  // Query substrate_actions table
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from("substrate_actions")
     .select("*")
     .eq("patient_id", patientId)
     .eq("practice_id", practiceId)
-    .or("status.eq.pending,status.is.null")
+    .eq("status", "active")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -134,9 +134,10 @@ export async function getPatientPriorityActions(
     return [];
   }
 
-  // Map DB fields and sort by urgency priority
+  // Map substrate_actions fields to PatientPriorityAction format
   const urgencyOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
-  const actions = (data || []) as unknown as PriorityAction[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const actions = (data || []) as any[];
   return actions
     .map((action) => ({
       id: action.id,
@@ -144,11 +145,11 @@ export async function getPatientPriorityActions(
       patient_id: action.patient_id,
       title: action.title,
       urgency: normalizeUrgency(action.urgency || "medium"),
-      timeframe: action.timeframe || "This week",
-      confidence_score: action.confidence_score || 85,
-      clinical_context: action.clinical_context,
+      timeframe: action.time_frame || "This week", // substrate_actions uses time_frame
+      confidence_score: action.ai_confidence || 85, // substrate_actions uses ai_confidence
+      clinical_context: action.context || action.ai_reasoning, // substrate_actions uses context
       suggested_actions: action.suggested_actions,
-      status: action.status || "pending",
+      status: action.status || "active",
       created_at: action.created_at,
     }))
     .sort((a, b) => {
@@ -160,6 +161,7 @@ export async function getPatientPriorityActions(
 
 /**
  * Mark a priority action as completed
+ * Updates substrate_actions table
  * @param actionId - The action's UUID
  * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
@@ -169,8 +171,9 @@ export async function completeAction(
 ): Promise<void> {
   const supabase = createClient();
 
-  const { error } = await supabase
-    .from("priority_actions")
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from("substrate_actions")
     .update({
       status: "completed",
       completed_at: new Date().toISOString(),
@@ -186,6 +189,7 @@ export async function completeAction(
 
 /**
  * Mark a priority action as dismissed
+ * Updates substrate_actions table
  * @param actionId - The action's UUID
  * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
@@ -195,8 +199,9 @@ export async function dismissAction(
 ): Promise<void> {
   const supabase = createClient();
 
-  const { error } = await supabase
-    .from("priority_actions")
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error } = await (supabase as any)
+    .from("substrate_actions")
     .update({
       status: "dismissed",
       completed_at: new Date().toISOString(),
@@ -212,6 +217,7 @@ export async function dismissAction(
 
 /**
  * Complete all pending actions for a patient
+ * Updates substrate_actions table
  * @param patientId - The patient's UUID
  * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
@@ -221,16 +227,17 @@ export async function completeAllPatientActions(
 ): Promise<void> {
   const supabase = createClient();
 
-  // Update priority actions
-  const { error: actionsError } = await supabase
-    .from("priority_actions")
+  // Update substrate actions
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { error: actionsError } = await (supabase as any)
+    .from("substrate_actions")
     .update({
       status: "completed",
       completed_at: new Date().toISOString(),
     })
     .eq("patient_id", patientId)
     .eq("practice_id", practiceId)
-    .or("status.eq.pending,status.is.null");
+    .eq("status", "active");
 
   if (actionsError) {
     log.error("Failed to complete patient actions", actionsError, {
@@ -262,6 +269,7 @@ export async function completeAllPatientActions(
 
 /**
  * Get action counts by urgency
+ * Queries substrate_actions table
  */
 export async function getActionCounts(practiceId: string = DEMO_PRACTICE_ID): Promise<{
   urgent: number;
@@ -272,11 +280,12 @@ export async function getActionCounts(practiceId: string = DEMO_PRACTICE_ID): Pr
 }> {
   const supabase = createClient();
 
-  const { data, error } = await supabase
-    .from("priority_actions")
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { data, error } = await (supabase as any)
+    .from("substrate_actions")
     .select("urgency")
     .eq("practice_id", practiceId)
-    .or("status.eq.pending,status.is.null");
+    .eq("status", "active");
 
   if (error) {
     log.error("Failed to fetch action counts", error, { action: "getActionCounts", practiceId });

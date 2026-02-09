@@ -7,7 +7,8 @@ import { ActivityRow } from "@/design-system/components/ui/activity-row";
 import { Heading, Text } from "@/design-system/components/ui/typography";
 import { PriorityActionCard } from "@/design-system/components/ui/priority-action-card";
 import { useSelectedIds } from "@/src/lib/stores/patient-view-store";
-import type { PatientDetail } from "./types";
+import { usePatientPriorityActions } from "@/src/lib/queries/use-patients";
+import type { PatientDetail, PriorityAction } from "./types";
 
 // Elegant easing (typed as tuple for framer-motion)
 const smoothEase: [number, number, number, number] = [0.25, 0.1, 0.25, 1.0];
@@ -63,8 +64,50 @@ interface OverviewTabProps {
   onActivitySelect: (activity: PatientDetail["recentActivity"][number]) => void;
 }
 
+// Map substrate trigger type to ActionType
+function mapTriggerToActionType(
+  title: string
+): "medication" | "followup" | "documentation" | "screening" | "risk" | "care-gap" {
+  const lowerTitle = title.toLowerCase();
+  if (lowerTitle.includes("medication") || lowerTitle.includes("refill")) return "medication";
+  if (lowerTitle.includes("note") || lowerTitle.includes("unsigned")) return "documentation";
+  if (lowerTitle.includes("elevated") || lowerTitle.includes("phq") || lowerTitle.includes("gad"))
+    return "screening";
+  if (lowerTitle.includes("missed") || lowerTitle.includes("not seen")) return "followup";
+  if (lowerTitle.includes("insurance") || lowerTitle.includes("auth")) return "care-gap";
+  return "risk"; // Default for unknown types
+}
+
+// Map substrate action urgency to PriorityLevel
+function mapUrgencyToPriority(urgency: string): "urgent" | "high" | "medium" | "low" {
+  switch (urgency) {
+    case "urgent":
+      return "urgent";
+    case "high":
+      return "high";
+    case "medium":
+      return "medium";
+    default:
+      return "low";
+  }
+}
+
 export function OverviewTab({ patient, onActivitySelect }: OverviewTabProps) {
   const { selectedVisitId } = useSelectedIds();
+
+  // Fetch priority actions from substrate_actions table
+  const { data: substrateActions = [] } = usePatientPriorityActions(patient.id);
+
+  // Transform substrate actions to PriorityAction format for display
+  const prioritizedActions: PriorityAction[] = substrateActions.map((action) => ({
+    id: action.id,
+    type: mapTriggerToActionType(action.title),
+    title: action.title,
+    description: action.clinical_context || "",
+    priority: mapUrgencyToPriority(action.urgency),
+    dueDate: action.timeframe || undefined,
+    aiConfidence: action.confidence_score || undefined,
+  }));
 
   return (
     <motion.div
@@ -98,7 +141,7 @@ export function OverviewTab({ patient, onActivitySelect }: OverviewTabProps) {
           </Button>
         </div>
         <motion.div className="flex flex-col gap-3" variants={containerVariants}>
-          {(patient.prioritizedActions || []).slice(0, 4).map((action, index) => (
+          {prioritizedActions.slice(0, 4).map((action, index) => (
             <motion.div key={action.id} variants={itemVariants} custom={index}>
               <PriorityActionCard
                 type={action.type}
@@ -110,7 +153,7 @@ export function OverviewTab({ patient, onActivitySelect }: OverviewTabProps) {
               />
             </motion.div>
           ))}
-          {(!patient.prioritizedActions || patient.prioritizedActions.length === 0) && (
+          {prioritizedActions.length === 0 && (
             <motion.div
               variants={itemVariants}
               className="border-border/60 bg-muted/20 rounded-xl border border-dashed py-10"

@@ -1,12 +1,13 @@
 /**
  * Communications Queries
- * Fetches patient messages from Supabase
+ * Fetches patient messages from Supabase with demo data fallback
  */
 
 import { createClient } from "@/src/lib/supabase/client";
 import { createLogger } from "@/src/lib/logger";
 import type { Communication as CommunicationRow, Patient } from "@/src/lib/supabase/types";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
+import { getDemoCommunicationThreads } from "@/src/lib/data/synthetic-adapter";
 
 const log = createLogger("queries/communications");
 
@@ -127,6 +128,7 @@ export async function markAsRead(
 
 /**
  * Get communications grouped by patient (for thread view)
+ * Falls back to demo data if Supabase query fails
  */
 export async function getCommunicationThreads(practiceId: string = DEMO_PRACTICE_ID): Promise<
   Array<{
@@ -138,65 +140,92 @@ export async function getCommunicationThreads(practiceId: string = DEMO_PRACTICE
 > {
   const supabase = createClient();
 
-  // Get all communications with patient info
-  const { data, error } = await supabase
-    .from("communications")
-    .select(
+  // Get demo threads (always available)
+  const demoThreads = getDemoCommunicationThreads();
+
+  try {
+    // Get all communications with patient info
+    const { data, error } = await supabase
+      .from("communications")
+      .select(
+        `
+        *,
+        patient:patients(
+          id,
+          first_name,
+          last_name,
+          avatar_url
+        )
       `
-      *,
-      patient:patients(
-        id,
-        first_name,
-        last_name,
-        avatar_url
       )
-    `
-    )
-    .eq("practice_id", practiceId)
-    .order("sent_at", { ascending: false });
+      .eq("practice_id", practiceId)
+      .order("sent_at", { ascending: false });
 
-  if (error) {
-    log.error("Failed to fetch communications", error, { action: "getCommunications", practiceId });
-    throw error;
-  }
-
-  // Group by patient
-  const patientMap = new Map<
-    string,
-    {
-      patient: Pick<Patient, "id" | "first_name" | "last_name" | "avatar_url">;
-      messages: Communication[];
-      unreadCount: number;
-    }
-  >();
-
-  const communications = (data || []) as unknown as CommunicationWithPatient[];
-  communications.forEach((comm) => {
-    const patientId = comm.patient_id;
-    if (!patientMap.has(patientId)) {
-      patientMap.set(patientId, {
-        patient: comm.patient,
-        messages: [],
-        unreadCount: 0,
+    if (error) {
+      log.warn("Failed to fetch communications from DB, using demo data only", {
+        action: "getCommunicationThreads",
       });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return demoThreads as any;
     }
 
-    const thread = patientMap.get(patientId)!;
-    thread.messages.push(comm);
-    if (!comm.is_read && comm.direction === "inbound") {
-      thread.unreadCount++;
+    // If no DB data, return demo threads
+    if (!data || data.length === 0) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return demoThreads as any;
     }
-  });
 
-  // Convert to array and add lastMessage
-  return Array.from(patientMap.values())
-    .map((thread) => ({
-      ...thread,
-      lastMessage: thread.messages[0] || null,
-    }))
-    .sort((a, b) => {
+    // Group by patient
+    const patientMap = new Map<
+      string,
+      {
+        patient: Pick<Patient, "id" | "first_name" | "last_name" | "avatar_url">;
+        messages: Communication[];
+        unreadCount: number;
+      }
+    >();
+
+    const communications = (data || []) as unknown as CommunicationWithPatient[];
+    communications.forEach((comm) => {
+      const patientId = comm.patient_id;
+      if (!patientMap.has(patientId)) {
+        patientMap.set(patientId, {
+          patient: comm.patient,
+          messages: [],
+          unreadCount: 0,
+        });
+      }
+
+      const thread = patientMap.get(patientId)!;
+      thread.messages.push(comm);
+      if (!comm.is_read && comm.direction === "inbound") {
+        thread.unreadCount++;
+      }
+    });
+
+    // Convert to array and add lastMessage
+    const dbThreads = Array.from(patientMap.values())
+      .map((thread) => ({
+        ...thread,
+        lastMessage: thread.messages[0] || null,
+      }))
+      .sort((a, b) => {
+        const aTime = a.lastMessage?.sent_at || "";
+        const bTime = b.lastMessage?.sent_at || "";
+        return bTime.localeCompare(aTime);
+      });
+
+    // Merge with demo threads (demo threads for patients not in DB)
+    const dbPatientIds = new Set(dbThreads.map((t) => t.patient.id));
+    const uniqueDemoThreads = demoThreads.filter((t) => !dbPatientIds.has(t.patient.id));
+
+    return [...dbThreads, ...uniqueDemoThreads].sort((a, b) => {
       const aTime = a.lastMessage?.sent_at || "";
       const bTime = b.lastMessage?.sent_at || "";
       return bTime.localeCompare(aTime);
     });
+  } catch {
+    // Fallback to demo threads on any error
+    return demoThreads;
+  }
 }

@@ -21,6 +21,7 @@ import type {
   OutcomeMeasure,
   Message,
   Invoice,
+  Communication,
 } from "@/src/lib/supabase/types";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
 
@@ -338,4 +339,144 @@ export function getDemoTodayAppointments(): Array<
       };
     })
     .sort((a, b) => a.start_time.localeCompare(b.start_time));
+}
+
+/**
+ * Get upcoming demo appointments with patient details (for schedule/calendar)
+ * Returns appointments from DEMO_DATE to specified days ahead
+ */
+export function getDemoUpcomingAppointments(days: number = 28): Array<
+  Appointment & {
+    patient: Pick<
+      Patient,
+      "id" | "first_name" | "last_name" | "avatar_url" | "risk_level" | "date_of_birth"
+    >;
+  }
+> {
+  const { DEMO_DATE, getDemoDaysFromNow } = require("@/src/lib/utils/demo-date");
+  const endDate = getDemoDaysFromNow(days);
+
+  // Get all demo appointments in date range
+  const upcomingAppointments = SYNTHETIC_APPOINTMENTS.filter(
+    (apt) => apt.patient_id.endsWith("-demo") && apt.date >= DEMO_DATE && apt.date <= endDate
+  );
+
+  return upcomingAppointments
+    .map((apt) => {
+      const patientUUID = getPatientUUID(apt.patient_id);
+      const patient = getDemoPatientByExternalId(apt.patient_id);
+
+      return {
+        ...syntheticAppointmentToDb(apt, patientUUID),
+        patient: {
+          id: patient?.id || patientUUID,
+          first_name: patient?.first_name || apt.patient_name.split(" ")[0] || "",
+          last_name: patient?.last_name || apt.patient_name.split(" ").slice(1).join(" ") || "",
+          avatar_url: patient?.avatar_url || null,
+          risk_level: patient?.risk_level || "low",
+          date_of_birth: patient?.date_of_birth || "1990-01-01",
+        },
+      };
+    })
+    .sort((a, b) => {
+      const dateCompare = a.date.localeCompare(b.date);
+      if (dateCompare !== 0) return dateCompare;
+      return a.start_time.localeCompare(b.start_time);
+    });
+}
+
+/**
+ * Convert synthetic message to database Communication type
+ * (Different from Message - Communication is used for unified inbox)
+ */
+export function syntheticMessageToCommunication(
+  msg: SyntheticMessage,
+  patientUUID: string
+): Communication {
+  const patient = getDemoPatientByExternalId(msg.patient_id);
+  const isOutbound = msg.direction === "outbound";
+
+  return {
+    id: generateDemoUUID(msg.id + "-comm"),
+    practice_id: DEMO_PRACTICE_ID,
+    patient_id: patientUUID,
+    channel: msg.channel,
+    direction: msg.direction,
+    sender: isOutbound ? "Dr. Demo" : patient ? `${patient.first_name} ${patient.last_name}` : null,
+    recipient: isOutbound
+      ? patient
+        ? `${patient.first_name} ${patient.last_name}`
+        : null
+      : "Dr. Demo",
+    sender_email: isOutbound ? "dr.demo@practice.com" : patient?.email || null,
+    recipient_email: isOutbound ? patient?.email || null : "dr.demo@practice.com",
+    sender_phone: isOutbound ? "555-0100" : patient?.phone_mobile || null,
+    recipient_phone: isOutbound ? patient?.phone_mobile || null : "555-0100",
+    message_body: msg.content,
+    is_read: msg.read,
+    sent_at: msg.timestamp,
+    created_at: msg.timestamp,
+  };
+}
+
+/**
+ * Get demo communication threads grouped by patient (for inbox)
+ * Returns threads with patient info, messages, unread count
+ */
+export function getDemoCommunicationThreads(): Array<{
+  patient: Pick<Patient, "id" | "first_name" | "last_name" | "avatar_url">;
+  messages: Communication[];
+  unreadCount: number;
+  lastMessage: Communication | null;
+}> {
+  // Filter to only demo patient messages
+  const demoMessages = SYNTHETIC_MESSAGES.filter((m) => m.patient_id.endsWith("-demo"));
+
+  // Group by patient
+  const patientMap = new Map<
+    string,
+    {
+      patient: Pick<Patient, "id" | "first_name" | "last_name" | "avatar_url">;
+      messages: Communication[];
+      unreadCount: number;
+    }
+  >();
+
+  demoMessages.forEach((msg) => {
+    const patientId = msg.patient_id;
+
+    if (!patientMap.has(patientId)) {
+      const patientUUID = getPatientUUID(patientId);
+      const patient = getDemoPatientByExternalId(patientId);
+
+      patientMap.set(patientId, {
+        patient: {
+          id: patientUUID,
+          first_name: patient?.first_name || "",
+          last_name: patient?.last_name || "",
+          avatar_url: patient?.avatar_url || null,
+        },
+        messages: [],
+        unreadCount: 0,
+      });
+    }
+
+    const thread = patientMap.get(patientId)!;
+    thread.messages.push(syntheticMessageToCommunication(msg, getPatientUUID(patientId)));
+    if (!msg.read && msg.direction === "inbound") {
+      thread.unreadCount++;
+    }
+  });
+
+  // Convert to array and add lastMessage
+  return Array.from(patientMap.values())
+    .map((thread) => ({
+      ...thread,
+      lastMessage: thread.messages[0] || null,
+    }))
+    .sort((a, b) => {
+      const aTime = a.lastMessage?.sent_at || "";
+      const bTime = b.lastMessage?.sent_at || "";
+      return bTime.localeCompare(aTime);
+    });
 }
