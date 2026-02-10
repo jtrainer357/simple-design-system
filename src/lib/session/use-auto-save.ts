@@ -24,6 +24,17 @@ interface UseAutoSaveReturn {
   reset: () => void;
 }
 
+/**
+ * React hook for auto-saving clinical documentation with debounce and interval-based saves
+ * @template T - The type of data being saved
+ * @param options - Configuration options for auto-save behavior
+ * @param options.data - The data to be saved
+ * @param options.onSave - Async callback function to perform the save
+ * @param options.interval - Interval in ms for periodic saves (default: 30000)
+ * @param options.debounceDelay - Debounce delay in ms after changes (default: 2000)
+ * @param options.enabled - Whether auto-save is enabled (default: true)
+ * @returns Object containing save status, controls, and error state
+ */
 export function useAutoSave<T>({
   data,
   onSave,
@@ -154,6 +165,11 @@ export function useAutoSave<T>({
   };
 }
 
+/**
+ * Returns UI indicator properties for displaying auto-save status
+ * @param status - Current auto-save status
+ * @returns Object containing display text, color class, and icon name
+ */
 export function getAutoSaveStatusIndicator(status: AutoSaveStatus): {
   text: string;
   color: string;

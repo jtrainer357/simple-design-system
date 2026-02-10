@@ -30,6 +30,11 @@ function formatTime(totalSeconds: number): string {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
+/**
+ * React hook providing accurate session timing for clinical documentation
+ * @param initialSeconds - Starting time in seconds (default: 0)
+ * @returns Timer controls and state including elapsed time, formatted display, and control functions
+ */
 export function useSessionTimer(initialSeconds: number = 0): UseSessionTimerReturn {
   const [elapsedSeconds, setElapsedSeconds] = useState(initialSeconds);
   const [isRunning, setIsRunning] = useState(false);

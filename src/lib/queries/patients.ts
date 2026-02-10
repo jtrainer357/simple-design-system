@@ -426,7 +426,7 @@ export type { VisitSummary };
 /**
  * Get patient visit summaries for recent activity
  * NOTE: visit_summaries table doesn't exist yet - returns empty array
- * TODO: Create visit_summaries table or derive from appointments/session_notes
+ * TODO(S2): Create visit_summaries table or derive from appointments/session_notes
  * @param patientId - The patient's UUID
  * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */

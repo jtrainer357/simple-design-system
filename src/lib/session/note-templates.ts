@@ -185,6 +185,11 @@ Please generate a treatment plan including:
 6. Criteria for Discharge`,
 };
 
+/**
+ * Retrieves the appropriate note template based on clinical note type
+ * @param noteType - The type of clinical note (progress_note, initial_evaluation, crisis_note, treatment_plan)
+ * @returns The corresponding NoteTemplate object, or PROGRESS_NOTE_TEMPLATE as default
+ */
 export function getNoteTemplate(noteType: NoteType): NoteTemplate | null {
   switch (noteType) {
     case "progress_note":
@@ -200,6 +205,7 @@ export function getNoteTemplate(noteType: NoteType): NoteTemplate | null {
   }
 }
 
+/** Array of all available clinical note templates */
 export const NOTE_TEMPLATES: NoteTemplate[] = [
   PROGRESS_NOTE_TEMPLATE,
   INITIAL_EVALUATION_TEMPLATE,
@@ -207,6 +213,12 @@ export const NOTE_TEMPLATES: NoteTemplate[] = [
   TREATMENT_PLAN_TEMPLATE,
 ];
 
+/**
+ * Compiles a note template by replacing placeholders with actual values
+ * @param template - The NoteTemplate to compile
+ * @param variables - Key-value pairs to substitute into the template (e.g., { diagnoses: "F32.1" })
+ * @returns The compiled prompt string with all placeholders replaced
+ */
 export function compileNoteTemplate(
   template: NoteTemplate,
   variables: Record<string, string>
