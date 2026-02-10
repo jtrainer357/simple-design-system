@@ -126,7 +126,7 @@ function UserMenu({
             onClose();
             router.push("/home/settings");
           }}
-          className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+          className="flex min-h-[44px] w-full items-center gap-3 px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100"
         >
           <Settings className="h-4 w-4" />
           Settings
@@ -136,7 +136,7 @@ function UserMenu({
             onClose();
             router.push("/home/profile");
           }}
-          className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+          className="flex min-h-[44px] w-full items-center gap-3 px-4 py-3 text-left text-sm text-gray-700 hover:bg-gray-100"
         >
           <User className="h-4 w-4" />
           Profile
@@ -147,7 +147,7 @@ function UserMenu({
       <div className="border-t py-1">
         <button
           onClick={handleLogout}
-          className="flex w-full items-center gap-3 px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50"
+          className="flex min-h-[44px] w-full items-center gap-3 px-4 py-3 text-left text-sm text-red-600 hover:bg-red-50"
         >
           <LogOut className="h-4 w-4" />
           Sign out

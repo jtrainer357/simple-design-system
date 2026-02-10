@@ -32,8 +32,8 @@ const colorBorderStyles: Record<EventColor, string> = {
   gray: "border-l-border",
   red: "border-l-destructive",
   orange: "border-l-primary/80",
-  // purple is an alias for neutral (no actual purple/violet in healthcare app)
-  purple: "border-l-event-neutral-border",
+  // muted is an alias for neutral - for subtle, less prominent events
+  muted: "border-l-event-neutral-border",
 };
 
 const colorBgStyles: Record<EventColor, string> = {
@@ -45,8 +45,8 @@ const colorBgStyles: Record<EventColor, string> = {
   gray: "bg-muted/80",
   red: "bg-destructive/10",
   orange: "bg-primary/15",
-  // purple is an alias for neutral (no actual purple/violet in healthcare app)
-  purple: "bg-event-neutral-bg/80",
+  // muted is an alias for neutral - for subtle, less prominent events
+  muted: "bg-event-neutral-bg/80",
 };
 
 interface TimeSlot {

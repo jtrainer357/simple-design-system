@@ -12,7 +12,7 @@ export type EventColor =
   | "gray"
   | "red"
   | "orange"
-  | "purple";
+  | "muted";
 
 interface CalendarEventCardProps {
   title: string;
@@ -75,8 +75,8 @@ const colorStyles: Record<
     borderLeft: "border-l-primary/80",
     borderOuter: "border-primary/20",
   },
-  // purple is an alias for neutral (no actual purple colors in healthcare app)
-  purple: {
+  // muted is an alias for neutral - for subtle, less prominent events
+  muted: {
     bg: "bg-event-neutral-bg/80",
     text: "text-foreground",
     borderLeft: "border-l-event-neutral-border",
