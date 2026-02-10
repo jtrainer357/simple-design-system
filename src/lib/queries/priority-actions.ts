@@ -7,6 +7,8 @@ import { createClient } from "@/src/lib/supabase/client";
 import { createLogger } from "@/src/lib/logger";
 import type { PriorityActionWithPatient, PriorityAction, Patient } from "@/src/lib/supabase/types";
 import { DEMO_PRACTICE_ID } from "@/src/lib/utils/demo-date";
+import { SYNTHETIC_PRIORITY_ACTIONS } from "@/src/lib/data/synthetic-priority-actions";
+import { getExternalIdFromUUID } from "@/src/lib/data/synthetic-adapter";
 
 const log = createLogger("queries/priority-actions");
 
@@ -103,8 +105,42 @@ export interface PatientPriorityAction {
 }
 
 /**
+ * Get synthetic priority actions for a patient (fallback when DB unavailable)
+ * Handles both UUID (from UI) and external_id (from synthetic data)
+ */
+function getSyntheticPatientActions(patientId: string): PatientPriorityAction[] {
+  const urgencyOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
+
+  // Convert UUID to external_id if needed (demo patients use UUIDs in UI)
+  const externalId = getExternalIdFromUUID(patientId) || patientId;
+
+  return SYNTHETIC_PRIORITY_ACTIONS.filter(
+    (action) => action.patient_id === externalId && action.status === "pending"
+  )
+    .map((action) => ({
+      id: action.id,
+      practice_id: action.practice_id,
+      patient_id: patientId, // Return the original patientId for consistency
+      title: action.title,
+      urgency: action.urgency,
+      timeframe: action.timeframe,
+      confidence_score: action.confidence_score,
+      clinical_context: action.clinical_context,
+      suggested_actions: action.suggested_actions,
+      status: "active",
+      created_at: action.created_at,
+    }))
+    .sort((a, b) => {
+      const aOrder = urgencyOrder[a.urgency] ?? 4;
+      const bOrder = urgencyOrder[b.urgency] ?? 4;
+      return aOrder - bOrder;
+    });
+}
+
+/**
  * Get priority actions for a specific patient
  * Queries substrate_actions table (created by substrate intelligence engine)
+ * Falls back to synthetic data when Supabase is unavailable
  * @param patientId - The patient's UUID
  * @param practiceId - The practice ID for tenant scoping (defaults to demo practice)
  */
@@ -114,49 +150,63 @@ export async function getPatientPriorityActions(
 ): Promise<PatientPriorityAction[]> {
   const supabase = createClient();
 
-  // Query substrate_actions table
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data, error } = await (supabase as any)
-    .from("substrate_actions")
-    .select("*")
-    .eq("patient_id", patientId)
-    .eq("practice_id", practiceId)
-    .eq("status", "active")
-    .order("created_at", { ascending: false });
+  try {
+    // Query substrate_actions table
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { data, error } = await (supabase as any)
+      .from("substrate_actions")
+      .select("*")
+      .eq("patient_id", patientId)
+      .eq("practice_id", practiceId)
+      .eq("status", "active")
+      .order("created_at", { ascending: false });
 
-  if (error) {
-    // Log but don't throw - gracefully degrade if table doesn't exist or RLS blocks
-    log.warn("Could not fetch patient priority actions", {
+    if (error) {
+      // Log and fall back to synthetic data
+      log.warn("Could not fetch patient priority actions, using synthetic data", {
+        action: "getPatientPriorityActions",
+        patientId,
+        error: error.message,
+      });
+      return getSyntheticPatientActions(patientId);
+    }
+
+    // If no data from DB, use synthetic
+    if (!data || data.length === 0) {
+      return getSyntheticPatientActions(patientId);
+    }
+
+    // Map substrate_actions fields to PatientPriorityAction format
+    const urgencyOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const actions = data as any[];
+    return actions
+      .map((action) => ({
+        id: action.id,
+        practice_id: action.practice_id,
+        patient_id: action.patient_id,
+        title: action.title,
+        urgency: normalizeUrgency(action.urgency || "medium"),
+        timeframe: action.time_frame || "This week", // substrate_actions uses time_frame
+        confidence_score: action.ai_confidence || 85, // substrate_actions uses ai_confidence
+        clinical_context: action.context || action.ai_reasoning, // substrate_actions uses context
+        suggested_actions: action.suggested_actions,
+        status: action.status || "active",
+        created_at: action.created_at,
+      }))
+      .sort((a, b) => {
+        const aOrder = urgencyOrder[a.urgency] ?? 4;
+        const bOrder = urgencyOrder[b.urgency] ?? 4;
+        return aOrder - bOrder;
+      });
+  } catch {
+    // Fallback to synthetic data on any error
+    log.warn("Priority actions query failed, using synthetic data", {
       action: "getPatientPriorityActions",
       patientId,
-      error: error.message,
     });
-    return [];
+    return getSyntheticPatientActions(patientId);
   }
-
-  // Map substrate_actions fields to PatientPriorityAction format
-  const urgencyOrder = { urgent: 0, high: 1, medium: 2, low: 3 };
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const actions = (data || []) as any[];
-  return actions
-    .map((action) => ({
-      id: action.id,
-      practice_id: action.practice_id,
-      patient_id: action.patient_id,
-      title: action.title,
-      urgency: normalizeUrgency(action.urgency || "medium"),
-      timeframe: action.time_frame || "This week", // substrate_actions uses time_frame
-      confidence_score: action.ai_confidence || 85, // substrate_actions uses ai_confidence
-      clinical_context: action.context || action.ai_reasoning, // substrate_actions uses context
-      suggested_actions: action.suggested_actions,
-      status: action.status || "active",
-      created_at: action.created_at,
-    }))
-    .sort((a, b) => {
-      const aOrder = urgencyOrder[a.urgency] ?? 4;
-      const bOrder = urgencyOrder[b.urgency] ?? 4;
-      return aOrder - bOrder;
-    });
 }
 
 /**

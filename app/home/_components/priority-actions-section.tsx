@@ -3,6 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { PriorityAction } from "@/design-system/components/ui/priority-action";
 import { AIActionCard } from "@/design-system/components/ui/ai-action-card";
 import { Heading, Text } from "@/design-system/components/ui/typography";
@@ -320,6 +321,7 @@ export function PriorityActionsSection({
   onSelectPatient,
   hideHeader = false,
 }: PriorityActionsSectionProps) {
+  const router = useRouter();
   const [actions, setActions] = React.useState<UnifiedAction[]>([]);
   const [todayAppts, setTodayAppts] = React.useState<AppointmentWithPatient[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -592,12 +594,7 @@ export function PriorityActionsSection({
           <Text size="sm" className="text-destructive mt-3">
             {error}
           </Text>
-          <Button
-            variant="outline"
-            size="sm"
-            className="mt-4"
-            onClick={() => window.location.reload()}
-          >
+          <Button variant="outline" size="sm" className="mt-4" onClick={() => router.refresh()}>
             Retry
           </Button>
         </div>

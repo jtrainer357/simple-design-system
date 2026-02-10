@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/design-system/components/ui/button";
 import { Progress } from "@/design-system/components/ui/progress";
 import { SourceSelectionStep } from "./steps/source-selection-step";
@@ -99,6 +100,7 @@ const DEMO_MAPPINGS: ColumnMapping[] = [
 ];
 
 export function ImportWizard() {
+  const router = useRouter();
   const [currentStep, setCurrentStep] = React.useState<ImportStep>("source-selection");
   const [batchId, setBatchId] = React.useState<string | null>(null);
   const [sourceSystem, setSourceSystem] = React.useState<string | null>(null);
@@ -299,7 +301,7 @@ export function ImportWizard() {
             <Button
               className="w-full min-w-[200px] bg-teal-600 hover:bg-teal-700 sm:w-auto"
               size="lg"
-              onClick={() => (window.location.href = "/home")}
+              onClick={() => router.push("/home")}
             >
               Go to Dashboard
             </Button>

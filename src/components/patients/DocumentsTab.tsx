@@ -33,6 +33,7 @@ import {
 import { cn } from "@/design-system/lib/utils";
 import { toast } from "sonner";
 import { createLogger } from "@/src/lib/logger";
+import { openExternalLink } from "@/src/lib/platform/links";
 
 const log = createLogger("DocumentsTab");
 
@@ -126,7 +127,7 @@ export function DocumentsTab({
   const handleDownload = async (doc: PatientDocument) => {
     if (!onDownload) {
       if (doc.url) {
-        window.open(doc.url, "_blank");
+        await openExternalLink(doc.url);
       }
       return;
     }

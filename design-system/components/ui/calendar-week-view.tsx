@@ -78,7 +78,7 @@ export function CalendarWeekView({
     <div
       className={cn("border-border/40 flex flex-col overflow-hidden rounded-xl border", className)}
     >
-      <div className="flex min-h-0 min-w-[800px] flex-1 flex-col overflow-auto">
+      <div className="flex min-h-0 flex-1 flex-col overflow-x-auto md:min-w-0">
         {/* Header with day names */}
         <div className="border-border/40 sticky top-0 z-20 grid grid-cols-[56px_repeat(7,1fr)] rounded-t-xl border-b bg-white/80 backdrop-blur-sm">
           <div className="py-3" /> {/* Time column spacer */}

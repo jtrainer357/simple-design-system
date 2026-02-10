@@ -204,3 +204,70 @@ export async function getSecureKeys(): Promise<string[]> {
 
   return keys;
 }
+
+// ============================================================================
+// Session Storage (Non-Secure, Temporary Storage)
+// ============================================================================
+
+/**
+ * Store a value in session storage
+ * Works across web and native platforms
+ *
+ * @param key - Storage key
+ * @param value - Value to store
+ */
+export function sessionSet(key: string, value: string): void {
+  if (typeof sessionStorage !== "undefined") {
+    try {
+      sessionStorage.setItem(key, value);
+    } catch (e) {
+      log.error("Failed to set session storage", e);
+    }
+  }
+}
+
+/**
+ * Retrieve a value from session storage
+ *
+ * @param key - Storage key
+ * @returns The stored value or null if not found
+ */
+export function sessionGet(key: string): string | null {
+  if (typeof sessionStorage !== "undefined") {
+    try {
+      return sessionStorage.getItem(key);
+    } catch (e) {
+      log.error("Failed to get session storage", e);
+      return null;
+    }
+  }
+  return null;
+}
+
+/**
+ * Remove a value from session storage
+ *
+ * @param key - Storage key
+ */
+export function sessionRemove(key: string): void {
+  if (typeof sessionStorage !== "undefined") {
+    try {
+      sessionStorage.removeItem(key);
+    } catch (e) {
+      log.error("Failed to remove session storage", e);
+    }
+  }
+}
+
+/**
+ * Clear all session storage
+ */
+export function sessionClear(): void {
+  if (typeof sessionStorage !== "undefined") {
+    try {
+      sessionStorage.clear();
+    } catch (e) {
+      log.error("Failed to clear session storage", e);
+    }
+  }
+}

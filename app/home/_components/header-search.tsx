@@ -40,7 +40,7 @@ export function HeaderSearch() {
               )}
             </div>
             <Input
-              className="focus-visible:ring-primary/20 h-11 w-full rounded-full border-none bg-white pr-12 pl-10 text-sm ring-1 ring-black/5 focus-visible:ring-2 lg:h-10"
+              className="focus-visible:ring-primary/20 h-10 w-full rounded-full border-none bg-white pr-12 pl-10 text-sm ring-1 ring-black/5 focus-visible:ring-2 md:h-11"
               placeholder={placeholder}
               value={displayText}
               readOnly

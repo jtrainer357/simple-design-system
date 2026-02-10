@@ -28,6 +28,7 @@ import {
 import { AddOn } from "@/src/lib/addOnsData";
 import { cn } from "@/design-system/lib/utils";
 import { createLogger } from "@/src/lib/logger";
+import { sessionGet, sessionSet, sessionRemove } from "@/src/lib/platform/storage";
 
 const log = createLogger("ExpressSetupModal");
 
@@ -74,7 +75,7 @@ export function ExpressSetupModal({ open, onOpenChange }: ExpressSetupModalProps
 
   // Load saved state on mount
   React.useEffect(() => {
-    const saved = sessionStorage.getItem(STORAGE_KEY);
+    const saved = sessionGet(STORAGE_KEY);
     if (saved) {
       try {
         const data = JSON.parse(saved);
@@ -100,7 +101,7 @@ export function ExpressSetupModal({ open, onOpenChange }: ExpressSetupModalProps
         accountData,
         // Don't save payment data for security
       };
-      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      sessionSet(STORAGE_KEY, JSON.stringify(data));
     }
   }, [step, selectedAddOns, practiceData, accountData, open]);
 
@@ -129,7 +130,7 @@ export function ExpressSetupModal({ open, onOpenChange }: ExpressSetupModalProps
             setIsLoading(false);
             setStep(step + 1);
             // Clear storage after success
-            sessionStorage.removeItem(STORAGE_KEY);
+            sessionRemove(STORAGE_KEY);
           }, 1500);
         } else {
           setStep(step + 1);

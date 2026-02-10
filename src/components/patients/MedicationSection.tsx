@@ -123,7 +123,7 @@ export function MedicationSection({
                   Add Medication
                 </Button>
               </DialogTrigger>
-              <DialogContent className="max-w-md">
+              <DialogContent className="w-[calc(100vw-2rem)] max-w-md sm:w-full">
                 <DialogHeader>
                   <DialogTitle>Add Medication</DialogTitle>
                   <DialogDescription>Add a new medication to the patient's list.</DialogDescription>
@@ -138,7 +138,7 @@ export function MedicationSection({
                       onChange={(e) => setFormData({ ...formData, medicationName: e.target.value })}
                     />
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div className="space-y-2">
                       <Label htmlFor="dosage">Dosage</Label>
                       <Input

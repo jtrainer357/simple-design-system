@@ -206,15 +206,58 @@
     border-color: var(--color-border);
   }
 
+  /* Safe area insets for notched devices (iPhone, modern Android) */
+  :root {
+    --sat: env(safe-area-inset-top, 0px);
+    --sab: env(safe-area-inset-bottom, 0px);
+    --sal: env(safe-area-inset-left, 0px);
+    --sar: env(safe-area-inset-right, 0px);
+  }
+
   body {
     background-color: transparent;
     min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport height for mobile browsers */
     position: relative;
     color: var(--color-foreground);
     font-family: "Akkurat LL", system-ui, sans-serif;
     font-feature-settings:
       "rlig" 1,
       "calt" 1;
+  }
+
+  /* Safe area utility classes for fixed/sticky elements */
+  .safe-area-pt {
+    padding-top: var(--sat);
+  }
+
+  .safe-area-pb {
+    padding-bottom: var(--sab);
+  }
+
+  .safe-area-pl {
+    padding-left: var(--sal);
+  }
+
+  .safe-area-pr {
+    padding-right: var(--sar);
+  }
+
+  .safe-area-inset {
+    padding-top: var(--sat);
+    padding-bottom: var(--sab);
+    padding-left: var(--sal);
+    padding-right: var(--sar);
+  }
+
+  /* Top offset for fixed headers on notched devices */
+  .safe-area-top {
+    top: var(--sat);
+  }
+
+  /* Bottom offset for fixed footers on notched devices */
+  .safe-area-bottom {
+    bottom: var(--sab);
   }
 
   /* Visible focus indicators for keyboard accessibility */

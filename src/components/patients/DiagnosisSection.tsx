@@ -128,7 +128,10 @@ export function DiagnosisSection({
                   Add Diagnosis
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[400px] p-0" align="end">
+              <PopoverContent
+                className="w-[calc(100vw-2rem)] max-w-md p-0 sm:w-[400px]"
+                align="end"
+              >
                 <Command shouldFilter={false}>
                   <CommandInput
                     placeholder="Search ICD-10 codes..."

@@ -9,6 +9,7 @@
 import { createClient } from "@/src/lib/supabase/client";
 import { createLogger } from "@/src/lib/logger";
 import { DEMO_PRACTICE_ID, getDemoToday, getDemoDaysAgo } from "@/src/lib/utils/demo-date";
+import { SYNTHETIC_INVOICES } from "@/src/lib/data/synthetic-billing";
 
 const log = createLogger("queries/billing");
 
@@ -123,7 +124,35 @@ export async function getInvoicesByDateRange(
 }
 
 /**
+ * Convert synthetic billing summary to query format
+ */
+function getSyntheticBillingSummary(): BillingSummary {
+  const totalCharged = SYNTHETIC_INVOICES.reduce((sum, inv) => sum + (inv.charge_amount || 0), 0);
+  const totalCollected = SYNTHETIC_INVOICES.reduce(
+    (sum, inv) => sum + (inv.insurance_paid || 0) + (inv.patient_paid || 0),
+    0
+  );
+  const outstandingAR = SYNTHETIC_INVOICES.reduce((sum, inv) => sum + (inv.balance || 0), 0);
+  const collectionRate = totalCharged > 0 ? (totalCollected / totalCharged) * 100 : 0;
+  const paidCount = SYNTHETIC_INVOICES.filter((inv) => inv.status?.toLowerCase() === "paid").length;
+  const pendingCount = SYNTHETIC_INVOICES.filter(
+    (inv) => inv.status?.toLowerCase() === "pending"
+  ).length;
+
+  return {
+    totalCharged,
+    totalCollected,
+    outstandingAR,
+    collectionRate: Math.round(collectionRate),
+    invoiceCount: SYNTHETIC_INVOICES.length,
+    paidCount,
+    pendingCount,
+  };
+}
+
+/**
  * Get billing summary for a practice (6 month history)
+ * Falls back to synthetic data when Supabase is unavailable
  */
 export async function getBillingSummary(
   practiceId: string = DEMO_PRACTICE_ID
@@ -132,50 +161,53 @@ export async function getBillingSummary(
   const today = getDemoToday();
   const sixMonthsAgo = getDemoDaysAgo(180);
 
-  const { data, error } = await supabase
-    .from("invoices")
-    .select("*")
-    .eq("practice_id", practiceId)
-    .gte("date_of_service", sixMonthsAgo)
-    .lte("date_of_service", today);
+  try {
+    const { data, error } = await supabase
+      .from("invoices")
+      .select("*")
+      .eq("practice_id", practiceId)
+      .gte("date_of_service", sixMonthsAgo)
+      .lte("date_of_service", today);
 
-  if (error) {
-    log.error("Failed to fetch billing summary", error, {
-      action: "getBillingSummary",
-      practiceId,
-    });
+    if (error) {
+      log.warn("Failed to fetch billing summary from DB, using synthetic data", {
+        action: "getBillingSummary",
+        practiceId,
+      });
+      return getSyntheticBillingSummary();
+    }
+
+    // If no data from DB, use synthetic
+    if (!data || data.length === 0) {
+      return getSyntheticBillingSummary();
+    }
+
+    const invoices = data as unknown as Invoice[];
+
+    const totalCharged = invoices.reduce((sum, inv) => sum + (inv.charge_amount || 0), 0);
+    const totalCollected = invoices.reduce(
+      (sum, inv) => sum + (inv.insurance_paid || 0) + (inv.patient_paid || 0),
+      0
+    );
+    const outstandingAR = invoices.reduce((sum, inv) => sum + (inv.balance || 0), 0);
+    const collectionRate = totalCharged > 0 ? (totalCollected / totalCharged) * 100 : 0;
+    const paidCount = invoices.filter((inv) => inv.status?.toLowerCase() === "paid").length;
+    const pendingCount = invoices.filter((inv) => inv.status?.toLowerCase() === "pending").length;
+
     return {
-      totalCharged: 0,
-      totalCollected: 0,
-      outstandingAR: 0,
-      collectionRate: 0,
-      invoiceCount: 0,
-      paidCount: 0,
-      pendingCount: 0,
+      totalCharged,
+      totalCollected,
+      outstandingAR,
+      collectionRate: Math.round(collectionRate),
+      invoiceCount: invoices.length,
+      paidCount,
+      pendingCount,
     };
+  } catch {
+    // Fallback to synthetic data on any error
+    log.warn("Billing query failed, using synthetic data", { action: "getBillingSummary" });
+    return getSyntheticBillingSummary();
   }
-
-  const invoices = (data || []) as unknown as Invoice[];
-
-  const totalCharged = invoices.reduce((sum, inv) => sum + (inv.charge_amount || 0), 0);
-  const totalCollected = invoices.reduce(
-    (sum, inv) => sum + (inv.insurance_paid || 0) + (inv.patient_paid || 0),
-    0
-  );
-  const outstandingAR = invoices.reduce((sum, inv) => sum + (inv.balance || 0), 0);
-  const collectionRate = totalCharged > 0 ? (totalCollected / totalCharged) * 100 : 0;
-  const paidCount = invoices.filter((inv) => inv.status?.toLowerCase() === "paid").length;
-  const pendingCount = invoices.filter((inv) => inv.status?.toLowerCase() === "pending").length;
-
-  return {
-    totalCharged,
-    totalCollected,
-    outstandingAR,
-    collectionRate: Math.round(collectionRate),
-    invoiceCount: invoices.length,
-    paidCount,
-    pendingCount,
-  };
 }
 
 /**

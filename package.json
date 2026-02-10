@@ -47,6 +47,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",
     "@auth/supabase-adapter": "^1.11.1",
+    "@capacitor/browser": "^8.0.0",
     "@google/generative-ai": "^0.24.1",
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.2",

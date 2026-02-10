@@ -99,7 +99,7 @@ export function CalendarEventCard({
       type="button"
       onClick={onClick}
       className={cn(
-        "relative w-full overflow-hidden rounded-md border border-l-[3px] px-2 py-1.5 text-left transition-all hover:brightness-95",
+        "relative min-h-[44px] w-full overflow-hidden rounded-md border border-l-[3px] px-2 py-2 text-left transition-all hover:brightness-95",
         styles.bg,
         styles.borderLeft,
         styles.borderOuter,
